@@ -1,0 +1,59 @@
+:root {
+    --tblr-primary: var(--tblr-indigo);
+}
+
+[data-bs-theme=light]
+{
+    --tblr-primary: var(--tblr-indigo);
+}
+
+.form-check {
+    display: inline-block;
+}
+
+/*
+####################
+# Bootstrap Select #
+####################
+*/
+.form-floating > .form-select
+{
+    padding: 0;
+}
+
+.input-group .btn:focus
+{
+    z-index: unset;
+}
+
+.tabler-select:hover
+{
+    background-color: var(--tblr-bg-forms);
+}
+
+.tabler-select:active
+{
+    background-color: var(--tblr-bg-forms) !important;
+}
+
+.tabler-select
+{
+    background-color: var(--tblr-bg-forms);
+    border: none;
+    height: calc(3.5rem + calc(var(--tblr-border-width) * 2));
+}
+
+/* .tabler-select.dropdown-toggle:after
+{
+    content: none;
+} */
+
+.tabler-select .filter-option-inner-inner
+{
+    padding-top: 1.2rem;
+}
+
+.tabler-select.show
+{
+    background-color: var(--tblr-bg-forms);
+}
