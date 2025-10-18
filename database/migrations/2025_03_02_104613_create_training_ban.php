@@ -15,8 +15,7 @@ return new class extends Migration
         Schema::create('training_bans', function (Blueprint $table) {
             $table->id('training_ban_id');
             $table->unsignedBigInteger('user_id');
-            $table->date('date_from')
-                ->default(DB::raw('CURRENT_DATE'));
+            $table->date('date_from');
             $table->date('date_to');
             $table->text('reason');
             $table->unsignedBigInteger('issuer_id');
