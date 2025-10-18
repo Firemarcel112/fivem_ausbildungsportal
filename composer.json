@@ -8,7 +8,6 @@
     "require": {
         "php": "^8.3",
         "guzzlehttp/guzzle": "^7.9",
-        "itsgoingd/clockwork": "^5.3",
         "laravel/framework": "^12.0",
         "laravel/pulse": "^1.4",
         "laravel/socialite": "^5.19",
@@ -20,6 +19,7 @@
         "stevebauman/purify": "^6.3"
     },
     "require-dev": {
+        "itsgoingd/clockwork": "^5.3",
         "barryvdh/laravel-ide-helper": "^3.6",
         "fakerphp/faker": "^1.23",
         "laravel/pail": "^1.1",
