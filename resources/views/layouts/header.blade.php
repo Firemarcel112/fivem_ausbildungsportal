@@ -3,9 +3,11 @@
         <button aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler collapsed" data-bs-target="#navbar-menu" data-bs-toggle="collapse" type="button">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
+        <div class="navbar-brand d-none-navbar-horizontal pe-0 pe-md-3">
             <a aria-label="{{ config('app.name') }}" href="{{ route('home') }}">
-                <img class="navbar-brand-image" src="">
+                @if (File::exists('storage/images/logo.png'))
+                    <img class="navbar-brand-image" src="{{ asset('storage/images/logo.png') }}">
+                @endif
             </a>
         </div>
         <div class="navbar-nav flex-row order-md-last">
