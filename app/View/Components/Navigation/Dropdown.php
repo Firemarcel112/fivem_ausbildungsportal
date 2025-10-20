@@ -29,7 +29,7 @@ class Dropdown extends Component
         $has_no_permission = in_array('', $any_permission, true) || in_array(null, $any_permission, true);
         $any_permission = array_filter($any_permission);
         if (!empty($any_permission) && !$has_no_permission) {
-            if (!auth()->user()->hasAnyPermission($any_permission)) {
+            if (!auth()?->user()?->hasAnyPermission($any_permission)) {
                 $can_see = false;
             }
         }
