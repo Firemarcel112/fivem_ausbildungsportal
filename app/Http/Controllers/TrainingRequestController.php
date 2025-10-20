@@ -8,11 +8,6 @@ use Illuminate\Http\Request;
 class TrainingRequestController extends Controller
 {
 
-    public function __construct()
-    {
-        $this->middleware('role:ausbilder');
-    }
-
     /**
      * Display a listing of the resource.
      *

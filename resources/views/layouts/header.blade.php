@@ -62,20 +62,16 @@
                     </x-navigation.item>
 
                     @can('is_trainer')
-                        @include('default.components.nav-item-dropdown', [
-                            'icon' => 'login',
-                            'text' => __('general.ausbilder'),
-                            'items' => [
-                                [
-                                    'text' => __('general.ausbilder_dashboard'),
-                                    'route_name' => 'ausbilder.index',
-                                ],
-                                [
-                                    'text' => 'Ausbildungswünsche',
-                                    'route_name' => 'trainings.request.index',
-                                ],
+                        <x-navigation.dropdown :items="[
+                            [
+                                'text' => __('general.ausbilder_dashboard'),
+                                'route_name' => 'ausbilder.index',
                             ],
-                        ])
+                            [
+                                'text' => __('general.ausbildungswuensche'),
+                                'route_name' => 'trainings.request.index',
+                            ],
+                        ]" :text="__('general.ausbilder')" icon="login" />
                     @endcan
 
                     @can('usermanagement.index')
@@ -84,11 +80,18 @@
                         </x-navigation.item>
                     @endcan
 
-                    @if (auth()->check() && auth()->user()->isSuperadmin())
-                        <x-navigation.item icon="x" url="admin.roles.index">
-                            <x-slot:text>{{ __('general.rollen') }}</x-slot:text>
-                        </x-navigation.item>
-                    @endif
+                    <x-navigation.dropdown :items="[
+                        [
+                            'text' => __('general.fraktionen'),
+                            'route_name' => 'administration.fractions.index',
+                            'permission' => 'administration.fractions.edit',
+                        ],
+                        [
+                            'text' => __('general.rollen'),
+                            'route_name' => 'admin.roles.index',
+                            'permission' => 'administration.roles.edit',
+                        ],
+                    ]" :text="__('general.administration')" icon="login" />
                 </ul>
             </div>
         </div>
