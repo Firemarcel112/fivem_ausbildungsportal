@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\Role as EnumsRole;
 use App\Facades\Alert;
 use App\Http\Controllers\Controller;
+use App\Models\PermissionCategorie;
 use App\Models\Role;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Permission;
 
 class RolesController extends Controller
 {
@@ -19,10 +17,8 @@ class RolesController extends Controller
      */
     public function index()
     {
-        if (!Auth::user()->isSuperadmin()) {
-            Alert::addAlert(__('general.keine_berechtigung'), 'danger');
-            return redirect()->back();
-        }
+        $this->checkPermission('administration.roles.edit');
+
         $roles = Role::with(['permissions', 'users'])
             ->get();
         return view('admin.roles.index', compact('roles'));
@@ -35,16 +31,20 @@ class RolesController extends Controller
      */
     public function edit(Role $role)
     {
-        if (!Auth::user()->isSuperadmin()) {
-            Alert::addAlert(__('general.keine_berechtigung'), 'danger');
-            return redirect()->back();
-        }
+        $this->checkPermission('administration.roles.edit');
 
-        $permissions = Permission::get();
+        $permission_categories = PermissionCategorie::with('permissions')
+            ->orderByDefault()
+            ->get();
+
         $permission_names = $role->permissions
             ->pluck('name')
             ->toArray();
-        return view('admin.roles.edit', compact('role', 'permissions', 'permission_names'));
+        return view('admin.roles.edit', compact(
+            'role',
+            'permission_categories',
+            'permission_names'
+        ));
     }
 
     /**
@@ -54,10 +54,8 @@ class RolesController extends Controller
      */
     public function update(Request $request, Role $role)
     {
-        if (!Auth::user()->isSuperadmin()) {
-            Alert::addAlert(__('general.keine_berechtigung'), 'danger');
-            return redirect()->back();
-        }
+        $this->checkPermission('administration.roles.edit');
+
         foreach ($request->permissions as $key => $value) {
             if ($value) {
                 $role->givePermissionTo($key);
@@ -69,12 +67,15 @@ class RolesController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Rolle Speichern
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function store(Request $request)
     {
-        if (!Auth::user()->isSuperadmin()) {
-            Alert::addAlert(__('general.keine_berechtigung'), 'danger');
-            return redirect()->back();
-        }
+        $this->checkPermission('administration.roles.edit');
 
         $request->validate([
             'name' => 'required|unique:roles,name',

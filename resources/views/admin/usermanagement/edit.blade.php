@@ -4,7 +4,7 @@
     <div class="container-xl space-y">
         <div class=" mb-4 row g-2 align-items-center">
             <div class="col">
-                <div class="page-pretitle text-blue">
+                <div class="page-pretitle">
                     {{ __('general.benutzerverwaltung') }}
                 </div>
                 <h2 class="page-title">
@@ -156,28 +156,33 @@
                                     @endif
                                 @endforeach
                             @endif
-                            @if ($permissions->isNotEmpty())
+                            @if ($permission_categories->isNotEmpty())
                                 <tr>
                                     <td class="text-center text-white bg-secondary" colspan="2">{{ __('general.berechtigungen') }}</td>
                                 </tr>
-                                @foreach ($permissions as $permission)
+                                @foreach ($permission_categories as $category)
                                     <tr>
-                                        <td>{{ $permission->getTranslatedName() }}</td>
-                                        <td>
-                                            <div class="d-flex">
-                                                <label class="form-check form-switch form-switch-3">
-                                                    <input name="permissions[{{ $permission->id }}]" type="hidden" value="0">
-                                                    <input @checked($has_permission_to[$permission->name]) class="form-check-input" name="permissions[{{ $permission->id }}]" type="checkbox" value="1" value="{{ $permission->getTranslatedName() }}">
-                                                </label>
-                                                @if (!$has_direct_permission_to[$permission->name] && $has_permission_to[$permission->name] && empty($permission_from_role_id[$permission->name]))
-                                                    <x-icon :hovertext="__('general.recht_geerbt')" name="info-circle" />
-                                                @endif
-                                                @if (!empty($permission_from_role_id[$permission->name]))
-                                                    <x-icon :hovertext="__('general.recht_von_rolle_geerbt')" name="info-circle" />
-                                                @endif
-                                            </div>
-                                        </td>
+                                        <td class="text-center text-white bg-info" colspan="2">{{ $category->getName() }}</td>
                                     </tr>
+                                    @foreach ($category->permissions as $permission)
+                                        <tr>
+                                            <td>{{ $permission->getTranslatedName() }}</td>
+                                            <td>
+                                                <div class="d-flex">
+                                                    <label class="form-check form-switch form-switch-3">
+                                                        <input name="permissions[{{ $permission->id }}]" type="hidden" value="0">
+                                                        <input @checked($has_permission_to[$permission->name]) class="form-check-input" name="permissions[{{ $permission->id }}]" type="checkbox" value="1" value="{{ $permission->getTranslatedName() }}">
+                                                    </label>
+                                                    @if (!$has_direct_permission_to[$permission->name] && $has_permission_to[$permission->name] && empty($permission_from_role_id[$permission->name]))
+                                                        <x-icon :hovertext="__('general.recht_geerbt')" name="info-circle" />
+                                                    @endif
+                                                    @if (!empty($permission_from_role_id[$permission->name]))
+                                                        <x-icon :hovertext="__('general.recht_von_rolle_geerbt')" name="info-circle" />
+                                                    @endif
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
                                 @endforeach
                             @endif
                         </table>

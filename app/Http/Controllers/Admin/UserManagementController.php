@@ -8,7 +8,7 @@ use App\Facades\Alert;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserStoreRequest;
 use App\Models\Fractions\Fraction;
-use App\Models\Permission;
+use App\Models\PermissionCategorie;
 use App\Models\Qualifications\Qualification;
 use App\Models\User;
 use App\Models\User\Account;
@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
 class UserManagementController extends Controller
@@ -117,9 +118,13 @@ class UserManagementController extends Controller
         }
         $user->load('account.fractions');
         $fractions = Fraction::get();
-        $permissions = Permission::get();
-        $permission_names = $permissions
-            ->pluck('name')
+        $permission_categories = PermissionCategorie::with('permissions')
+            ->orderByDefault()
+            ->get();
+
+        $permission_names = $permission_categories
+            ->pluck('permissions.*.name')
+            ->flatten()
             ->toArray();
 
         $has_direct_permission_to = [];
@@ -145,7 +150,7 @@ class UserManagementController extends Controller
         return view('admin.usermanagement.edit', compact(
             'user',
             'fractions',
-            'permissions',
+            'permission_categories',
             'role_permissions',
             'roles',
             'has_permission_to',
@@ -204,7 +209,8 @@ class UserManagementController extends Controller
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
             return redirect()->back();
         }
-        $new_password = fake()->password();
+        $new_password = Str::random(12);
+
         DB::beginTransaction();
         $user = new User();
         $user->setName($request->input('username'));
@@ -291,7 +297,7 @@ class UserManagementController extends Controller
         ];
         $user->setName($account_data['username']);
         if ($account_data['change_password']) {
-            $new_password = fake()->password(8);
+            $new_password = Str::random(12);
             $user->setPassword($new_password);
             Alert::addAlert(__('general.neues_passwort', ['password' => $new_password]), 'warning');
         }

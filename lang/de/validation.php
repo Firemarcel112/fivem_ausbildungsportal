@@ -165,6 +165,10 @@ return [
         'fraction' => 'Fraktion',
         'password' => 'Passwort',
         'default_fractions' => 'Standardfraktion',
+        'name' => 'Name',
+        'short_name' => 'Kürzel',
+        'discord_webhook' => 'Discord Webhook (Ankündigungen)',
+        'discord_webhook_completed' => 'Discord Webhook (Abschluss)',
     ],
     'custom' => [
         'attribute-name' => [
