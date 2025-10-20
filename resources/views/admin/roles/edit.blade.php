@@ -32,21 +32,26 @@
                                     <th>{{ __('general.zuweisung') }}</th>
                                 </tr>
                             </thead>
-                            @foreach ($permissions as $permission)
-                                @php
-                                    $has_permission_to = $role->hasPermissionTo($permission);
-                                @endphp
+                            @foreach ($permission_categories as $category)
                                 <tr>
-                                    <td>{{ $permission->getTranslatedName() }}</td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <label class="form-check form-switch form-switch-3">
-                                                <input name="permissions[{{ $permission->id }}]" type="hidden" value="0">
-                                                <input @checked($has_permission_to) class="form-check-input" name="permissions[{{ $permission->id }}]" type="checkbox" value="1" value="{{ $permission->name }}">
-                                            </label>
-                                        </div>
-                                    </td>
+                                    <td class="text-center text-white bg-info" colspan="2">{{ $category->getName() }}</td>
                                 </tr>
+                                @foreach ($category->permissions as $permission)
+                                    @php
+                                        $has_permission_to = $role->hasPermissionTo($permission);
+                                    @endphp
+                                    <tr>
+                                        <td>{{ $permission->getTranslatedName() }}</td>
+                                        <td>
+                                            <div class="d-flex">
+                                                <label class="form-check form-switch form-switch-3">
+                                                    <input name="permissions[{{ $permission->id }}]" type="hidden" value="0">
+                                                    <input @checked($has_permission_to) class="form-check-input" name="permissions[{{ $permission->id }}]" type="checkbox" value="1" value="{{ $permission->name }}">
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
                             @endforeach
                         </table>
                     </div>

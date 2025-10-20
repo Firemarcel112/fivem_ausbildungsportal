@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Spatie\Permission\Models\Permission as SpatiePermission;
 
 /**
@@ -36,8 +37,150 @@ class Permission extends SpatiePermission
     protected $table = 'permissions';
     protected $primaryKey = 'id';
 
+    #########################
+    # CUSTOM FUNCTIONS
+    #########################
+
     public function getTranslatedName()
     {
         return __('permissions.' . $this->name);
+    }
+
+    #########################
+    # SCOPES
+    #########################
+
+    #########################
+    # RELATIONS
+    #########################
+
+    #########################
+    # GET & SET
+    #########################
+
+    /**
+     * Get the id attribute.
+     *
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set the id attribute.
+     *
+     * @param int $value
+     * @return void
+     */
+    public function setId(int $value)
+    {
+        $this->id = $value;
+    }
+
+    /**
+     * Get the name attribute.
+     *
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Set the name attribute.
+     *
+     * @param string $value
+     * @return void
+     */
+    public function setName(string $value)
+    {
+        $this->name = $value;
+    }
+
+    /**
+     * Get the guard_name attribute.
+     *
+     * @return string
+     */
+    public function getGuardName(): string
+    {
+        return $this->guard_name;
+    }
+
+    /**
+     * Set the guard_name attribute.
+     *
+     * @param string $value
+     * @return void
+     */
+    public function setGuardName(string $value)
+    {
+        $this->guard_name = $value;
+    }
+
+    /**
+     * Get the created_at attribute.
+     *
+     * @return ?Carbon
+     */
+    public function getCreated(): ?Carbon
+    {
+        return is_null($this->created_at) ? null : Carbon::parse($this->created_at);
+    }
+
+    /**
+     * Set the created_at attribute.
+     *
+     * @param ?Carbon $value
+     * @return void
+     */
+    public function setCreated(?Carbon $value)
+    {
+        $this->created_at = $value;
+    }
+
+    /**
+     * Get the updated_at attribute.
+     *
+     * @return ?Carbon
+     */
+    public function getUpdated(): ?Carbon
+    {
+        return is_null($this->updated_at) ? null : Carbon::parse($this->updated_at);
+    }
+
+    /**
+     * Set the updated_at attribute.
+     *
+     * @param ?Carbon $value
+     * @return void
+     */
+    public function setUpdated(?Carbon $value)
+    {
+        $this->updated_at = $value;
+    }
+
+    /**
+     * Get the categorie_id attribute.
+     *
+     * @return ?int
+     */
+    public function getCategorieId(): ?int
+    {
+        return $this->categorie_id;
+    }
+
+    /**
+     * Set the categorie_id attribute.
+     *
+     * @param ?int $value
+     * @return void
+     */
+    public function setCategorieId(?int $value)
+    {
+        $this->categorie_id = $value;
     }
 }

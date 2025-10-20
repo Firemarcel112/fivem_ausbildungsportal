@@ -113,4 +113,28 @@ Route::middleware(['auth', 'alerts'])
                 Route::post('zuweisen/{user}', 'assign')
                     ->name('user.assign');
             });
+
+        Route::prefix('administration')
+            ->name('administration.')
+            ->group(function () {
+                Route::prefix('fractions')
+                    ->name('fractions.')
+                    ->controller(\App\Http\Controllers\Administration\FractionsController::class)
+                    ->group(function () {
+                        Route::get('', 'index')
+                            ->name('index');
+
+                        Route::post('store', 'store')
+                            ->name('store');
+
+                        Route::get('{fraction}/bearbeiten', 'edit')
+                            ->name('edit');
+
+                        Route::post('{fraction}/update', 'update')
+                            ->name('update');
+
+                        Route::post('{fraction}/destroy', 'destroy')
+                            ->name('destroy');
+                    });
+            });
     });

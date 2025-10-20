@@ -83,8 +83,8 @@ class GenerateModelFunctions extends Command
 
             // Prüfen, ob Getter oder Setter bereits existiert
             if (
-                $this->methodExistsInContent($model_content, "get{$method_suffix}Attribute") ||
-                $this->methodExistsInContent($model_content, "set{$method_suffix}Attribute")
+                $this->methodExistsInContent($model_content, "get{$method_suffix}") ||
+                $this->methodExistsInContent($model_content, "set{$method_suffix}")
             ) {
                 $this->warn("⚠️  Überspringe {$column} — Accessor oder Mutator existiert bereits.");
                 continue;
@@ -272,6 +272,7 @@ EOT;
         if ($method_name == 'setCreatedAt' || $method_name == 'setUpdatedAt') {
             return true;
         }
+
         return strpos($content, "function {$method_name}") !== false;
     }
 }

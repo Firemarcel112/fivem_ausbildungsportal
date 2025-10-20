@@ -2,28 +2,61 @@
 
 namespace Database\Seeders\Production;
 
-use App\Models\Fractions\Fraction;
 use Artisan;
+use App\Models\Permission;
+use App\Models\PermissionCategorie;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Permission;
 
 class AddPermissions extends Seeder
 {
 
     public array $permissions = [
-        'is_trainer',
-        'user.qualifications.assign',
-        'usermanagement.index',
-        'usermanagement.store',
-        'usermanagement.edit.account_data',
-        'usermanagement.edit.personal_data',
-        'usermanagement.edit.permissions',
-        'trainings.delete',
-        'trainingban.assign',
-        'trainingban.show_internal_reason',
-        'trainings.store',
-        'trainings.participants.show',
-        'announcements',
+        'Ausbilder' => [
+            'permissions' => [
+                'is_trainer',
+                'announcements',
+            ],
+            'rank' => 10,
+        ],
+        'Qualifikationen' => [
+            'permissions' => [
+                'user.qualifications.assign',
+            ],
+            'rank' => 50,
+        ],
+        'Benutzerverwaltung' => [
+            'permissions' => [
+                'usermanagement.index',
+                'usermanagement.store',
+                'usermanagement.edit.account_data',
+                'usermanagement.edit.personal_data',
+                'usermanagement.edit.permissions',
+            ],
+            'rank' => 40,
+        ],
+        'Ausbildungen' => [
+            'permissions' => [
+                'trainings.delete',
+                'trainings.store',
+                'trainings.participants.show',
+            ],
+            'rank' => 20,
+        ],
+        'Ausbildungssperren' => [
+            'permissions' => [
+                'trainingban.assign',
+                'trainingban.show_internal_reason',
+            ],
+            'rank' => 30,
+        ],
+        'Administration' => [
+            'permissions' => [
+                'administration.roles.edit',
+                'administration.fractions.edit',
+                'administration.fractions.delete',
+            ],
+            'rank' => 100,
+        ],
     ];
 
     /**
@@ -31,11 +64,25 @@ class AddPermissions extends Seeder
      */
     public function run(): void
     {
-        foreach ($this->permissions as $permission) {
-            $model = Permission::firstOrNew(['name' => $permission]);
 
+        foreach ($this->permissions as $name => $categorie) {
+            $model = PermissionCategorie::firstOrNew([
+                'name' => $name,
+            ]);
+            $model->setRank($categorie['rank'] ?? 0);
             $model->save();
+
+            foreach ($categorie['permissions'] as $permission_name) {
+                $permission = Permission::firstOrNew(
+                    [
+                        'name' => $permission_name
+                    ]
+                );
+                $permission->setCategorieId($model->getId());
+                $permission->save();
+            }
         }
+
         Artisan::call('permission:cache-reset');
     }
 }
