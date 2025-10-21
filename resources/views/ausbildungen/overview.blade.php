@@ -28,7 +28,7 @@
                 <x-slot:body>
                     <form action="{{ route('ausbildung.update', $training) }}" class="space-y" method="POST" x-data="{
                         trainer_id: @js($training->getTrainerId()),
-                        date: @js($training->getDate()->format('y-m-d')),
+                        date: @js($training->getDate()->format('Y-m-d')),
                         time: @js($training->getTime()->format('H:i')),
                         min_participants: @js($training->getMinParticipants()),
                         max_participants: @js($training->getMaxParticipants()),
