@@ -16,9 +16,13 @@ abstract class Controller extends BaseController
      */
     public function checkPermission($permission)
     {
-        if (Auth::check() && !Auth::user()->hasPermissionTo($permission)) {
+        if (!Auth::check()) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
-            return redirect()->back();
+            abort(403);
+        }
+        if (!Auth::user()->hasPermissionTo($permission)) {
+            Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+            abort(403);
         }
         return true;
     }
