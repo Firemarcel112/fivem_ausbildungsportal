@@ -2,17 +2,8 @@
 
 namespace App\Http\Controllers\Ausbilder;
 
-use App\Enums\Role;
-use App\Facades\Alert;
 use App\Http\Controllers\Controller;
-use App\Models\AlgorithmenKategorie;
-use App\Models\Ausbildung;
-use App\Models\Fractions\Fraction;
-use App\Models\Fraktion;
-use App\Models\Qualifications\Qualification;
-use App\Models\Qualifikation;
 use App\Models\Trainings\Training;
-use App\Models\User;
 
 class OverviewController extends Controller
 {
