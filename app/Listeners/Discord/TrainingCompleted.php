@@ -128,17 +128,20 @@ class TrainingCompleted implements ShouldQueue
             return $absent_participants_ids->contains($id);
         });
 
-        foreach ($request->notices ?? [] as $key => $notice) {
-            $results['Notizen'][$key] = $notice;
-        }
-
+        $results['Notizen'] = $participants_data->filter(function ($participant, $id) use ($request) {
+            return !empty($request['notices'][$id]);
+        })
+            ->map(function ($participant, $id) use ($request) {
+                $participant['notice'] = $request['notices'][$id] ?? null;
+                return $participant;
+            });
         /** @var Participant $participant */
         foreach ($participants as $participant) {
             $participant->setPresent($results['Anwesend']->pluck('id')->contains($participant->getId()) ? 1 : 0);
             $participant->setPassed($results['bestanden']->pluck('id')->contains($participant->getId()) ? 1 : 0);
             $participant->setLoggedOut($results['abgemeldet']->pluck('id')->contains($participant->getId()) ? 1 : 0);
-            if (!empty($request->notices[$participant->getId()])) {
-                $participant->setNotices($request->notices[$participant->getId()]);
+            if (!empty($results['Notizen'][$participant->getId()])) {
+                $participant->setNotices($results['Notizen'][$participant->getId()]['notice']);
             }
             $participant->save();
             if ($participant->getPassed()) {
@@ -160,17 +163,23 @@ class TrainingCompleted implements ShouldQueue
             switch ($fraction->getShortName()) {
                 default:
                     foreach ($cases as $case) {
-                        if ($case == 'Notizen') {
-                            continue;
-                        }
                         $formated_data[$case] = $results[$case]
                             ->filter(function ($data) use ($fraction) {
                                 return empty($data['fraction']) ? false : ($data['fraction'] == $fraction->getShortName() || $fraction->getMaster());
+                            });
+                        if ($case == 'Notizen' && $fraction->getMaster()) {
+                            $formated_data[$case] = $formated_data[$case]->map(function ($data) {
+                                return '* ' . $data['name'] . " ({$data['fraction']}) \n" . $data['notice'];
                             })
-                            ->map(function ($data) {
-                                return '* ' . $data['name'] . " ({$data['fraction']})";
-                            })
-                            ->implode("\n");
+                                ->implode("\n\n");
+                        } else {
+                            $formated_data[$case] = $formated_data[$case]
+                                ->map(function ($data) {
+                                    return '* ' . $data['name'] . " ({$data['fraction']})";
+                                })
+                                ->implode("\n");
+                        }
+
                         if (!empty($formated_data[$case])) {
                             $fields[] = [
                                 'name' => str_replace('_', ' ', ucwords($case)),

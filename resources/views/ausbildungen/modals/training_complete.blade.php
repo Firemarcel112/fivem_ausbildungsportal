@@ -26,26 +26,31 @@
                 </div>
             </li>
             @foreach ($training->getSortParticipants() as $participant)
-                <li class="list-group-item" x-data="{ note: false, present: false, logged_out: false }">
+                <li class="list-group-item" x-data="{
+                    note: false,
+                    present: false,
+                    logged_out: false,
+                    passed: false,
+                }">
                     <div class="row">
                         <div class="col-6 d-flex align-items-center">
                             <p class="text-center w-100">{{ $participant->getFullName() }}</p>
                         </div>
                         <div class="col-6 text-start">
                             <div>
-                                <label class="form-check form-switch" x-bind:class="{ 'd-none': logged_out == true }">
-                                    <input class="form-check-input" id="anwesend" name="anwesend[{{ $participant->getId() }}]" type="checkbox" value="1" x-model="present">
+                                <label class="form-check form-switch" x-show="!logged_out">
+                                    <input class="form-check-input" id="anwesend" name="anwesend[{{ $participant->getId() }}]" type="checkbox" value="1" x-bind:checked="passed" x-model="present">
                                     <span class="ms-2 form-check-label" for="anwesend">{{ __('general.anwesend') }}</span>
                                 </label>
                             </div>
                             <div>
-                                <label class="form-check form-switch" x-bind:class="{ 'd-none': logged_out == true }">
-                                    <input class="form-check-input" id="bestanden" name="bestanden[{{ $participant->getId() }}]" type="checkbox" value="1">
+                                <label class="form-check form-switch" x-show="!logged_out">
+                                    <input class="form-check-input" id="bestanden" name="bestanden[{{ $participant->getId() }}]" type="checkbox" value="1" x-model="passed">
                                     <span class="ms-2 form-check-label" for="bestanden">{{ __('general.bestanden') }}</span>
                                 </label>
                             </div>
                             <div>
-                                <label class="form-check form-switch" x-bind:class="{ 'd-none': present == true }">
+                                <label class="form-check form-switch" x-show="!present && !passed">
                                     <input class="form-check-input" id="abgemeldet" name="abgemeldet[{{ $participant->getId() }}]" type="checkbox" value="1" x-model="logged_out">
                                     <span class="ms-2 form-check-label" for="abgemeldet">{{ __('general.abgemeldet') }}</span>
                                 </label>
