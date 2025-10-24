@@ -87,6 +87,11 @@
                             'permission' => 'administration.fractions.edit',
                         ],
                         [
+                            'text' => __('general.qualifikationen'),
+                            'route_name' => 'administration.qualifications.index',
+                            'permission' => 'administration.qualifications.edit',
+                        ],
+                        [
                             'text' => __('general.rollen'),
                             'route_name' => 'admin.roles.index',
                             'permission' => 'administration.roles.edit',

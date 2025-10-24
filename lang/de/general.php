@@ -219,4 +219,8 @@ return [
     'fraktion_sicher_loeschen' => 'Möchtest du die Fraktion ":name" wirklich löschen? :br Dieser Vorgang kann nicht rückgängig gemacht werden.',
     'erfolgreich_aktualisiert' => 'Erfolgreich aktualisiert',
     'erfolgreich_geloescht' => 'Erfolgreich gelöscht',
+    'rank' => 'Rang',
+    'qualifikationen' => 'Qualifikationen',
+    'qualifikation_sicher_loeschen' => 'Möchtest du die Qualifikation ":name" wirklich löschen? :br Dieser Vorgang kann nicht rückgängig gemacht werden.',
+    'qualifikation_anlegen' => 'Qualifikation anlegen',
 ];

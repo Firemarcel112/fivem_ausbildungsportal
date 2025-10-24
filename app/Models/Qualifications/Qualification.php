@@ -2,6 +2,7 @@
 
 namespace App\Models\Qualifications;
 
+use App\Events\QualificationAction;
 use App\Models\BaseModel;
 use App\Models\Trainings\Requirement;
 use Carbon\Carbon;
@@ -32,6 +33,13 @@ class Qualification extends BaseModel
 {
     protected $table = 'qualifications';
     protected $primaryKey = 'qualification_id';
+
+    protected $dispatchesEvents = [
+        'created' => QualificationAction::class,
+        'updated' => QualificationAction::class,
+        'deleted' => QualificationAction::class,
+    ];
+
 
     #########################
     # CUSTOM FUNCTIONS

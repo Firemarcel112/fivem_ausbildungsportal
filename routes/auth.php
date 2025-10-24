@@ -136,5 +136,20 @@ Route::middleware(['auth', 'alerts'])
                         Route::post('{fraction}/destroy', 'destroy')
                             ->name('destroy');
                     });
+                Route::prefix('qualifications')
+                    ->name('qualifications.')
+                    ->controller(\App\Http\Controllers\Administration\QualificationsController::class)
+                    ->group(function () {
+                        Route::get('', 'index')
+                            ->name('index');
+                        Route::post('store', 'store')
+                            ->name('store');
+                        Route::get('{qualification}/bearbeiten', 'edit')
+                            ->name('edit');
+                        Route::post('{qualification}/update', 'update')
+                            ->name('update');
+                        Route::post('{qualification}/destroy', 'destroy')
+                            ->name('destroy');
+                    });
             });
     });
