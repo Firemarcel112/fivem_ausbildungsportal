@@ -223,4 +223,8 @@ return [
     'qualifikationen' => 'Qualifikationen',
     'qualifikation_sicher_loeschen' => 'Möchtest du die Qualifikation ":name" wirklich löschen? :br Dieser Vorgang kann nicht rückgängig gemacht werden.',
     'qualifikation_anlegen' => 'Qualifikation anlegen',
+    'voraussetzung_anlegen' => 'Voraussetzung anlegen',
+    'voraussetzung' => 'Voraussetzung',
+    'voraussetzung_bearbeiten' => 'Voraussetzung bearbeiten',
+    'voraussetzung_sicher_loeschen' => 'Möchtest du die Voraussetzung ":name" wirklich löschen? :br Dieser Vorgang kann nicht rückgängig gemacht werden.',
 ];

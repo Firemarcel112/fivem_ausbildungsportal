@@ -2,44 +2,44 @@
 
 namespace App\Models\Qualifications;
 
-use App\Events\QualificationAction;
 use App\Models\BaseModel;
-use App\Models\Qualifications\Requirement;
+use App\Models\Fractions\Fraction;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
+ * @property int $requirement_id
  * @property int $qualification_id
+ * @property int $fraktion_id
  * @property string $name
  * @property int $rank
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
- * @method static Builder<static>|Qualification isOrderByDefault()
- * @method static Builder<static>|Qualification newModelQuery()
- * @method static Builder<static>|Qualification newQuery()
- * @method static Builder<static>|Qualification query()
- * @method static Builder<static>|Qualification whereCreatedAt($value)
- * @method static Builder<static>|Qualification whereName($value)
- * @method static Builder<static>|Qualification whereQualificationId($value)
- * @method static Builder<static>|Qualification whereRank($value)
- * @method static Builder<static>|Qualification whereUpdatedAt($value)
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Requirement> $requirements
- * @property-read int|null $requirements_count
+ * @method static Builder<static>|Requirement isOrderByDefault()
+ * @method static Builder<static>|Requirement newModelQuery()
+ * @method static Builder<static>|Requirement newQuery()
+ * @method static Builder<static>|Requirement query()
+ * @method static Builder<static>|Requirement whereCreatedAt($value)
+ * @method static Builder<static>|Requirement whereFraktionId($value)
+ * @method static Builder<static>|Requirement whereName($value)
+ * @method static Builder<static>|Requirement whereQualificationId($value)
+ * @method static Builder<static>|Requirement whereRank($value)
+ * @method static Builder<static>|Requirement whereRequirementId($value)
+ * @method static Builder<static>|Requirement whereUpdatedAt($value)
+ * @property int $fraction_id
+ * @method static Builder<static>|Requirement orderByDefault()
+ * @method static Builder<static>|Requirement whereFractionId($value)
+ * @property-read Fraction|null $fraction
  * @mixin \Eloquent
  */
-class Qualification extends BaseModel
+class Requirement extends BaseModel
 {
-    protected $table = 'qualifications';
-    protected $primaryKey = 'qualification_id';
+    protected $table = 'requirements';
+    protected $primaryKey = 'requirement_id';
 
-    protected $dispatchesEvents = [
-        'created' => QualificationAction::class,
-        'updated' => QualificationAction::class,
-        'deleted' => QualificationAction::class,
-    ];
-
+    protected $guarded = ['requirement_id'];
 
     #########################
     # CUSTOM FUNCTIONS
@@ -50,28 +50,27 @@ class Qualification extends BaseModel
     #########################
 
     /**
-     * Scope für Standardsortierung
-     * @param Builder $query
+     * Legt die Standardsortierung fest
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return Builder
      */
-    public function scopeIsOrderByDefault(Builder $query)
+    public function scopeOrderByDefault(Builder $query)
     {
-        return $query->orderBy('rank')
-            ->orderBy('name');
+        return $query->orderBy('rank');
     }
 
     #########################
     # RELATIONS
-    ########################
+    #########################
 
-    public function requirements()
+    public function fraction()
     {
-        return $this->hasMany(
-            Requirement::class,
-            'qualification_id',
-            'qualification_id'
-        )
-            ->orderByDefault();
+        return $this->belongsTo(
+            Fraction::class,
+            'fraction_id',
+            'fraction_id'
+        );
     }
 
     #########################
@@ -79,24 +78,45 @@ class Qualification extends BaseModel
     #########################
 
     /**
-     * Get the qualification_id attribute.
+     * Get the requirement_id attribute.
      *
      * @return int
      */
     public function getId(): int
     {
-        return $this->qualification_id;
+        return $this->requirement_id;
     }
 
     /**
-     * Set the qualification_id attribute.
+     * Set the requirement_id attribute.
      *
      * @param int $value
      * @return void
      */
     public function setId(int $value)
     {
-        $this->qualification_id = $value;
+        $this->requirement_id = $value;
+    }
+
+    /**
+     * Get the requirement_id attribute.
+     *
+     * @return int
+     */
+    public function getRequirementId(): int
+    {
+        return $this->requirement_id;
+    }
+
+    /**
+     * Set the requirement_id attribute.
+     *
+     * @param int $value
+     * @return void
+     */
+    public function setRequirementId(int $value)
+    {
+        $this->requirement_id = $value;
     }
 
     /**
@@ -118,6 +138,27 @@ class Qualification extends BaseModel
     public function setQualificationId(int $value)
     {
         $this->qualification_id = $value;
+    }
+
+    /**
+     * Get the fraction_id attribute.
+     *
+     * @return int
+     */
+    public function getFractionId(): int
+    {
+        return $this->fraction_id;
+    }
+
+    /**
+     * Set the fraction_id attribute.
+     *
+     * @param int $value
+     * @return void
+     */
+    public function setFractionId(int $value)
+    {
+        $this->fraction_id = $value;
     }
 
     /**

@@ -56,6 +56,7 @@ class AddPermissions extends Seeder
                 'administration.fractions.delete',
                 'administration.qualifications.edit',
                 'administration.qualifications.delete',
+                'administration.requirements.delete',
             ],
             'rank' => 100,
         ],

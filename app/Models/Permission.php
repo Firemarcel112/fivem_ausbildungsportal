@@ -29,6 +29,8 @@ use Spatie\Permission\Models\Permission as SpatiePermission;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission withoutRole($roles, $guard = null)
+ * @property int|null $categorie_id
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission whereCategorieId($value)
  * @mixin \Eloquent
  */
 class Permission extends SpatiePermission

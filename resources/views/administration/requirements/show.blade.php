@@ -8,15 +8,18 @@
                     {{ __('general.administration') }}
                 </div>
                 <h2 class="page-title">
-                    {{ __('general.qualifikationen') }}
+                    {{ __('general.voraussetzungen') }}: {{ $qualification->getName() }}
                 </h2>
             </div>
             <div class="col-auto ms-auto d-print-none">
                 <div class="btn-list">
-                    <a class="btn btn-primary" data-bs-target="#create-new-qualification" data-bs-toggle="modal">
-                        <x-icon :classes="['me-2']" name="plus" />{{ __('general.qualifikation_anlegen') }}
+                    <a class="btn btn-primary" data-bs-target="#create-new-requirement" data-bs-toggle="modal">
+                        <x-icon :classes="['me-2']" name="plus" />{{ __('general.voraussetzung_anlegen') }}
                     </a>
-                    @include('administration.qualifications.modals.create')
+                    @include('administration.requirements.modals.create', [
+                        'fractions' => $fractions,
+                        'qualification' => $qualification,
+                    ])
                 </div>
             </div>
         </div>
@@ -28,33 +31,38 @@
                         <tr>
                             <th>{{ __('general.id') }}</th>
                             <th>{{ __('general.name') }}</th>
+                            <th>{{ __('general.fraktion') }}</th>
                             <th>{{ __('general.rank') }}</th>
                             <th></th>
                         </tr>
-                        @foreach ($qualifications as $qualification)
+                        @foreach ($requirements as $requirement)
                             <tr>
                                 <td>
-                                    {{ $qualification->getId() }}
+                                    {{ $requirement->getId() }}
                                 </td>
                                 <td>
-                                    {{ $qualification->getName() }}
+                                    {{ $requirement->getName() }}
                                 </td>
                                 <td>
-                                    {{ $qualification->getRank() }}
+                                    {{ $requirement->fraction->getName() }}
+                                </td>
+                                <td>
+                                    {{ $requirement->getRank() }}
                                 </td>
                                 <td class="text-end">
-                                    <a class="btn btn-primary btn-sm me-2" href="{{ route('administration.requirements.show', $qualification) }}">
-                                        <x-icon :hovertext="__('general.voraussetzungen')" name="shield-question" />
-                                    </a>
-                                    <a class="btn btn-primary btn-sm me-2" href="{{ route('administration.qualifications.edit', $qualification) }}">
+                                    <a class="btn btn-primary btn-sm me-2" href="{{ route('administration.requirements.edit', [
+                                        'qualification' => $qualification,
+                                        'requirement' => $requirement,
+                                    ]) }}">
                                         <x-icon :hovertext="__('general.bearbeiten')" name="edit" />
                                     </a>
-                                    <a class="btn btn-danger btn-sm" data-bs-target="#qualification-{{ $qualification->getId() }}-delete" data-bs-toggle="modal">
+                                    <a class="btn btn-danger btn-sm" data-bs-target="#requirement-{{ $requirement->getId() }}-delete" data-bs-toggle="modal">
                                         <x-icon :hovertext="__('general.loeschen')" name="trash" />
                                     </a>
                                 </td>
                             </tr>
-                            @include('administration.qualifications.modals.delete', [
+                            @include('administration.requirements.modals.delete', [
+                                'requirement' => $requirement,
                                 'qualification' => $qualification,
                             ])
                         @endforeach

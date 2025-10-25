@@ -33,6 +33,7 @@ class QualificationsController extends Controller
      */
     public function store(CreateRequest $request)
     {
+        $this->checkPermission('administration.qualifications.edit');
         $qualification = new Qualification();
         $qualification->setName($request->input('name'));
         $qualification->setRank($request->input('rank', 0));
@@ -84,6 +85,7 @@ class QualificationsController extends Controller
     public function destroy(Qualification $qualification)
     {
         $this->checkPermission('administration.qualifications.delete');
+        $qualification->load('requirements');
 
         $exists_trainings = Training::where('qualification_id', $qualification->getId())
             ->exists();
@@ -96,6 +98,10 @@ class QualificationsController extends Controller
             ]), 'danger');
             return redirect()->back();
         }
+
+        $qualification->requirements->each(function ($requirement) {
+            $requirement->delete();
+        });
 
         $qualification->delete();
 

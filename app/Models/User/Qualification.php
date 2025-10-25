@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder<static>|Qualification whereUpdatedAt($value)
  * @method static Builder<static>|Qualification whereUserId($value)
  * @method static Builder<static>|Qualification whereUserQualificationId($value)
+ * @method static Builder<static>|Qualification isQualificationId(int $qualification_id)
  * @mixin \Eloquent
  */
 class Qualification extends BaseModel
