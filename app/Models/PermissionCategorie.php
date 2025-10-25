@@ -1,37 +1,38 @@
 <?php
 
-namespace App\Models\Qualifications;
+namespace App\Models;
 
 use App\Models\BaseModel;
-use App\Models\Qualifications\Requirement;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * @property int $qualification_id
+ * @property int $permission_categorie_id
  * @property string $name
  * @property int $rank
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
- * @method static Builder<static>|Qualification isOrderByDefault()
- * @method static Builder<static>|Qualification newModelQuery()
- * @method static Builder<static>|Qualification newQuery()
- * @method static Builder<static>|Qualification query()
- * @method static Builder<static>|Qualification whereCreatedAt($value)
- * @method static Builder<static>|Qualification whereName($value)
- * @method static Builder<static>|Qualification whereQualificationId($value)
- * @method static Builder<static>|Qualification whereRank($value)
- * @method static Builder<static>|Qualification whereUpdatedAt($value)
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Requirement> $requirements
- * @property-read int|null $requirements_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $permissions
+ * @property-read int|null $permissions_count
+ * @method static Builder<static>|PermissionCategorie newModelQuery()
+ * @method static Builder<static>|PermissionCategorie newQuery()
+ * @method static Builder<static>|PermissionCategorie orderByDefault()
+ * @method static Builder<static>|PermissionCategorie query()
+ * @method static Builder<static>|PermissionCategorie whereCreatedAt($value)
+ * @method static Builder<static>|PermissionCategorie whereName($value)
+ * @method static Builder<static>|PermissionCategorie wherePermissionCategorieId($value)
+ * @method static Builder<static>|PermissionCategorie whereRank($value)
+ * @method static Builder<static>|PermissionCategorie whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class Qualification extends BaseModel
+class PermissionCategorie extends BaseModel
 {
-    protected $table = 'qualifications';
-    protected $primaryKey = 'qualification_id';
+    protected $table = 'permission_categories';
+    protected $primaryKey = 'permission_categorie_id';
+
+    protected $guarded = ['permission_categorie_id'];
 
     #########################
     # CUSTOM FUNCTIONS
@@ -43,27 +44,26 @@ class Qualification extends BaseModel
 
     /**
      * Scope für Standardsortierung
-     * @param Builder $query
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return Builder
      */
-    public function scopeIsOrderByDefault(Builder $query)
+    public function scopeOrderByDefault(Builder $query)
     {
-        return $query->orderBy('rank')
-            ->orderBy('name');
+        return $query->orderBy('rank', 'asc');
     }
 
     #########################
     # RELATIONS
-    ########################
+    #########################
 
-    public function requirements()
+    public function permissions()
     {
         return $this->hasMany(
-            Requirement::class,
-            'qualification_id',
-            'qualification_id'
-        )
-            ->orderByDefault();
+            Permission::class,
+            'categorie_id',
+            'permission_categorie_id'
+        );
     }
 
     #########################
@@ -71,45 +71,45 @@ class Qualification extends BaseModel
     #########################
 
     /**
-     * Get the qualification_id attribute.
+     * Get the permission_categorie_id attribute.
      *
      * @return int
      */
     public function getId(): int
     {
-        return $this->qualification_id;
+        return $this->permission_categorie_id;
     }
 
     /**
-     * Set the qualification_id attribute.
+     * Set the permission_categorie_id attribute.
      *
      * @param int $value
      * @return void
      */
     public function setId(int $value)
     {
-        $this->qualification_id = $value;
+        $this->permission_categorie_id = $value;
     }
 
     /**
-     * Get the qualification_id attribute.
+     * Get the permission_categorie_id attribute.
      *
      * @return int
      */
-    public function getQualificationId(): int
+    public function getPermissionCategorieId(): int
     {
-        return $this->qualification_id;
+        return $this->permission_categorie_id;
     }
 
     /**
-     * Set the qualification_id attribute.
+     * Set the permission_categorie_id attribute.
      *
      * @param int $value
      * @return void
      */
-    public function setQualificationId(int $value)
+    public function setPermissionCategorieId(int $value)
     {
-        $this->qualification_id = $value;
+        $this->permission_categorie_id = $value;
     }
 
     /**

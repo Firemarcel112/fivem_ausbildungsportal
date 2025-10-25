@@ -113,4 +113,58 @@ Route::middleware(['auth', 'alerts'])
                 Route::post('zuweisen/{user}', 'assign')
                     ->name('user.assign');
             });
+
+        Route::prefix('administration')
+            ->name('administration.')
+            ->group(function () {
+                Route::prefix('fractions')
+                    ->name('fractions.')
+                    ->controller(\App\Http\Controllers\Administration\FractionsController::class)
+                    ->group(function () {
+                        Route::get('', 'index')
+                            ->name('index');
+
+                        Route::post('store', 'store')
+                            ->name('store');
+
+                        Route::get('{fraction}/bearbeiten', 'edit')
+                            ->name('edit');
+
+                        Route::post('{fraction}/update', 'update')
+                            ->name('update');
+
+                        Route::post('{fraction}/destroy', 'destroy')
+                            ->name('destroy');
+                    });
+                Route::prefix('qualifications')
+                    ->name('qualifications.')
+                    ->controller(\App\Http\Controllers\Administration\QualificationsController::class)
+                    ->group(function () {
+                        Route::get('', 'index')
+                            ->name('index');
+                        Route::post('store', 'store')
+                            ->name('store');
+                        Route::get('{qualification}/bearbeiten', 'edit')
+                            ->name('edit');
+                        Route::post('{qualification}/update', 'update')
+                            ->name('update');
+                        Route::post('{qualification}/destroy', 'destroy')
+                            ->name('destroy');
+                    });
+                Route::prefix('requirements/{qualification}')
+                    ->name('requirements.')
+                    ->controller(\App\Http\Controllers\Administration\RequirementsController::class)
+                    ->group(function () {
+                        Route::get('', 'show')
+                            ->name('show');
+                        Route::post('store', 'store')
+                            ->name('store');
+                        Route::get('{requirement}/bearbeiten', 'edit')
+                            ->name('edit');
+                        Route::post('{requirement}/update', 'update')
+                            ->name('update');
+                        Route::post('{requirement}/destroy', 'destroy')
+                            ->name('destroy');
+                    });
+            });
     });
