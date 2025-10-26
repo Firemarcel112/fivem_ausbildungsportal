@@ -44,6 +44,16 @@ class Qualification extends BaseModel
     # SCOPES
     #########################
 
+    /**
+     * Scope für Qualifikation-ID
+     * @param Builder $query
+     * @param int $qualification_id
+     */
+    public function scopeIsQualificationId(Builder $query, int $qualification_id)
+    {
+        return $query->where('qualification_id', $qualification_id);
+    }
+
     #########################
     # RELATIONS
     #########################
