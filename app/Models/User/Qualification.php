@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder<static>|Qualification whereUpdatedAt($value)
  * @method static Builder<static>|Qualification whereUserId($value)
  * @method static Builder<static>|Qualification whereUserQualificationId($value)
+ * @method static Builder<static>|Qualification isQualificationId(int $qualification_id)
  * @mixin \Eloquent
  */
 class Qualification extends BaseModel
@@ -42,6 +43,16 @@ class Qualification extends BaseModel
     #########################
     # SCOPES
     #########################
+
+    /**
+     * Scope für Qualifikation-ID
+     * @param Builder $query
+     * @param int $qualification_id
+     */
+    public function scopeIsQualificationId(Builder $query, int $qualification_id)
+    {
+        return $query->where('qualification_id', $qualification_id);
+    }
 
     #########################
     # RELATIONS

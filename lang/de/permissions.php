@@ -17,4 +17,7 @@ return [
     'administration.fractions.edit' => 'Administration: Fraktionen bearbeiten',
     'administration.fractions.delete' => 'Administration: Fraktionen löschen',
     'administration.roles.edit' => 'Administration: Rollen bearbeiten',
+    'administration.qualifications.edit' => 'Administration: Qualifikationen bearbeiten',
+    'administration.qualifications.delete' => 'Administration: Qualifikationen löschen',
+    'administration.requirements.delete' => 'Administration: Voraussetzungen löschen',
 ];

@@ -66,6 +66,8 @@ class FractionsController extends Controller
      */
     public function update(CreateRequest $request, Fraction $fraction)
     {
+        $this->checkPermission('administration.fractions.edit');
+
         $fraction->setName($request->input('name'));
         $fraction->setShortName($request->input('short_name'));
         $fraction->setDiscordWebhook($request->input('discord_webhook'));
