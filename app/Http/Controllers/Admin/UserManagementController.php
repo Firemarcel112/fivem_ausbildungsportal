@@ -363,6 +363,9 @@ class UserManagementController extends Controller
         $user->account->directQualifications->each(function ($qualification) use ($user) {
             $qualification->delete();
         });
+        $user->account->trainings->each(function ($participant) use ($user) {
+            $participant->delete();
+        });
 
         $user->permissions->each(function ($permission) use ($user) {
             $user->revokePermissionTo($permission->name);

@@ -5,6 +5,7 @@ namespace App\Models\User;
 use App\Models\BaseModel;
 use App\Models\Fractions\Fraction;
 use App\Models\Qualifications\Qualification;
+use App\Models\Trainings\Participant;
 use App\Models\User\Fraction as UserFraction;
 use App\Models\User\Qualification as UserQualification;
 use Carbon\Carbon;
@@ -81,6 +82,16 @@ class Account extends BaseModel
     #########################
     # RELATIONS
     #########################
+
+    public function trainings()
+    {
+        return $this->hasMany(
+            Participant::class,
+            'user_id',
+            'user_id'
+        );
+    }
+
 
     public function fractions(): BelongsToMany
     {
