@@ -20,4 +20,5 @@ return [
     'administration.qualifications.edit' => 'Administration: Qualifikationen bearbeiten',
     'administration.qualifications.delete' => 'Administration: Qualifikationen löschen',
     'administration.requirements.delete' => 'Administration: Voraussetzungen löschen',
+    'usermanagement.delete' => 'Benutzerverwaltung: Benutzer löschen',
 ];

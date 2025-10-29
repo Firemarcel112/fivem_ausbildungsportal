@@ -31,14 +31,19 @@
                     <form action="{{ route('usermanagement.update', $user) }}" class="space-y" method="POST">
                         @csrf
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-4">
                                 <x-forms.input :default="$account->getFirstName()" name="first_name" required>
                                     {{ __('general.vorname') }}
                                 </x-forms.input>
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
                                 <x-forms.input :default="$account->getLastName()" name="last_name" required>
                                     {{ __('general.nachname') }}
+                                </x-forms.input>
+                            </div>
+                            <div class="col-4">
+                                <x-forms.input :default="$account->getDateOfBirth()->format('Y-m-d')" name="date_of_birth" required type="date">
+                                    {{ __('general.geburtsdatum') }}
                                 </x-forms.input>
                             </div>
                         </div>

@@ -227,4 +227,5 @@ return [
     'voraussetzung' => 'Voraussetzung',
     'voraussetzung_bearbeiten' => 'Voraussetzung bearbeiten',
     'voraussetzung_sicher_loeschen' => 'Möchtest du die Voraussetzung ":name" wirklich löschen? :br Dieser Vorgang kann nicht rückgängig gemacht werden.',
+    'benutzer_loeschen_confirm' => 'Möchtest du den Benutzer ":name" wirklich löschen? :br Dieser Vorgang kann nicht rückgängig gemacht werden.',
 ];
