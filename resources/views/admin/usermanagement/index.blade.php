@@ -206,6 +206,29 @@
                                             <x-icon :classes="['text-white']" :hovertext="__('general.bearbeiten')" name="edit" />
                                         </a>
                                     @endcan
+                                    @can('usermanagement.delete')
+                                        <x-modal body_classes="text-center" form_action="{{ route('usermanagement.destroy', [$user]) }}" id="delete-user-{{ $user->getId() }}">
+
+                                            <x-slot:title>{{ __('general.loeschen') }}</x-slot:title>
+                                            <x-slot:body>
+                                                <div class="text-center">
+                                                    <x-icon :classes="['text-warning']" name="alert-triangle" width-height="48" />
+                                                </div>
+                                                <p class="text-warning">{!! __('general.benutzer_loeschen_confirm', [
+                                                    'name' => $user->getFullName(),
+                                                    'br' => '<br/>',
+                                                ]) !!}
+                                                </p>
+                                            </x-slot:body>
+                                            <x-slot:footer>
+                                                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">{{ __('general.abbrechen') }}</button>
+                                                <button class="btn btn-danger" type="submit">{{ __('general.loeschen') }}</button>
+                                            </x-slot:footer>
+                                        </x-modal>
+                                        <a class="btn btn-sm btn-danger" data-bs-target="#delete-user-{{ $user->getId() }}" data-bs-toggle="modal">
+                                            <x-icon :classes="['text-white', 'cursor-pointer']" :hovertext="__('general.loeschen')" name="trash" />
+                                        </a>
+                                    @endcan
                                 </td>
                             </tr>
                         @empty

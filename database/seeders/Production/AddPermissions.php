@@ -31,6 +31,7 @@ class AddPermissions extends Seeder
                 'usermanagement.edit.account_data',
                 'usermanagement.edit.personal_data',
                 'usermanagement.edit.permissions',
+                'usermanagement.delete',
             ],
             'rank' => 40,
         ],

@@ -250,10 +250,12 @@ class UserManagementController extends Controller
             'last_name' => $request->input('last_name'),
             'default_fraction' => $request->input('default_fraction', null),
             'fractions' => Arr::flatten($request->input('fraction_ids', [])),
+            'date_of_birth' => Carbon::create($request->input('date_of_birth')),
         ];
         $user_data['fractions'][] = $request->input('default_fraction', null);
         $account = $user->account;
         $account->setFirstName($user_data['first_name']);
+        $account->setDateOfBirth($user_data['date_of_birth']);
         $account->setLastName($user_data['last_name']);
 
         $current_fractions = $account->fractions->pluck('fraction_id')->toArray();
@@ -343,5 +345,35 @@ class UserManagementController extends Controller
             }
             $user->syncRoles($grant_role_id, $revoke_role_id);
         }
+    }
+
+    /**
+     * Löscht einen Benutzer
+     *
+     * @param \App\Models\User $user
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy(User $user)
+    {
+        $this->checkPermission('usermanagement.delete');
+        if ($user->isSuperadmin() || Auth::user()->getId() == $user->getId()) {
+            Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+            return redirect()->back();
+        }
+        $user->account->directQualifications->each(function ($qualification) use ($user) {
+            $qualification->delete();
+        });
+        $user->account->trainings->each(function ($participant) use ($user) {
+            $participant->delete();
+        });
+
+        $user->permissions->each(function ($permission) use ($user) {
+            $user->revokePermissionTo($permission->name);
+        });
+        $user->account->delete();
+        $user->delete();
+
+        Alert::addAlert(__('general.erfolgreich_geloescht'), 'success');
+        return redirect()->back();
     }
 }

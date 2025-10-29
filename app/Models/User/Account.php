@@ -4,13 +4,14 @@ namespace App\Models\User;
 
 use App\Models\BaseModel;
 use App\Models\Fractions\Fraction;
-use App\Models\User\Fraction as UserFraction;
-use Illuminate\Database\Eloquent\Builder;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use App\Models\User\Qualification as UserQualification;
 use App\Models\Qualifications\Qualification;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Models\Trainings\Participant;
+use App\Models\User\Fraction as UserFraction;
+use App\Models\User\Qualification as UserQualification;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $user_account_id
@@ -82,6 +83,16 @@ class Account extends BaseModel
     # RELATIONS
     #########################
 
+    public function trainings()
+    {
+        return $this->hasMany(
+            Participant::class,
+            'user_id',
+            'user_id'
+        );
+    }
+
+
     public function fractions(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -100,6 +111,15 @@ class Account extends BaseModel
             'user_id',
             'qualification_id'
         )->withPivot('created_at', 'training_id');
+    }
+
+    public function directQualifications(): HasMany
+    {
+        return $this->hasMany(
+            UserQualification::class,
+            'user_id',
+            'user_id'
+        );
     }
 
     #########################
