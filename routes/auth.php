@@ -87,6 +87,9 @@ Route::middleware(['auth', 'alerts'])
                 Route::post('update/{user}', 'update')
                     ->name('update')
                     ->where('user', '[0-9]+');
+                Route::post('destroy/{user}', 'destroy')
+                    ->name('destroy')
+                    ->where('user', '[0-9]+');
             });
         Route::prefix('ausbildungen')
             ->name('trainings.')
