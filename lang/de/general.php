@@ -241,4 +241,13 @@ return [
     'frau' => 'Frau',
     'ohne' => 'Ohne',
     'keine_zertifikate' => 'Keine Zertifkate',
+    'dokumente' => 'Dokumente',
+    'keine_dokumente_verfuegbar' => 'Keine Dokumente verfügbar',
+    'zugeordnet_zu' => 'Zugeordnet zu',
+    'nicht_zugeordnet' => 'Nicht zugeordnet',
+    'typ' => 'Typ',
+    'dokument_sicher_loeschen' => 'Möchtest du das Dokument ":name" wirklich löschen? :br Dieser Vorgang kann nicht rückgängig gemacht werden.',
+    'teilnehmer_nicht_vorhanden' => 'Teilnehmer nicht vorhanden',
+    'zertifikat_erstellen' => 'Zertifikat erstellen',
+    'datum_ausbildung' => 'Datum Ausbildung',
 ];

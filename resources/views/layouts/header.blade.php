@@ -80,6 +80,12 @@
                         </x-navigation.item>
                     @endcan
 
+                    @canAny(['documents.show.account'])
+                        <x-navigation.item icon="file" url="documents.index">
+                            <x-slot:text>{{ __('general.dokumente') }}</x-slot:text>
+                        </x-navigation.item>
+                    @endcanany
+
                     <x-navigation.dropdown :items="[
                         [
                             'text' => __('general.fraktionen'),
