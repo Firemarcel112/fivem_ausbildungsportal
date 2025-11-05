@@ -3,10 +3,28 @@
     <x-slot:body>
         <x-forms.input :floating="true" name="username" required>{{ __('general.benutzername') }}</x-forms.input>
 
-        <div class="d-flex ms-auto">
-            <x-forms.input name="first_name" required>{{ __('general.vorname') }}</x-forms.input>
-            <x-forms.input name="last_name" required>{{ __('general.nachname') }}</x-forms.input>
-            <x-forms.input name="date_of_birth" required type="date">{{ __('general.geburtsdatum') }}</x-forms.input>
+        <div class="row">
+            <div class="col">
+                <x-forms.input name="first_name" required>{{ __('general.vorname') }}</x-forms.input>
+            </div>
+            <div class="col">
+                <x-forms.input name="last_name" required>{{ __('general.nachname') }}</x-forms.input>
+            </div>
+            <div class="col">
+                <x-forms.select label="{{ __('general.geschlecht') }}" name="gender" required>
+                    @foreach ($genders as $gender)
+                        <option value="{{ $gender['value'] }}">{{ $gender['name'] }}</option>
+                    @endforeach
+                </x-forms.select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <x-forms.input name="date_of_birth" required type="date">{{ __('general.geburtsdatum') }}</x-forms.input>
+            </div>
+            <div class="col">
+                <x-forms.input name="birth_location" required>{{ __('general.geburtsort') }}</x-forms.input>
+            </div>
         </div>
 
         <div>

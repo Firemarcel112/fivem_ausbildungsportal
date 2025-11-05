@@ -138,7 +138,7 @@
                         @forelse ($training->getSortParticipants() as $participant)
                             <tr>
                                 <td>
-                                    {{ $participant->getFullName() }} ({{ $participant->account->getDefaultFraction()->getShortName() }})
+                                    {{ $participant->account->getSalutation() }} {{ $participant->getFullName() }} ({{ $participant->account->getDefaultFraction()->getShortName() }})
                                     @if (!empty($participant->account))
                                         <a href="{{ route('profile.show', $participant->account) }}" target="_blank">
                                             <x-icon name="external-link" />
@@ -146,7 +146,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    {{ $participant->getBirthDate() }}
+                                    {{ $participant->getBirthDate() }} in {{ $participant->account?->getBirthLocation() }}
                                 </td>
                                 <td>
                                     {{ $participant->getCreated()->format('d.m.Y H:i') }}

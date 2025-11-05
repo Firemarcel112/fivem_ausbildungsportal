@@ -61,6 +61,12 @@ class AddPermissions extends Seeder
             ],
             'rank' => 100,
         ],
+        'Dokumente' => [
+            'permissions' => [
+                'documents.show.account',
+            ],
+            'rank' => 40,
+        ]
     ];
 
     /**

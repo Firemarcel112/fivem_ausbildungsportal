@@ -296,13 +296,29 @@ class User extends Authenticatable implements Auditable
     }
 
     /**
+     * Gibt die Anrede zurück
+     *
+     * @return string
+     */
+    public function getSalutation()
+    {
+        $gender = $this->account?->getGender() ?? 'D';
+
+        return match ($gender) {
+            'M' => __('general.herr'),
+            'W' => __('general.frau'),
+            'D' => '',
+        };
+    }
+
+    /**
      * Gibt den Discord namen oder den Normalen Namen zurück
      *
      * @return string
      */
     public function getDiscordName(): string
     {
-        if (!empty($this->discord)) {
+        if (!empty($this->discord) && !empty(config('services.discord.client_id'))) {
             return $this?->discord?->getUsername() ?? $this->getFullName();
         }
         return $this->getFullName();

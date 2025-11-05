@@ -170,4 +170,12 @@ Route::middleware(['auth', 'alerts'])
                             ->name('destroy');
                     });
             });
+
+        Route::prefix('dokumente')
+            ->name('documents.')
+            ->controller(\App\Http\Controllers\DocumentsController::class)
+            ->group(function () {
+                Route::get('{document}', 'show')
+                    ->name('show');
+            });
     });

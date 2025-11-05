@@ -4,9 +4,9 @@ namespace App\Listeners\Discord;
 
 use App\Enums\Training\Type;
 use App\Events\DiscordNotify;
+use App\Events\TrainingComplete;
 use App\Models\Trainings\Participant;
 use App\Models\Trainings\Training;
-use App\Models\User\Qualification as UserQualification;
 use App\Traits\DiscordTrait;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
@@ -145,12 +145,10 @@ class TrainingCompleted implements ShouldQueue
             }
             $participant->save();
             if ($participant->getPassed()) {
-                $add_qualification = UserQualification::firstOrNew([
-                    'user_id' => $participant->getUserId(),
-                    'qualification_id' => $model->getQualificationId(),
-                ]);
-                $add_qualification->setTrainingId($model->getId());
-                $add_qualification->save();
+                event(new TrainingComplete(
+                    $model,
+                    $participant,
+                ));
             }
         }
         foreach ($fractions as $fraction) {
