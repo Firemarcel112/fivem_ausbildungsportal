@@ -29,6 +29,9 @@ class DocumentsController extends Controller
             abort(403);
         }
 
-        return response()->file($document->getUrl());
+        if (auth()->user()->isSuperadmin() && !$request->has('download')) {
+            return response()->file($document->getUrl());
+        }
+        return response()->download($document->getUrl());
     }
 }
