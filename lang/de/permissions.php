@@ -21,4 +21,8 @@ return [
     'administration.qualifications.delete' => 'Administration: Qualifikationen löschen',
     'administration.requirements.delete' => 'Administration: Voraussetzungen löschen',
     'usermanagement.delete' => 'Benutzerverwaltung: Benutzer löschen',
+    'documents.show.account' => 'Dokumente: Dokumente von Benutzern anzeigen',
+    'documents.edit' => 'Dokumente: Dokumente bearbeiten (zuordnungen ändern)',
+    'documents.create' => 'Dokumente: Dokument manuell erstellen',
+    'documents.delete' => 'Dokumente: Dokument löschen',
 ];

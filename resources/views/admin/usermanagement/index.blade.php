@@ -82,7 +82,7 @@
                                         <div class="flex-fill ms-2">
                                             <div class="font-weight-medium">
                                                 <a class="cursor-pointer" data-bs-title="{{ $user->getDiscordName() }} ({{ $user->getId() }})" data-bs-toggle="tooltip" href="{{ route('profile.show', $user) }}">
-                                                    {{ $user->getFullName() }}
+                                                    {{ $user->getSalutation() }} {{ $user->getFullName() }}
                                                 </a>
                                                 @if ($user->discord && !empty(config('services.discord.client_id')))
                                                     <x-icon :hovertext="__('general.discord_account_verknuepft')" name="discord" />

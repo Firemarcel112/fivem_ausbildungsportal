@@ -31,6 +31,8 @@ class UserStoreRequest extends FormRequest
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'date_of_birth' => ['required', 'date'],
+            'birth_location' => ['required'],
+            'gender' => ['required', 'in:M,W,D'],
             'username' => ['required', 'string', 'max:255', 'unique:users,name'],
             'default_fraction' => ['required', 'integer', 'exists:fractions,fraction_id'],
             'fraction.*' => ['integer', 'exists:fractions,fraction_id'],

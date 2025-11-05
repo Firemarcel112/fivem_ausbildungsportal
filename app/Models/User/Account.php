@@ -3,6 +3,7 @@
 namespace App\Models\User;
 
 use App\Models\BaseModel;
+use App\Models\Document;
 use App\Models\Fractions\Fraction;
 use App\Models\Qualifications\Qualification;
 use App\Models\Trainings\Participant;
@@ -57,6 +58,22 @@ class Account extends BaseModel
     public function getFullName()
     {
         return $this->first_name . ' ' . $this->last_name;
+    }
+
+    /**
+     * Gibt die Anrede zurück
+     *
+     * @return string
+     */
+    public function getSalutation()
+    {
+        $gender = $this?->getGender() ?? 'D';
+
+        return match ($gender) {
+            'M' => __('general.herr'),
+            'W' => __('general.frau'),
+            'D' => '',
+        };
     }
 
     #########################
@@ -120,6 +137,17 @@ class Account extends BaseModel
             'user_id',
             'user_id'
         );
+    }
+
+    public function certificates()
+    {
+        return $this->belongsToMany(
+            Document::class,
+            'documents_link',
+            'link_id',
+            'document_id',
+        )
+            ->where('link_type', 'ACCOUNT');
     }
 
     #########################
@@ -307,5 +335,48 @@ class Account extends BaseModel
     public function setUpdated(?Carbon $value)
     {
         $this->updated_at = $value;
+    }
+
+
+    /**
+     * Get the gender attribute.
+     *
+     * @return mixed
+     */
+    public function getGender(): mixed
+    {
+        return $this->gender;
+    }
+
+    /**
+     * Set the gender attribute.
+     *
+     * @param mixed $value
+     * @return void
+     */
+    public function setGender(mixed $value)
+    {
+        $this->gender = $value;
+    }
+
+    /**
+     * Get the birth_location attribute.
+     *
+     * @return ?string
+     */
+    public function getBirthLocation(): ?string
+    {
+        return $this->birth_location;
+    }
+
+    /**
+     * Set the birth_location attribute.
+     *
+     * @param ?string $value
+     * @return void
+     */
+    public function setBirthLocation(?string $value)
+    {
+        $this->birth_location = $value;
     }
 }

@@ -143,4 +143,18 @@ return [
     'enroll_deadline' => env('ENROLL_DEADLINE', 10),
     // Zeit in Minuten bevor die Ausbildung beginnt ob diese schon abgeschlossen werden darf
     'training_complete_minutes' => (int) env('TRAINING_COMPLETE_MINUTES', 10),
+
+    'certificates' => [
+        'organisation_name' => env('PDF_CERTIFICATE_ORGANISATION_NAME', env('APP_NAME')),
+        'sub_name' => env('PDF_CERTIFICATE_SUB_NAME'),
+    ],
+    'pdf_sign' => [
+        // Pfad zur Jsign java
+        'jsign_path' => env('PDF_SIGN_JSIGNPDF_PATH'),
+        // P12 Key Name im Ordner /storage/private/
+        'p12_key_name' => env('P12_KEY_NAME'),
+        // Password des P12 keys
+        'p12_password' => env('P12_PASSWORD'),
+    ]
+
 ];

@@ -18,7 +18,21 @@ class RegisterController extends Controller
     public function index()
     {
         $fractions = Fraction::get();
-        return view('auth.register', compact('fractions'));
+        $genders = [
+            [
+                'name' => __('general.maennlich') . ' (' . __('general.anrede') . ': ' . __('general.herr') . ')',
+                'value' => 'M',
+            ],
+            [
+                'name' => __('general.weiblich') . ' (' . __('general.anrede') . ': ' . __('general.frau') . ')',
+                'value' => 'W',
+            ],
+            [
+                'name' => __('general.divers') . ' (' . __('general.anrede') . ': ' . __('general.ohne') . ')',
+                'value' => 'D',
+            ],
+        ];
+        return view('auth.register', compact('fractions', 'genders'));
     }
 
     /**
@@ -42,6 +56,8 @@ class RegisterController extends Controller
         $account->setUserId($user->getQueueableId());
         $account->setFirstName($request->input('first_name'));
         $account->setLastName($request->input('last_name'));
+        $account->setGender($request->input('gender'));
+        $account->setBirthLocation($request->input('birth_location'));
         $account->setDateOfBirth(Carbon::create($request->input('date_of_birth')));
         $account->save();
 
