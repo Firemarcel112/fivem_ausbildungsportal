@@ -1,4 +1,8 @@
-<div @class(['card', 'card-' . $size ?? 'md', ...$classes ?? []])>
+<div @class([
+    'card',
+    'card-' . $size ?? 'md' => $size != 'default',
+    ...$classes ?? [],
+])>
     @if (!empty($header))
         <div class="card-header">
             {{ $header }}

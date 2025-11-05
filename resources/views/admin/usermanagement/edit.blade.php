@@ -8,7 +8,7 @@
                     {{ __('general.benutzerverwaltung') }}
                 </div>
                 <h2 class="page-title">
-                    {{ $user->getFullName() }}
+                    {{ $user->getSalutation() }} {{ $user->getFullName() }}
                 </h2>
             </div>
             <div class="col-auto ms-auto d-print-none">
@@ -42,8 +42,22 @@
                                 </x-forms.input>
                             </div>
                             <div class="col-4">
+                                <x-forms.select label="{{ __('general.geschlecht') }}" name="gender" required>
+                                    @foreach ($genders as $gender)
+                                        <option @selected($account->getGender() == $gender['value']) value="{{ $gender['value'] }}">{{ $gender['name'] }}</option>
+                                    @endforeach
+                                </x-forms.select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
                                 <x-forms.input :default="$account->getDateOfBirth()->format('Y-m-d')" name="date_of_birth" required type="date">
                                     {{ __('general.geburtsdatum') }}
+                                </x-forms.input>
+                            </div>
+                            <div class="col-6">
+                                <x-forms.input :default="$account->getBirthLocation()" name="birth_location" required>
+                                    {{ __('general.geburtsort') }}
                                 </x-forms.input>
                             </div>
                         </div>

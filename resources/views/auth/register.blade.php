@@ -39,6 +39,18 @@
                                         <x-forms.input name="last_name" required>{{ __('general.nachname') }}</x-forms.input>
                                     </div>
                                     <div class="col">
+                                        <x-forms.select label="{{ __('general.geschlecht') }}" name="gender" required>
+                                            @foreach ($genders as $gender)
+                                                <option value="{{ $gender['value'] }}">{{ $gender['name'] }}</option>
+                                            @endforeach
+                                        </x-forms.select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <x-forms.input name="birth_location" required>{{ __('general.geburtsort') }}</x-forms.input>
+                                    </div>
+                                    <div class="col">
                                         <x-forms.input name="date_of_birth" required type="date">{{ __('general.geburtsdatum') }}</x-forms.input>
                                     </div>
                                 </div>

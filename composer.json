@@ -15,6 +15,7 @@
         "livewire/livewire": "^3.6",
         "owen-it/laravel-auditing": "^14.0",
         "socialiteproviders/discord": "^4.2",
+        "spatie/laravel-pdf": "^1.8",
         "spatie/laravel-permission": "^6.15",
         "stevebauman/purify": "^6.3"
     },

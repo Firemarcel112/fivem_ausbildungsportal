@@ -77,6 +77,20 @@ class UserManagementController extends Controller
                 $data = $data->sortBy(fn($user) => $user->account->getFirstName());
         }
 
+        $genders = [
+            [
+                'name' => __('general.maennlich') . ' (' . __('general.anrede') . ': ' . __('general.herr') . ')',
+                'value' => 'M',
+            ],
+            [
+                'name' => __('general.weiblich') . ' (' . __('general.anrede') . ': ' . __('general.frau') . ')',
+                'value' => 'W',
+            ],
+            [
+                'name' => __('general.divers') . ' (' . __('general.anrede') . ': ' . __('general.ohne') . ')',
+                'value' => 'D',
+            ],
+        ];
         $items_per_page = $request->items_per_page ?? 10;
         $data = new LengthAwarePaginator(
             $data->forPage($request->input('page', 1), $items_per_page),
@@ -93,6 +107,7 @@ class UserManagementController extends Controller
                 'fractions',
                 'qualifications',
                 'items_per_page',
+                'genders',
             )
         );
     }
@@ -147,6 +162,21 @@ class UserManagementController extends Controller
             ->pluck('fraction_id')
             ->toArray();
 
+        $genders = [
+            [
+                'name' => __('general.maennlich') . ' (' . __('general.anrede') . ': ' . __('general.herr') . ')',
+                'value' => 'M',
+            ],
+            [
+                'name' => __('general.weiblich') . ' (' . __('general.anrede') . ': ' . __('general.frau') . ')',
+                'value' => 'W',
+            ],
+            [
+                'name' => __('general.divers') . ' (' . __('general.anrede') . ': ' . __('general.ohne') . ')',
+                'value' => 'D',
+            ],
+        ];
+
         return view('admin.usermanagement.edit', compact(
             'user',
             'fractions',
@@ -158,6 +188,7 @@ class UserManagementController extends Controller
             'permission_from_role_id',
             'account',
             'user_fractions',
+            'genders',
         ));
     }
 
@@ -251,12 +282,16 @@ class UserManagementController extends Controller
             'default_fraction' => $request->input('default_fraction', null),
             'fractions' => Arr::flatten($request->input('fraction_ids', [])),
             'date_of_birth' => Carbon::create($request->input('date_of_birth')),
+            'birth_location' => $request->input('birth_location'),
+            'gender' => $request->input('gender')
         ];
         $user_data['fractions'][] = $request->input('default_fraction', null);
         $account = $user->account;
         $account->setFirstName($user_data['first_name']);
         $account->setDateOfBirth($user_data['date_of_birth']);
         $account->setLastName($user_data['last_name']);
+        $account->setBirthLocation($user_data['birth_location']);
+        $account->setGender($user_data['gender']);
 
         $current_fractions = $account->fractions->pluck('fraction_id')->toArray();
         $remove_fractions = array_diff($current_fractions, $user_data['fractions']);

@@ -170,4 +170,26 @@ Route::middleware(['auth', 'alerts'])
                             ->name('destroy');
                     });
             });
+
+        Route::prefix('dokumente')
+            ->name('documents.')
+            ->controller(\App\Http\Controllers\DocumentsController::class)
+            ->group(function () {
+                Route::match(['GET', 'POST'], '', 'index')
+                    ->name('index');
+                Route::get('anzeigen/{document}', 'show')
+                    ->name('show');
+
+                Route::post('store', 'store')
+                    ->name('store');
+
+                Route::get('edit/{document}', 'edit')
+                    ->name('edit');
+
+                Route::post('update/{document}', 'update')
+                    ->name('update');
+
+                Route::post('destroy/{document}', 'destroy')
+                    ->name('destroy');
+            });
     });

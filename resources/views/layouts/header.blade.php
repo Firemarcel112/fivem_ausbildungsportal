@@ -35,7 +35,7 @@
                         <x-avatar :user="auth()->user()" size='sm'></x-avatar>
 
                         <div class="text-white d-none d-xl-block ps-2">
-                            <div class="text-nowrap">{{ auth()->user()->getDiscordName() }}</div>
+                            <div class="text-nowrap">{{ auth()->user()->getSalutation() }} {{ auth()->user()->getDiscordName() }}</div>
                             <div class="mt-1 text-white small">
                                 {{ auth()->user()->account->getDefaultFraction()->getName() }} ({{ auth()->user()->account->getDefaultFraction()->getShortName() }})
                             </div>
@@ -79,6 +79,12 @@
                             <x-slot:text>{{ __('general.benutzerverwaltung') }}</x-slot:text>
                         </x-navigation.item>
                     @endcan
+
+                    @canAny(['documents.show.account'])
+                        <x-navigation.item icon="file" url="documents.index">
+                            <x-slot:text>{{ __('general.dokumente') }}</x-slot:text>
+                        </x-navigation.item>
+                    @endcanany
 
                     <x-navigation.dropdown :items="[
                         [
