@@ -48,6 +48,7 @@ class AddQualification implements ShouldQueue
         try {
             Pdf::view('certificate.index', [
                 'trainer_name' => $training->getTrainerName(),
+                'training_date' => $training->getDate()->format('d.m.Y'),
                 'name' => $participant->getFullName(),
                 'birth_date' => $participant->getBirthDate(),
                 'birth_location' => $participant->account->getBirthLocation(),
