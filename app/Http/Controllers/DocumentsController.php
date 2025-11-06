@@ -191,7 +191,8 @@ class DocumentsController extends Controller
         $qualification = Qualification::findOrfail($request->input('qualification'));
 
         $certificate_name = 'Zertifikat_' . str_replace(' ', '_', $full_name);
-        $certificate_name = $certificate_name . '_' . $qualification->getName();
+        $qualification_name = str_replace(['ä', 'ö', 'ü', 'Ä', 'Ö', 'Ü'], ['ae', 'oe', 'ue', 'Ae', 'Oe', 'Ue'], $qualification->getName());
+        $certificate_name = $certificate_name . '_' . $qualification_name;
         $certificate_name = $certificate_name . '_' . now()->format('Y_m_d_His');
 
         $certificate_path = Storage::disk('certificates')->path($certificate_name . '.pdf');
@@ -267,10 +268,8 @@ class DocumentsController extends Controller
             } elseif (!$has_permission) {
                 abort(403);
             }
-        } else {
-            if (!auth()->user()->isSuperadmin() || !auth()->user()->hasPermissionTo('documents.edit')) {
-                abort(403);
-            }
+        } else if (!auth()->user()->hasPermissionTo('documents.edit')) {
+            abort(403);
         }
 
         if (auth()->user()->isSuperadmin() && !$request->has('download')) {
