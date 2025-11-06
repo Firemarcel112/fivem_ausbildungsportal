@@ -40,7 +40,8 @@ class AddQualification implements ShouldQueue
         $add_qualification->save();
 
         $certificate_name = 'Zertifikat_' . str_replace(' ', '_', $participant->getFullName());
-        $certificate_name = $certificate_name . '_' . $qualification->getName();
+        $qualification_name = str_replace(['ä', 'ö', 'ü', 'Ä', 'Ö', 'Ü'], ['ae', 'oe', 'ue', 'Ae', 'Oe', 'Ue'], $qualification->getName());
+        $certificate_name = $certificate_name . '_' . $qualification_name;
         $certificate_name = $certificate_name . '_' . now()->format('Y_m_d_His');
 
         $certificate_path = Storage::disk('certificates')->path($certificate_name . '.pdf');
