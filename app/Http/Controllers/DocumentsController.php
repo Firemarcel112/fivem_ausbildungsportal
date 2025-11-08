@@ -265,8 +265,6 @@ class DocumentsController extends Controller
             $has_permission = auth()->user()->hasPermissionTo('documents.show.' . $link_type);
             if ($link_type == 'ACCOUNT' && (!$is_own_file || !$has_permission)) {
                 abort(403);
-            } elseif (!$has_permission) {
-                abort(403);
             }
         } else if (!auth()->user()->hasPermissionTo('documents.edit')) {
             abort(403);

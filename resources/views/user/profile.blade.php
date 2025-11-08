@@ -8,7 +8,7 @@
                     {{ __('general.profil') }}
                 </div>
                 <div class="page-title">
-                    <h2>{{ auth()->user()->getSalutation() }} {{ $user->getFullName() }}
+                    <h2>{{ $user->getSalutation() }} {{ $user->getFullName() }}
                 </div>
             </div>
             @include('default.alerts')
@@ -35,7 +35,7 @@
                         <div class="d-flex">
                             <x-avatar :user="$user" size="lg"></x-avatar>
                             <div class="ms-2">
-                                <span class="d-block">{{ auth()->user()->getSalutation() }} {{ $user->getFullName() }}</span>
+                                <span class="d-block">{{ $user->getSalutation() }} {{ $user->getFullName() }}</span>
                                 @if (!empty($user->discord) && !empty(config('services.discord.client_id')))
                                     <span class="d-block">
                                         {{ __('general.discord_name') }} ({{ config('app.primary_guild_name') }}): {{ $user->getDiscordName() }}
