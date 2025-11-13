@@ -226,9 +226,7 @@ class User extends Authenticatable implements Auditable
             foreach ($revoke_role_ids as $role_id) {
                 $has_role = $this->hasRole($role_id, null, false);
                 if ($has_role) {
-                    $this->auditDetach('roles', $role_id,  true, [
-                        'role_id' => $role_id
-                    ]);
+                    $this->auditDetach('roles', $role_id,  true);
                 }
             }
             unset($revoke_role_ids);
