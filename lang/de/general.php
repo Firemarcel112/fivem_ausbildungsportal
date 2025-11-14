@@ -250,4 +250,7 @@ return [
     'teilnehmer_nicht_vorhanden' => 'Teilnehmer nicht vorhanden',
     'zertifikat_erstellen' => 'Zertifikat erstellen',
     'datum_ausbildung' => 'Datum Ausbildung',
+    'zertifikat_automatisch_erstellen' => 'Zertifikat wird automatisch erstellt',
+    'zertifikat_wird_automatisch_nach_beendigung_erstellt' => 'Das Zertifikat wird nach abschliessen automatisch erstellt',
+    'zertifikat_wird_nicht_automatisch_nach_beendigung_erstellt' => 'Das Zertifikat wird nach abschliessen nicht automatisch erstellt',
 ];

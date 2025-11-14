@@ -28,6 +28,7 @@
                         <tr>
                             <th>{{ __('general.id') }}</th>
                             <th>{{ __('general.name') }}</th>
+                            <th>{{ __('general.zertifikat_automatisch_erstellen') }}
                             <th>{{ __('general.rank') }}</th>
                             <th></th>
                         </tr>
@@ -38,6 +39,13 @@
                                 </td>
                                 <td>
                                     {{ $qualification->getName() }}
+                                </td>
+                                <td>
+                                    @if ($qualification->getGenerateCertificate())
+                                        {{ __('general.ja') }}
+                                    @else
+                                        {{ __('general.nein') }}
+                                    @endif
                                 </td>
                                 <td>
                                     {{ $qualification->getRank() }}

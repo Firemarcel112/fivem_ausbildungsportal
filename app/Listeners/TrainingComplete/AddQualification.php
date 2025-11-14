@@ -39,8 +39,13 @@ class AddQualification implements ShouldQueue
         $add_qualification->setTrainingId($training->getId());
         $add_qualification->save();
 
-        $certificate_name = 'Zertifikat_' . str_replace(' ', '_', $participant->getFullName());
-        $qualification_name = str_replace(['ä', 'ö', 'ü', 'Ä', 'Ö', 'Ü'], ['ae', 'oe', 'ue', 'Ae', 'Oe', 'Ue'], $qualification->getName());
+        if (!$qualification->getGenerateCertificate()) {
+            return;
+        }
+
+        $participant_name = str_replace([' ', 'ä', 'ö', 'ü', 'Ä', 'Ö', 'Ü',], ['_', 'ae', 'oe', 'ue', 'Ae', 'Oe', 'Ue'], $participant->getFullName());
+        $certificate_name = 'Zertifikat_' . $participant_name;
+        $qualification_name = str_replace([' ', 'ä', 'ö', 'ü', 'Ä', 'Ö', 'Ü'], ['_', 'ae', 'oe', 'ue', 'Ae', 'Oe', 'Ue'], $qualification->getName());
         $certificate_name = $certificate_name . '_' . $qualification_name;
         $certificate_name = $certificate_name . '_' . now()->format('Y_m_d_His');
 
