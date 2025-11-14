@@ -37,6 +37,7 @@ class QualificationsController extends Controller
         $qualification = new Qualification();
         $qualification->setName($request->input('name'));
         $qualification->setRank($request->input('rank', 0));
+        $qualification->setGenerateCertificate($request->input('generate_certificate', 1));
         $qualification->save();
 
         Alert::addAlert(__('general.erfolgreich_angelegt'), 'success');
@@ -70,6 +71,7 @@ class QualificationsController extends Controller
 
         $qualification->setName($request->input('name'));
         $qualification->setRank($request->input('rank', 0));
+        $qualification->setGenerateCertificate($request->input('generate_certificate', 1));
         $qualification->save();
 
         Alert::addAlert(__('general.erfolgreich_aktualisiert'), 'success');
