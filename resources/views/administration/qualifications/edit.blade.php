@@ -22,6 +22,14 @@
                     @csrf
                     <x-forms.input :default="$qualification->getName()" name="name" required>{{ __('general.name') }}</x-forms.input>
                     <x-forms.input :default="$qualification->getRank()" name="rank">{{ __('general.rank') }}</x-forms.input>
+                    <x-forms.select label="{{ __('general.zertifikat_automatisch_erstellen') }}" name="generate_certificate" required>
+                        <option @selected(old('generate_certificate', $qualification->getGenerateCertificate()) == 1) value="1">
+                            {{ __('general.ja') }}
+                        </option>
+                        <option @selected(old('generate_certificate', $qualification->getGenerateCertificate()) == 0) value="0">
+                            {{ __('general.nein') }}
+                        </option>
+                    </x-forms.select>
                     <x-forms.button :classes="['mt-2']">{{ __('general.speichern') }}</x-forms.button>
                 </form>
             </x-slot:body>

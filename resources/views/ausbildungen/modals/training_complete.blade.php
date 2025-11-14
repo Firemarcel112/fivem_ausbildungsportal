@@ -1,6 +1,15 @@
 <x-modal form_action="{{ route('ausbildung.abschliessen', $training) }}" id="lehrgangAbschliessenModal">
     <x-slot:title>{{ __('general.lehrgang_abschliessen') }}</x-slot:title>
     <x-slot:body>
+        @if ($training->qualification->getGenerateCertificate())
+            <x-alert :static="true">
+                {{ __('general.zertifikat_wird_automatisch_nach_beendigung_erstellt') }}
+            </x-alert>
+        @else
+            <x-alert :static="true" type="warning">
+                {{ __('general.zertifikat_wird_nicht_automatisch_nach_beendigung_erstellt') }}
+            </x-alert>
+        @endif
         <x-forms.button>
             {{ __('general.lehrgang_abschliessen') }}
         </x-forms.button>

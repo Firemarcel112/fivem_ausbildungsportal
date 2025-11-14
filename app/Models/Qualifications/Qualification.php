@@ -203,4 +203,25 @@ class Qualification extends BaseModel
     {
         $this->updated_at = $value;
     }
+
+    /**
+     * Get the generate_certificate attribute.
+     *
+     * @return int
+     */
+    public function getGenerateCertificate(): int
+    {
+        return $this->generate_certificate;
+    }
+
+    /**
+     * Set the generate_certificate attribute.
+     *
+     * @param int $value
+     * @return void
+     */
+    public function setGenerateCertificate(int $value)
+    {
+        $this->generate_certificate = $value;
+    }
 }

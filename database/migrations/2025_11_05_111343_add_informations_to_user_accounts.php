@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::table('user_accounts', function (Blueprint $table) {
             $table->enum('gender', ['M', 'W', 'D'])
                 ->default('M')
+                ->after('last_name')
                 ->comment('Bestimmt die Anrede auf dem Zertifikat M = Herr / W = Frau / D = Ohne Anrede');
             $table->string('birth_location')
                 ->nullable()
+                ->after('date_of_birth')
                 ->comment('Bestimmt den Geburtsort auf dem Zertifikat');
         });
     }
