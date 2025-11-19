@@ -73,7 +73,7 @@ class Training extends BaseModel
      */
     public function getTrainerName()
     {
-        if ($this->trainer->isTrainer()) {
+        if ($this->trainer->isTrainer() || $this->isCompleted()) {
             return $this->trainer->getFullName();
         }
         return __('general.unbekannt');
