@@ -37,6 +37,9 @@ class Deploy extends Command
         $bar->advance();
 
         if (str_contains($git_output, 'Already up to date')) {
+            $this->info("\n⚡ Optimiere Cache ...");
+            $this->call('optimize');
+            $this->call('queue:restart');
             $this->info("\n📁 Keine Änderungen vorhanden. Deployment beendet.");
             $bar->finish();
             return true;
@@ -107,9 +110,9 @@ class Deploy extends Command
          * STEP 7: Cache optimieren
          * ----------------------------------------------------
          */
-        $this->call('queue:restart');
         $this->info("\n⚡ Optimiere Cache ...");
         $this->call('optimize');
+        $this->call('queue:restart');
 
         $bar->advance();
         $bar->finish();
