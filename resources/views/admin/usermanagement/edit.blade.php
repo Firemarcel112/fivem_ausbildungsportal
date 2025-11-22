@@ -158,7 +158,7 @@
                                         <td>
                                             <div class="form-check form-switch">
                                                 <input name="roles[{{ $role->id }}]" type="hidden" value="0">
-                                                <input @checked($user->hasRole($role->name, null, false)) class="form-check-input" name="roles[{{ $role->id }}]" type="checkbox" value="1">
+                                                <input @checked($user->hasRole($role->name, null, false)) @disabled(!auth()->user()->hasRole($role->name)) class="form-check-input" name="roles[{{ $role->id }}]" type="checkbox" value="1">
                                             </div>
                                         </td>
                                     </tr>
@@ -190,7 +190,7 @@
                                                 <div class="d-flex">
                                                     <label class="form-check form-switch form-switch-3">
                                                         <input name="permissions[{{ $permission->id }}]" type="hidden" value="0">
-                                                        <input @checked($has_permission_to[$permission->name]) class="form-check-input" name="permissions[{{ $permission->id }}]" type="checkbox" value="1" value="{{ $permission->getTranslatedName() }}">
+                                                        <input @checked($has_permission_to[$permission->name]) @disabled(!$can_give_permission[$permission->name]) class="form-check-input" name="permissions[{{ $permission->id }}]" type="checkbox" value="1" value="{{ $permission->getTranslatedName() }}">
                                                     </label>
                                                     @if (!$has_direct_permission_to[$permission->name] && $has_permission_to[$permission->name] && empty($permission_from_role_id[$permission->name]))
                                                         <x-icon :hovertext="__('general.recht_geerbt')" name="info-circle" />
