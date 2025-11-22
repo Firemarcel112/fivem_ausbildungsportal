@@ -155,6 +155,8 @@ return [
         'p12_key_name' => env('P12_KEY_NAME'),
         // Password des P12 keys
         'p12_password' => env('P12_PASSWORD'),
-    ]
+    ],
+
+    'php' => env('PHP_CLI_COMMAND', 'php'),
 
 ];
