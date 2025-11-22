@@ -150,10 +150,12 @@ class UserManagementController extends Controller
             $query->orderByRaw("CASE WHEN name LIKE '%*%' THEN 0 ELSE 1 END, name");
         }])
             ->get();
+        $current_user_permissions = Auth::user()->getAllPermissions();
         foreach ($permission_names as $name) {
             $has_direct_permission_to[$name] = $user->hasDirectPermission($name);
             $has_permission_to[$name] = $user->hasPermissionTo($name, null, false);
             $permission_from_role_id[$name] = $role_permissions?->where('name', $name)?->first()->pivot?->role_id ?? null;
+            $can_give_permission[$name] = $current_user_permissions->firstWhere('name', $name)?->exists ?? false;
         }
         $account = $user->account;
 
@@ -186,6 +188,7 @@ class UserManagementController extends Controller
             'has_permission_to',
             'has_direct_permission_to',
             'permission_from_role_id',
+            'can_give_permission',
             'account',
             'user_fractions',
             'genders',
@@ -356,10 +359,16 @@ class UserManagementController extends Controller
      */
     public function updatePermissions(Request $request, User $user)
     {
+        $get_current_user_permissions = Auth::user()->getAllPermissions();
+        $get_current_user_roles = Auth::user()->roles;
         if ($request->has('permissions')) {
             $grant_permission_id = [];
             $revoke_permission_id = [];
             foreach ($request->permissions as $key => $value) {
+                $current_user_has_permission = $get_current_user_permissions->firstWhere('id', $key)?->exists ?? false;
+                if (!$current_user_has_permission && !Auth::user()->isSuperadmin()) {
+                    continue;
+                }
                 if ($value == 1) {
                     $grant_permission_id[] = $key;
                 } else {
@@ -372,6 +381,10 @@ class UserManagementController extends Controller
             $grant_role_id = [];
             $revoke_role_id = [];
             foreach ($request->roles as $key => $value) {
+                $current_user_has_role = $get_current_user_roles->firstWhere('id', $key)?->exists ?? false;
+                if (!$current_user_has_role && !Auth::user()->isSuperadmin()) {
+                    continue;
+                }
                 if ($value == 1) {
                     $grant_role_id[] = $key;
                 } else {
