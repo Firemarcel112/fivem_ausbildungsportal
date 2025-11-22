@@ -20,6 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'alerts' => \App\Http\Middleware\GeneralAlert::class,
         ]);
+        $middleware->append([
+            \App\Http\Middleware\IgnoreInvalidHttpMethodOverride::class,
+        ]);
         $middleware->appendToGroup('web', [
             \App\Http\Middleware\GeneralAlert::class,
         ]);
