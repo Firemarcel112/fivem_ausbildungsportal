@@ -29,7 +29,7 @@
                             <option @selected(old('fraction_id', $requirement->fraction->getId()) == $fraction->getId()) value="{{ $fraction->getId() }}">{{ $fraction->getFullName() }}</option>
                         @endforeach
                     </x-forms.select>
-                    <x-forms.input :default="$qualification->getRank()" name="rank">{{ __('general.rank') }}</x-forms.input>
+                    <x-forms.input :default="$requirement->getRank()" name="rank">{{ __('general.rank') }}</x-forms.input>
                     <x-forms.button :classes="['mt-2']">{{ __('general.speichern') }}</x-forms.button>
                 </form>
             </x-slot:body>
