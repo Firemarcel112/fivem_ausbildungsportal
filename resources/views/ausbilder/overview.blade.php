@@ -49,7 +49,7 @@
                                 <td>{{ $training->getCountParticipants() }} / {{ $training->getMaxParticipants() }}</td>
                                 <td class="text-end">
                                     <a class="me-2 btn btn-sm btn-info" href="{{ route('ausbildung.show', $training) }}">
-                                        <x-icon :hovertext="__('general.bearbeiten')" name="edit" />
+                                        <x-icon :hovertext="__('general.ansehen')" name="eye" />
                                     </a>
                                     @can('trainings.delete')
                                         <button class="cursor-pointer btn btn-sm btn-danger" data-bs-target="#ausbildung-{{ $training->getId() }}-loeschen" data-bs-toggle="modal">
@@ -109,13 +109,8 @@
                                 <td>{{ $training->getCountParticipants() }} / {{ $training->getMaxParticipants() }}</td>
                                 <td class="text-end">
                                     <a class="me-2 btn btn-sm btn-info" href="{{ route('ausbildung.show', $training) }}">
-                                        <x-icon :hovertext="__('general.bearbeiten')" name="edit" />
+                                        <x-icon :hovertext="__('general.ansehen')" name="eye" />
                                     </a>
-                                    @can('trainings.delete')
-                                        <button class="cursor-pointer btn btn-sm btn-danger" data-bs-target="#ausbildung-{{ $training->getId() }}-loeschen" data-bs-toggle="modal">
-                                            <x-icon :hovertext="__('general.loeschen')" name="trash" />
-                                        </button>
-                                    @endcan
                                 </td>
                             </tr>
 

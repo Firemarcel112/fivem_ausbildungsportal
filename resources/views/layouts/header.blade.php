@@ -61,15 +61,17 @@
                         <x-slot:text>{{ __('general.voraussetzungen') }}</x-slot:text>
                     </x-navigation.item>
 
-                    @can('is_trainer')
+                    @canAny(['trainings.show', 'trainings.requests'])
                         <x-navigation.dropdown :items="[
                             [
                                 'text' => __('general.ausbilder_dashboard'),
                                 'route_name' => 'ausbilder.index',
+                                'permission' => 'trainings.show',
                             ],
                             [
                                 'text' => __('general.ausbildungswuensche'),
                                 'route_name' => 'trainings.request.index',
+                                'permission' => 'trainings.requests',
                             ],
                         ]" :text="__('general.ausbilder')" icon="login" />
                     @endcan
@@ -80,11 +82,11 @@
                         </x-navigation.item>
                     @endcan
 
-                    @canAny(['documents.show.account'])
+                    @can('documents.show.account')
                         <x-navigation.item icon="file" url="documents.index">
                             <x-slot:text>{{ __('general.dokumente') }}</x-slot:text>
                         </x-navigation.item>
-                    @endcanany
+                    @endcan
 
                     <x-navigation.dropdown :items="[
                         [

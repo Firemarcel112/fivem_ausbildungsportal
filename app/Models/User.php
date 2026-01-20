@@ -99,7 +99,10 @@ class User extends Authenticatable implements Auditable
         ];
     }
 
-    public $with = ['permissions'];
+    public $with = [
+        'permissions',
+        'account'
+    ];
 
     #########################
     # CUSTOM FUNCTIONS

@@ -2,6 +2,7 @@
 
 return [
     'anzahl_pro_seite' => 'Anzahl pro Seite',
+    'ansehen' => 'Ansehen',
     'abbrechen' => 'Abbrechen',
     'abgemeldet' => 'Abgemeldet',
     'abmelden' => 'abmelden',
@@ -22,6 +23,7 @@ return [
     'ausbilder_dashboard' => 'Ausbilder Dashboard',
     'ausbilder_nicht_mehr_aktiv' => 'Ausbilder nicht mehr Aktiv, bitte Ausbilder neu zuweisen!',
     'ausbilder' => 'Ausbilder',
+    'ausbildung_bereits_abgeschlossen' => 'Die Ausbildung wurde bereits abgeschlossen und kann nicht mehr gelöscht werden!',
     'ausbildung_erfolgreich_angelegt' => 'Ausbildung wurde erfolgreich angelegt',
     'ausbildung_erstellen' => 'Ausbildung erstellen',
     'ausbildungen' => 'Ausbildungen',

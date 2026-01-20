@@ -29,7 +29,7 @@ class TrainingController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Auth::check() && !Auth::user()->isTrainer()) {
+        if (!Auth::check() && !Auth::user()->can('trainings.show')) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
             return redirect()->back();
         }
@@ -83,7 +83,7 @@ class TrainingController extends Controller
     public function show(Training $training)
     {
         $training->load(['trainer', 'participants.account.fractions']);
-        if (!Auth::user()?->isTrainer() && !Auth::user()?->isSuperadmin()) {
+        if (!Auth::user()->can('trainings.show')) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
             return redirect()->back();
         }
@@ -122,6 +122,10 @@ class TrainingController extends Controller
      */
     public function update(Request $request, Training $training)
     {
+        if (!Auth::user()->isTrainer()) {
+            Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+            return redirect()->back();
+        }
         $request->flash();
         $trainer = $request->input('trainer_id');
         $date = $request->input('date');
@@ -196,6 +200,10 @@ class TrainingController extends Controller
      */
     public function complete(Request $request, Training $training)
     {
+        if (!Auth::user()->isTrainer()) {
+            Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+            return redirect()->back();
+        }
         $fraktionen = Fraction::get();
 
         $notifications = [];
@@ -265,6 +273,10 @@ class TrainingController extends Controller
      */
     public function addParticipants(Request $request, Training $training)
     {
+        if (!Auth::user()->isTrainer()) {
+            Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+            return redirect()->back();
+        }
         $success = false;
         foreach ($request->input('user_ids', []) as $user_id) {
             $user = Account::find($user_id);
@@ -307,6 +319,11 @@ class TrainingController extends Controller
      */
     public function removeParticipant(Request $request, Participant $participant)
     {
+        if (!Auth::user()->isTrainer()) {
+            Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+            return redirect()->back();
+        }
+
         if ($participant->delete()) {
             Alert::addAlert('Teilnehmer vom Lehrgang entfernt!', 'success');
             return redirect()->back();
@@ -322,6 +339,11 @@ class TrainingController extends Controller
     public function destroy(Request $request, Training $training)
     {
         $this->checkPermission('trainings.delete');
+
+        if ($training->isCompleted()) {
+            Alert::addAlert(__('general.ausbildung_bereits_abgeschlossen'), 'danger');
+            return redirect()->back();
+        }
 
         $training->load('participants');
         if ($training->participants && $training->participants->count() > 0) {
