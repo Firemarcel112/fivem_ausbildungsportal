@@ -13,7 +13,7 @@ class OverviewController extends Controller
      */
     public function index()
     {
-        $this->checkPermission('is_trainer');
+        $this->checkPermission('trainings.show');
 
         $trainings = Training::with([
             'participants.account',

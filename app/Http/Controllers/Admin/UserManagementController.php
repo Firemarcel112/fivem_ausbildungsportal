@@ -155,7 +155,7 @@ class UserManagementController extends Controller
             $has_direct_permission_to[$name] = $user->hasDirectPermission($name);
             $has_permission_to[$name] = $user->hasPermissionTo($name, null, false);
             $permission_from_role_id[$name] = $role_permissions?->where('name', $name)?->first()->pivot?->role_id ?? null;
-            $can_give_permission[$name] = $current_user_permissions->firstWhere('name', $name)?->exists ?? false;
+            $can_give_permission[$name] = $current_user_permissions->firstWhere('name', $name)?->exists ?? Auth::user()->isSuperadmin() ?? false;
         }
         $account = $user->account;
 

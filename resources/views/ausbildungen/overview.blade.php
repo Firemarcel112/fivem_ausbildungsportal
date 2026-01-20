@@ -92,12 +92,14 @@
                             <div>
                                 <x-discord-notification />
                             </div>
-                            <div class="d-none" x-bind:class="{
-                                'd-block': trainer_id != original.trainer_id || date != original.date || time != original.time || min_participants != original.min_participants || max_participants != original.max_participants || meeting_point != original.meeting_point || additional_informations != original.additional_informations,
-                                'd-none': trainer_id == original.trainer_id && date == original.date && time == original.time && min_participants == original.min_participants && max_participants == original.max_participants && meeting_point == original.meeting_point && additional_informations == original.additional_informations
-                            }">
-                                <button class="btn btn-primary" type="submit">{{ __('general.speichern') }}</button>
-                            </div>
+                            @can('is_trainer')
+                                <div class="d-none" x-bind:class="{
+                                    'd-block': trainer_id != original.trainer_id || date != original.date || time != original.time || min_participants != original.min_participants || max_participants != original.max_participants || meeting_point != original.meeting_point || additional_informations != original.additional_informations,
+                                    'd-none': trainer_id == original.trainer_id && date == original.date && time == original.time && min_participants == original.min_participants && max_participants == original.max_participants && meeting_point == original.meeting_point && additional_informations == original.additional_informations
+                                }">
+                                    <button class="btn btn-primary" type="submit">{{ __('general.speichern') }}</button>
+                                </div>
+                            @endcan
                         @else
                             <div>
                                 <p><b>{{ __('general.ausbilder') }}:</b> {{ $training->getTrainerName() }}</p>
@@ -107,12 +109,14 @@
                     </form>
                     <div class="text-end">
                         @if (!$training->isCompleted())
-                            @if (now()->addMinutes(config('app.training_complete_minutes')) > $training->getDeadlineTime())
-                                <button class="btn btn-success" data-bs-target="#lehrgangAbschliessenModal" data-bs-toggle="modal" type="button">
-                                    {{ __('general.lehrgang_abschliessen') }}
-                                </button>
-                                @include('ausbildungen.modals.training_complete')
-                            @endif
+                            @can('is_trainer')
+                                @if (now()->addMinutes(config('app.training_complete_minutes')) > $training->getDeadlineTime())
+                                    <button class="btn btn-success" data-bs-target="#lehrgangAbschliessenModal" data-bs-toggle="modal" type="button">
+                                        {{ __('general.lehrgang_abschliessen') }}
+                                    </button>
+                                    @include('ausbildungen.modals.training_complete')
+                                @endif
+                            @endcan
                         @else
                             <p class="text-success">{{ __('general.lehrgang_abgeschlossen') }}</p>
                         @endif
@@ -121,118 +125,126 @@
             </x-card>
         </div>
 
-        <div class="mt-4 mb-4 row">
-            <x-card>
-                <x-slot:header>
-                    <h3 class="card-title">{{ __('general.teilnehmer') }} ({{ $training->getCountParticipants() }})</h3>
-                </x-slot:header>
-                <x-slot:body>
-                    <table class="table table-vcenter">
-                        <thead>
-                            <th>{{ __('general.name') }}</th>
-                            <th>{{ __('general.geburtsdatum') }}</th>
-                            <th>{{ __('general.angemeldet') }}</th>
-                            <th>{{ __('general.qualifikation') }}</th>
-                            <th></th>
-                        </thead>
-                        @forelse ($training->getSortParticipants() as $participant)
-                            <tr>
-                                <td>
-                                    {{ $participant->account->getSalutation() }} {{ $participant->getFullName() }} ({{ $participant->account->getDefaultFraction()->getShortName() }})
-                                    @if (!empty($participant->account))
-                                        <a href="{{ route('profile.show', $participant->account) }}" target="_blank">
-                                            <x-icon name="external-link" />
-                                        </a>
-                                    @endif
-                                </td>
-                                <td>
-                                    {{ $participant->getBirthDate() }} in {{ $participant->account?->getBirthLocation() }}
-                                </td>
-                                <td>
-                                    {{ $participant->getCreated()->format('d.m.Y H:i') }}
-                                </td>
-                                <td>
-                                    <div class="accordion-flush" id="qualifications-accordion-{{ $participant->getId() }}">
-                                        <div class="accordion-item">
-                                            <div class="accordion-header">
-                                                <button aria-controls="collapse-{{ $participant->getId() }}" aria-expanded="false" class="accordion-button collapsed" data-bs-target="#collapse-{{ $participant->getId() }}" data-bs-toggle="collapse">
-                                                    {{ __('general.qualifikationen_anzeigen') }}
-                                                    <div class="accordion-button-toggle">
-                                                        <x-icon name="chevron-down" />
-                                                    </div>
-                                                </button>
+        @can('trainings.participants.show')
+            <div class="mt-4 mb-4 row">
+                <x-card>
+                    <x-slot:header>
+                        <h3 class="card-title">{{ __('general.teilnehmer') }} ({{ $training->getCountParticipants() }})</h3>
+                    </x-slot:header>
+                    <x-slot:body>
+                        <table class="table table-vcenter">
+                            <thead>
+                                <th>{{ __('general.name') }}</th>
+                                <th>{{ __('general.geburtsdatum') }}</th>
+                                <th>{{ __('general.angemeldet') }}</th>
+                                <th>{{ __('general.qualifikation') }}</th>
+                                <th></th>
+                            </thead>
+                            @forelse ($training->getSortParticipants() as $participant)
+                                <tr>
+                                    <td>
+                                        {{ $participant->account->getSalutation() }} {{ $participant->getFullName() }} ({{ $participant->account->getDefaultFraction()->getShortName() }})
+                                        @if (!empty($participant->account))
+                                            @can('usermanagement.index')
+                                                <a href="{{ route('profile.show', $participant->account) }}" target="_blank">
+                                                    <x-icon name="external-link" />
+                                                </a>
+                                            @endcan
+                                        @endif
+                                    </td>
+                                    <td>
+                                        {{ $participant->getBirthDate() }} in {{ $participant->account?->getBirthLocation() }}
+                                    </td>
+                                    <td>
+                                        {{ $participant->getCreated()->format('d.m.Y H:i') }}
+                                    </td>
+                                    <td>
+                                        <div class="accordion-flush" id="qualifications-accordion-{{ $participant->getId() }}">
+                                            <div class="accordion-item">
+                                                <div class="accordion-header">
+                                                    <button aria-controls="collapse-{{ $participant->getId() }}" aria-expanded="false" class="accordion-button collapsed" data-bs-target="#collapse-{{ $participant->getId() }}" data-bs-toggle="collapse">
+                                                        {{ __('general.qualifikationen_anzeigen') }}
+                                                        <div class="accordion-button-toggle">
+                                                            <x-icon name="chevron-down" />
+                                                        </div>
+                                                    </button>
 
-                                            </div>
-                                            <div class="accordion-collapse collapse" data-bs-parent="#qualifications-accordion-{{ $participant->getId() }}" id="collapse-{{ $participant->getId() }}">
-                                                <div class="accordion-body">
-                                                    <ul style="list-style: none; padding-left: 0;">
-                                                        @forelse($participant?->account?->qualifications ?? [] as $qualification)
-                                                            <li>
-                                                                {{ $qualification->getName() }}
-                                                            </li>
-                                                        @empty
-                                                            <li>{{ __('general.keine_qualifikation') }}</li>
-                                                        @endforelse
-                                                    </ul>
+                                                </div>
+                                                <div class="accordion-collapse collapse" data-bs-parent="#qualifications-accordion-{{ $participant->getId() }}" id="collapse-{{ $participant->getId() }}">
+                                                    <div class="accordion-body">
+                                                        <ul style="list-style: none; padding-left: 0;">
+                                                            @forelse($participant?->account?->qualifications ?? [] as $qualification)
+                                                                <li>
+                                                                    {{ $qualification->getName() }}
+                                                                </li>
+                                                            @empty
+                                                                <li>{{ __('general.keine_qualifikation') }}</li>
+                                                            @endforelse
+                                                        </ul>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+                                    </td>
+                                    <td class="text-end">
+                                        @if (!$training->isCompleted())
+                                            @can('is_trainer')
+                                                <button class="btn btn-sm btn-danger" data-bs-target="#confirm-remove-teilnehmer-{{ $participant->getId() }}" data-bs-toggle="modal" type="button">
+                                                    <x-icon name="trash" />
+                                                </button>
+
+                                                <x-modal form_action="{{ route('ausbildung.teilnehmer.entfernen', $participant) }}" id="confirm-remove-teilnehmer-{{ $participant->getId() }}">
+                                                    <x-slot:title>
+                                                        {{ __('general.teilnehmer_entfernen') . ': ' . $participant->getFullName() }}
+                                                    </x-slot:title>
+                                                    <x-slot:footer>
+                                                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">
+                                                            {{ __('general.abbrechen') }}
+                                                        </button>
+                                                        <button class="btn btn-danger" type="submit">
+                                                            {{ __('general.entfernen') }}
+                                                        </button>
+                                                    </x-slot:footer>
+                                                </x-modal>
+                                            @endcan
+                                        @else
+                                            <span class="ms-2">
+                                                @if ($participant->getNotices())
+                                                    <x-icon :hovertext="$participant->getNotices()" name="info-circle" />
+                                                @endif
+                                                {!! $participant->getOutputBadge() !!}
+                                            </span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td class="text-center" colspan="5">
+                                        {{ __('general.keine_teilnehmer') }}
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </table>
+                        @if (!$training->isCompleted())
+                            @can('is_trainer')
+                                <h4>{{ __('general.teilnehmer_hinzufuegen') }}:</h4>
+                                <form action="{{ route('ausbildung.teilnehmer.hinzufuegen', $training) }}" class="space-y" method="POST">
+                                    @csrf
+                                    <x-forms.select label="{{ __('general.teilnehmer') }}" multiple name="user_ids" required>
+                                        @foreach ($users_not_in_training as $user)
+                                            <option value="{{ $user->getId() }}">{{ $user->getFullName() }} ({{ $user->account->getDefaultFraction()->getShortName() }})</option>
+                                        @endforeach
+                                    </x-forms.select>
+
+                                    <div>
+                                        <button class="btn btn-primary" type="submit">{{ __('general.teilnehmer_hinzufuegen') }}</button>
                                     </div>
-                                </td>
-                                <td class="text-end">
-                                    @if (!$training->isCompleted())
-                                        <button class="btn btn-sm btn-danger" data-bs-target="#confirm-remove-teilnehmer-{{ $participant->getId() }}" data-bs-toggle="modal" type="button">
-                                            <x-icon name="trash" />
-                                        </button>
-
-                                        <x-modal form_action="{{ route('ausbildung.teilnehmer.entfernen', $participant) }}" id="confirm-remove-teilnehmer-{{ $participant->getId() }}">
-                                            <x-slot:title>
-                                                {{ __('general.teilnehmer_entfernen') . ': ' . $participant->getFullName() }}
-                                            </x-slot:title>
-                                            <x-slot:footer>
-                                                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">
-                                                    {{ __('general.abbrechen') }}
-                                                </button>
-                                                <button class="btn btn-danger" type="submit">
-                                                    {{ __('general.entfernen') }}
-                                                </button>
-                                            </x-slot:footer>
-                                        </x-modal>
-                                    @else
-                                        <span class="ms-2">
-                                            @if ($participant->getNotices())
-                                                <x-icon :hovertext="$participant->getNotices()" name="info-circle" />
-                                            @endif
-                                            {!! $participant->getOutputBadge() !!}
-                                        </span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td class="text-center" colspan="5">
-                                    {{ __('general.keine_teilnehmer') }}
-                                </td>
-                            </tr>
-                        @endforelse
-                    </table>
-                    @if (!$training->isCompleted())
-                        <h4>{{ __('general.teilnehmer_hinzufuegen') }}:</h4>
-                        <form action="{{ route('ausbildung.teilnehmer.hinzufuegen', $training) }}" class="space-y" method="POST">
-                            @csrf
-                            <x-forms.select label="{{ __('general.teilnehmer') }}" multiple name="user_ids" required>
-                                @foreach ($users_not_in_training as $user)
-                                    <option value="{{ $user->getId() }}">{{ $user->getFullName() }} ({{ $user->account->getDefaultFraction()->getShortName() }})</option>
-                                @endforeach
-                            </x-forms.select>
-
-                            <div>
-                                <button class="btn btn-primary" type="submit">{{ __('general.teilnehmer_hinzufuegen') }}</button>
-                            </div>
-                        </form>
-                    @endif
-                </x-slot:body>
-            </x-card>
-        </div>
+                                </form>
+                            @endcan
+                        @endif
+                    </x-slot:body>
+                </x-card>
+            </div>
+        @endcan
     </div>
 @endsection
