@@ -37,6 +37,8 @@ class AddPermissions extends Seeder
         ],
         'Ausbildungen' => [
             'permissions' => [
+                'trainings.show',
+                'trainings.requests',
                 'trainings.delete',
                 'trainings.store',
                 'trainings.participants.show',

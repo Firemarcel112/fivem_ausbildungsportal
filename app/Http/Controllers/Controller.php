@@ -14,13 +14,22 @@ abstract class Controller extends BaseController
      * @param mixed $permission
      * @return bool|\Illuminate\Http\RedirectResponse
      */
-    public function checkPermission($permission)
+    public function checkPermission(string|array $permissions)
     {
         if (!Auth::check()) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
             abort(403);
         }
-        if (!Auth::user()->hasPermissionTo($permission)) {
+        if (is_array($permissions)) {
+            foreach ($permissions as $permission) {
+                if (Auth::user()->hasPermissionTo($permission)) {
+                    return true;
+                }
+            }
+            Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+            abort(403);
+        }
+        if (!Auth::user()->hasPermissionTo($permissions)) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
             abort(403);
         }
