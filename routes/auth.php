@@ -153,6 +153,8 @@ Route::middleware(['auth', 'alerts'])
                             ->name('update');
                         Route::post('{qualification}/destroy', 'destroy')
                             ->name('destroy');
+                        Route::post('{qualification}/toggle/hide', 'toggleHide')
+                            ->name('toggle_hide');
                     });
                 Route::prefix('requirements/{qualification}')
                     ->name('requirements.')

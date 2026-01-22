@@ -5,6 +5,8 @@ namespace App\Models\Qualifications;
 use App\Events\QualificationAction;
 use App\Models\BaseModel;
 use App\Models\Qualifications\Requirement;
+use App\Models\Trainings\Training;
+use App\Models\User\Qualification as UserQualification;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -27,6 +29,15 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder<static>|Qualification whereUpdatedAt($value)
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Requirement> $requirements
  * @property-read int|null $requirements_count
+ * @property int $generate_certificate Wenn 1 dann werden automatisch bei abschluss dieser Qualifikation Zertifikate erstellt
+ * @property int $hide
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Training> $trainings
+ * @property-read int|null $trainings_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, UserQualification> $userQualifications
+ * @property-read int|null $user_qualifications_count
+ * @method static Builder<static>|Qualification isVisible(bool $value = true)
+ * @method static Builder<static>|Qualification whereGenerateCertificate($value)
+ * @method static Builder<static>|Qualification whereHide($value)
  * @mixin \Eloquent
  */
 class Qualification extends BaseModel
@@ -56,8 +67,20 @@ class Qualification extends BaseModel
      */
     public function scopeIsOrderByDefault(Builder $query)
     {
-        return $query->orderBy('rank')
+        return $query->orderBy('hide')
+            ->orderBy('rank')
             ->orderBy('name');
+    }
+
+    /**
+     * Scope für sichtbare oder ausgeblendete Qualifikationen
+     * @param Builder $query
+     * @param bool $value
+     * @return Builder
+     */
+    public function scopeIsVisible(Builder $query, bool $value = true)
+    {
+        return $query->where('hide', !$value);
     }
 
     #########################
@@ -72,6 +95,24 @@ class Qualification extends BaseModel
             'qualification_id'
         )
             ->orderByDefault();
+    }
+
+    public function trainings()
+    {
+        return $this->hasMany(
+            Training::class,
+            'qualification_id',
+            'qualification_id'
+        );
+    }
+
+    public function userQualifications()
+    {
+        return $this->hasMany(
+            UserQualification::class,
+            'qualification_id',
+            'qualification_id'
+        );
     }
 
     #########################
@@ -223,5 +264,26 @@ class Qualification extends BaseModel
     public function setGenerateCertificate(int $value)
     {
         $this->generate_certificate = $value;
+    }
+
+    /**
+     * Get the hide attribute.
+     *
+     * @return int
+     */
+    public function getHide(): int
+    {
+        return $this->hide;
+    }
+
+    /**
+     * Set the hide attribute.
+     *
+     * @param int $value
+     * @return void
+     */
+    public function setHide(int $value)
+    {
+        $this->hide = $value;
     }
 }

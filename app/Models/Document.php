@@ -6,6 +6,27 @@ use App\Models\BaseModel;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * @property int $document_id
+ * @property string $title
+ * @property string|null $description
+ * @property string $url
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
+ * @property-read int|null $audits_count
+ * @property-read \App\Models\DocumentLink|null $documentAssign
+ * @method static Builder<static>|Document newModelQuery()
+ * @method static Builder<static>|Document newQuery()
+ * @method static Builder<static>|Document query()
+ * @method static Builder<static>|Document whereCreatedAt($value)
+ * @method static Builder<static>|Document whereDescription($value)
+ * @method static Builder<static>|Document whereDocumentId($value)
+ * @method static Builder<static>|Document whereTitle($value)
+ * @method static Builder<static>|Document whereUpdatedAt($value)
+ * @method static Builder<static>|Document whereUrl($value)
+ * @mixin \Eloquent
+ */
 class Document extends BaseModel
 {
     protected $table = 'documents';
