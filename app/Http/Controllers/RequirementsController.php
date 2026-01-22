@@ -14,6 +14,7 @@ class RequirementsController extends Controller
     {
         $qualifications = Qualification::with('requirements')
             ->isOrderByDefault()
+            ->isVisible()
             ->get();
         $fractions = Fraction::get();
 
