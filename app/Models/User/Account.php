@@ -39,6 +39,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Qualification> $qualifications
  * @property-read int|null $qualifications_count
  * @method static Builder<static>|Account isSearch(string $search)
+ * @property string $gender Bestimmt die Anrede auf dem Zertifikat M = Herr / W = Frau / D = Ohne Anrede
+ * @property string|null $birth_location Bestimmt den Geburtsort auf dem Zertifikat
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Document> $certificates
+ * @property-read int|null $certificates_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, UserQualification> $directQualifications
+ * @property-read int|null $direct_qualifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Participant> $trainings
+ * @property-read int|null $trainings_count
+ * @method static Builder<static>|Account whereBirthLocation($value)
+ * @method static Builder<static>|Account whereGender($value)
  * @mixin \Eloquent
  */
 class Account extends BaseModel

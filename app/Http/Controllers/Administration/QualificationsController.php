@@ -20,8 +20,13 @@ class QualificationsController extends Controller
     public function index()
     {
         $this->checkPermission('administration.qualifications.edit');
-        $qualifications = Qualification::isOrderByDefault()
+        $qualifications = Qualification::with([
+            'trainings',
+            'userQualifications'
+        ])
+            ->isOrderByDefault()
             ->get();
+
         return view('administration.qualifications.index', compact('qualifications'));
     }
 
@@ -108,6 +113,23 @@ class QualificationsController extends Controller
         $qualification->delete();
 
         Alert::addAlert(__('general.erfolgreich_geloescht'), 'success');
+        return redirect()->back();
+    }
+
+    /**
+     * Blendet eine Qualifikation ein/aus
+     *
+     * @param Qualification $qualification
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function toggleHide(Qualification $qualification)
+    {
+        $this->checkPermission('administration.qualifications.edit');
+
+        $qualification->setHide(!$qualification->getHide());
+        $qualification->save();
+
+        Alert::addAlert(__('general.erfolgreich_aktualisiert'), 'success');
         return redirect()->back();
     }
 }

@@ -25,6 +25,7 @@ use App\Models\Qualifications\Requirement as QualificationRequirement;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Requirement whereRank($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Requirement whereRequirementId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Requirement whereUpdatedAt($value)
+ * @property-read \App\Models\Fractions\Fraction|null $fraction
  * @mixin \Eloquent
  */
 class Requirement extends QualificationRequirement {}
