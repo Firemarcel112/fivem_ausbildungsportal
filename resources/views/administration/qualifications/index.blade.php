@@ -75,7 +75,7 @@
                                                 <x-icon :hovertext="__('general.ausblenden')" name="eye-off" />
                                             </a>
                                         @else
-                                            <a class="btn btn-warning btn-sm" data-bs-target="#qualification-{{ $qualification->getId() }}-show" data-bs-toggle="modal">
+                                            <a class="btn btn-secondaryw btn-sm" data-bs-target="#qualification-{{ $qualification->getId() }}-show" data-bs-toggle="modal">
                                                 <x-icon :hovertext="__('general.einblenden')" name="eye" />
                                             </a>
                                         @endif
