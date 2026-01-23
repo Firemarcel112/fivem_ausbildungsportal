@@ -21,6 +21,39 @@ class TrainingController extends Controller
 {
     use DiscordTrait;
 
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $this->checkPermission('trainings.show');
+
+        $trainings = Training::with([
+            'participants.account',
+            'trainer.account',
+            'qualification',
+        ])
+            ->isCompletedBuilder(0)
+            ->orderByDefault()
+            ->get();
+
+        $trainings_completed = Training::with([
+            'participants.account',
+            'trainer.account',
+            'qualification',
+        ])
+            ->isCompletedBuilder(1)
+            ->orderByDefault('DESC')
+            ->paginate(20);
+
+        return view('ausbilder.overview', [
+            'trainings' => $trainings,
+            'trainings_completed' => $trainings_completed,
+            'algorithmen_kategorien' => collect(),
+        ]);
+    }
+
     /**
      * Summary of store
      *
