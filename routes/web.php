@@ -35,7 +35,7 @@ Route::post('announcement/store', [\App\Http\Controllers\AnnouncementController:
 
 Route::prefix('ausbilder')
     ->name('ausbilder.')
-    ->controller(\App\Http\Controllers\Ausbilder\OverviewController::class)
+    ->controller(\App\Http\Controllers\TrainingController::class)
     ->group(function () {
         Route::get('/', 'index')
             ->name('index');
