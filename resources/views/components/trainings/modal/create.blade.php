@@ -22,7 +22,7 @@
             </div>
 
             <div>
-                <x-forms.input name="meeting_point" required value="{{ config('app.default_meeting_point') }}">
+                <x-forms.input name="meeting_point" required value="{{ config('settings.default_meeting_point') }}">
                     {{ __('general.treffpunkt') }}
                 </x-forms.input>
             </div>
