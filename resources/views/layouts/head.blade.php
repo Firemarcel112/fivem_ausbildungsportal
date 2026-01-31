@@ -17,4 +17,7 @@
         }
     </script>
     <script src="{{ asset('js/common.js') }}"></script>
+    @if (config('clockwork.enable'))
+        <script src="https://cdn.jsdelivr.net/gh/underground-works/clockwork-browser@1/dist/toolbar.js"></script>
+    @endif
 </head>

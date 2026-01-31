@@ -135,19 +135,10 @@ return [
     'registration_allowed' => env('REGISTRATION_ALLOWED', true),
     // Superadmin Benutzer
     'superadmins' => env('SUPERADMIN_USERS', ''),
-    // Standard Treffpunkt für Ausbildungen
-    'default_meeting_point' => env('DEFAULT_MEETING_POINT', null),
+
     // Name des Primary Discords
     'primary_guild_name' => env('PRIMARY_GUILD_NAME', null),
-    // Zeit in Minuten bevor die Ausbildung beginnt: Ob sich noch angemeldet werden darf
-    'enroll_deadline' => env('ENROLL_DEADLINE', 10),
-    // Zeit in Minuten bevor die Ausbildung beginnt ob diese schon abgeschlossen werden darf
-    'training_complete_minutes' => (int) env('TRAINING_COMPLETE_MINUTES', 10),
 
-    'certificates' => [
-        'organisation_name' => env('PDF_CERTIFICATE_ORGANISATION_NAME', env('APP_NAME')),
-        'sub_name' => env('PDF_CERTIFICATE_SUB_NAME'),
-    ],
     'pdf_sign' => [
         // Pfad zur Jsign java
         'jsign_path' => env('PDF_SIGN_JSIGNPDF_PATH'),

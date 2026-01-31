@@ -110,7 +110,7 @@
                     <div class="text-end">
                         @if (!$training->isCompleted())
                             @can('is_trainer')
-                                @if (now()->addMinutes(config('app.training_complete_minutes')) > $training->getDeadlineTime())
+                                @if (now()->addMinutes((int) config('settings.training_complete_minutes')) > $training->getDeadlineTime())
                                     <button class="btn btn-success" data-bs-target="#lehrgangAbschliessenModal" data-bs-toggle="modal" type="button">
                                         {{ __('general.lehrgang_abschliessen') }}
                                     </button>
