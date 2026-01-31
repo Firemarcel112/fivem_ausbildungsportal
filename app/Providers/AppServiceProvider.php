@@ -2,16 +2,21 @@
 
 namespace App\Providers;
 
+use App\Models\Setting;
 use App\Models\User;
 use App\Policies\GeneralPolicy;
 use App\Services\AlertService;
+use App\Traits\ClockworkTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class AppServiceProvider extends ServiceProvider
 {
+    use ClockworkTrait;
+
     /**
      * Register any application services.
      */
@@ -39,5 +44,21 @@ class AppServiceProvider extends ServiceProvider
                 return $user->isSuperadmin() || (config('app.env') == 'local');
             });
         }
+
+        $this->loadSettings();
+    }
+
+    /**
+     * Lädt die Settings in Config dateien
+     * @return void
+     */
+    public function loadSettings()
+    {
+        $this->beginClockwork('Load Settings');
+        $settings = Setting::all();
+        foreach ($settings as $setting) {
+            config(['settings.' . $setting->getKey() => $setting->getValue()]);
+        }
+        $this->endClockwork('Load Settings');
     }
 }

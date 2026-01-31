@@ -13,6 +13,8 @@ class ProductionSeeder extends Seeder
     public array $classes = [
         AddQualifications::class,
         AddPermissions::class,
+
+        AddDefaultSettings::class,
     ];
 
     /**

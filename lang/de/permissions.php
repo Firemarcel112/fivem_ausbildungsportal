@@ -7,6 +7,7 @@ return [
     'administration.qualifications.edit' => 'Administration: Qualifikationen bearbeiten',
     'administration.requirements.delete' => 'Administration: Voraussetzungen löschen',
     'administration.roles.edit' => 'Administration: Rollen bearbeiten',
+    'administration.settings.edit' => 'Administration: Einstellungen bearbeiten',
     'announcements' => 'Ankündigungen: erstellen',
     'documents.create' => 'Dokumente: Dokument manuell erstellen',
     'documents.delete' => 'Dokumente: Dokument löschen',

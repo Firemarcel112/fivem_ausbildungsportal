@@ -34,6 +34,19 @@ Route::middleware(['auth', 'alerts'])
                         Route::post('store', 'store')
                             ->name('store');
                     });
+                Route::prefix('settings')
+                    ->name('settings.')
+                    ->controller(\App\Http\Controllers\Administration\SettingsController::class)
+                    ->group(function () {
+                        Route::get('', 'index')
+                            ->name('index');
+                        Route::post('store', 'store')
+                            ->name('store');
+                        Route::get('{setting}/bearbeiten', 'edit')
+                            ->name('edit');
+                        Route::post('{setting}/update', 'update')
+                            ->name('update');
+                    });
             });
 
         Route::prefix('ausbildung')

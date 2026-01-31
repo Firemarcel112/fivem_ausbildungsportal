@@ -92,7 +92,7 @@
                                         @if ($training->getCountParticipants() < $training->getMinParticipants())
                                             <span>
                                                 <x-icon :classes="[
-                                                    'text-danger' => now() > $training->getDeadlineTime()->subMinutes(config('app.enroll_deadline')),
+                                                    'text-danger' => now() > $training->getDeadlineTime()->subMinutes((int) config('settings.enroll_deadline')),
                                                     'cursor-pointer',
                                                 ]" :hovertext="__('general.zu_wenig_teilnehmer', ['br' => '<br>', 'min' => $training->getMinParticipants()])" name="alert-triangle" />
                                             </span>

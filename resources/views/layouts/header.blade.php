@@ -104,6 +104,11 @@
                             'route_name' => 'admin.roles.index',
                             'permission' => 'administration.roles.edit',
                         ],
+                        [
+                            'text' => __('general.einstellungen'),
+                            'route_name' => 'admin.settings.index',
+                            'permission' => 'administration.settings.edit',
+                        ],
                     ]" :text="__('general.administration')" icon="login" />
                 </ul>
             </div>
