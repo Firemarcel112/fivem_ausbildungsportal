@@ -49,6 +49,19 @@ class Setting extends BaseModel
         return $setting ?? $default;
     }
 
+    /**
+     * Legt die Auditing Daten fest
+     *
+     * @param array $data
+     * @return array
+     */
+    public function transformAudit(array $data): array
+    {
+        $data['auditable_id'] = $this->getId();
+
+        return $data;
+    }
+
     #########################
     # SCOPES
     #########################
