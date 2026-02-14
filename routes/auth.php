@@ -128,6 +128,8 @@ Route::middleware(['auth', 'alerts'])
             ->group(function () {
                 Route::post('zuweisen/{user}', 'assign')
                     ->name('user.assign');
+                Route::post('entfernen/{user}', 'remove')
+                    ->name('user.remove');
             });
 
         Route::prefix('administration')

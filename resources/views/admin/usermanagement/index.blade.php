@@ -185,6 +185,17 @@
                                     @endif
                                 </td>
                                 <td class="text-end">
+                                    @if (!empty($user->account->qualifications->count()))
+                                        @can('user.qualifications.remove')
+                                            <a class="btn btn-sm btn-primary" data-bs-target="#remove-user-qualification-{{ $user->getId() }}" data-bs-toggle="modal">
+                                                <x-icon :classes="['text-danger']" :hovertext="__('general.qualifikation_entfernen')" name="circle-minus" />
+                                            </a>
+                                            @include('training.modals.remove_qualification', [
+                                                'user' => $user,
+                                                'qualifications' => $user->account->qualifications,
+                                            ])
+                                        @endcan
+                                    @endif
                                     @can('user.qualifications.assign')
                                         <a class="btn btn-sm btn-primary" data-bs-target="#add-user-qualification-{{ $user->getId() }}" data-bs-toggle="modal">
                                             <x-icon :classes="['text-success']" :hovertext="__('general.qualifikation_zuweisen')" name="plus" />

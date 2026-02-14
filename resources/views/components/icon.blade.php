@@ -1,3 +1,3 @@
-@include('default.icons.' . $name, [
+@includeIf('default.icons.' . $name, [
     'classes' => $classes,
 ])

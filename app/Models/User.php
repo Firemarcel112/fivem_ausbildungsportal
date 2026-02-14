@@ -3,14 +3,11 @@
 namespace App\Models;
 
 use App\Enums\Role as RoleEnum;
-use App\Models\Qualifications\Qualification;
 use App\Models\Trainings\TrainingBan;
 use App\Models\Training\TrainingBanReason;
 use App\Models\Trainings\Participant;
 use App\Models\User\Account;
-use App\Models\User\Qualification as UserQualification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
