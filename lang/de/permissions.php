@@ -22,6 +22,7 @@ return [
     'trainings.requests' => 'Ausbildungen: Ausbildungswünsche einsehen',
     'trainings.store' => 'Ausbildungen: anlegen',
     'user.qualifications.assign' => 'Qualifikationen manuell zuweisen',
+    'user.qualifications.remove' => 'Qualifikationen manuell entfernen',
     'usermanagement.delete' => 'Benutzerverwaltung: Benutzer löschen',
     'usermanagement.edit.account_data' => 'Benutzerverwaltung: Kontodaten bearbeiten',
     'usermanagement.edit.permissions' => 'Benutzerverwaltung: Berechtigungen bearbeiten',

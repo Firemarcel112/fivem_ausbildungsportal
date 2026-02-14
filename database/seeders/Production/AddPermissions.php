@@ -21,6 +21,7 @@ class AddPermissions extends Seeder
         'Qualifikationen' => [
             'permissions' => [
                 'user.qualifications.assign',
+                'user.qualifications.remove',
             ],
             'rank' => 50,
         ],

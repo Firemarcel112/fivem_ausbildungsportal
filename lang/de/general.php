@@ -258,6 +258,7 @@ return [
     'zertifikat_automatisch_erstellen' => 'Zertifikat wird automatisch erstellt',
     'zertifikat_wird_automatisch_nach_beendigung_erstellt' => 'Das Zertifikat wird nach abschliessen automatisch erstellt',
     'zertifikat_wird_nicht_automatisch_nach_beendigung_erstellt' => 'Das Zertifikat wird nach abschliessen nicht automatisch erstellt',
+    'qualifikation_entfernen' => 'Qualifikation entfernen',
     'qualifikation_sicher_ausblenden' => 'Möchtest du die Qualifikation ":name" wirklich ausblenden? :br  Ausgeblendete Qualifikationen werden in der Ausbildungsliste zum erstellen nicht mehr angezeigt.',
     'qualifikation_sicher_einblenden' => 'Möchtest du die Qualifikation ":name" wirklich einblenden? :br  Eingeblendete Qualifikationen werden in der Ausbildungsliste zum erstellen wieder angezeigt.',
     'wert' => 'Wert',
