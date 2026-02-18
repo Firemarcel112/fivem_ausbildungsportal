@@ -2,7 +2,7 @@
 
 namespace App\DTO;
 
-use App\Models\Trainings\Participant;
+use App\Models\User\Account;
 use Illuminate\Support\Carbon;
 
 class ParticipantDTO
@@ -59,12 +59,11 @@ class ParticipantDTO
 
     /**
      * Erstellt dass DTO anhand eines Participant Models
-     * @param Participant $participant
+     * @param Account $participant
      * @return ParticipantDTO
      */
-    public static function fromModel(Participant $participant): self
+    public static function fromModel(Account $participant): self
     {
-        $participant = $participant->account;
         return new self(
             $participant->getSalutation(),
             $participant->getFirstName(),

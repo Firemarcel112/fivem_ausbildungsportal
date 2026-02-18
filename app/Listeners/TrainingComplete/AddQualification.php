@@ -45,7 +45,7 @@ class AddQualification implements ShouldQueue
         try {
             $document_url = app(DocumentService::class)
                 ->createCertificate(
-                    ParticipantDTO::fromModel($participant),
+                    ParticipantDTO::fromModel($participant->account),
                     TrainerDTO::fromModel($training->trainer),
                     $qualification->getName(),
                     $training->getDate()->format('d.m.Y'),
