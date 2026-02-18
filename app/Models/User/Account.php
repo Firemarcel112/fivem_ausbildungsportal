@@ -9,7 +9,7 @@ use App\Models\Qualifications\Qualification;
 use App\Models\Trainings\Participant;
 use App\Models\User\Fraction as UserFraction;
 use App\Models\User\Qualification as UserQualification;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
