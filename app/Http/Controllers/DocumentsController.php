@@ -2,22 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Storage;
 use Exception;
+use App\DTO\ParticipantDTO;
+use App\DTO\TrainerDTO;
 use App\Facades\Alert;
 use App\Models\Document;
 use App\Models\DocumentLink;
 use App\Models\Qualifications\Qualification;
 use App\Models\User;
 use App\Models\User\Account;
-use App\Services\PdfService;
-use Carbon\Carbon;
+use App\Services\DocumentService;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use Spatie\LaravelPdf\Facades\Pdf;
-use Illuminate\Support\Facades\Log;
 
 class DocumentsController extends Controller
 {
@@ -154,12 +153,7 @@ class DocumentsController extends Controller
 
         if ($request->has('participant') && !empty($request->input('participant'))) {
             $user = Account::findOrFail($request->input('participant'));
-            $first_name = $user->getFirstName();
-            $last_name = $user->getLastName();
-            $salutation = $user->getSalutation();
-            $birth_date = $user->getDateOfBirth()->format('d.m.Y');
-            $birth_location = $user->getBirthLocation();
-            $full_name = $user->getFullName();
+            $participant_dto = ParticipantDTO::fromModel($user);
         } else {
             $genders = [
                 [
@@ -179,70 +173,35 @@ class DocumentsController extends Controller
                 ],
             ];
             $genders = collect($genders);
-            $first_name = $request->input('first_name');
-            $last_name = $request->input('last_name');
-            $salutation = $genders->firstWhere('value', $request->input('gender'))['salutation'];
-            $birth_date = Carbon::create($request->input('date_of_birth'))->format('d.m.Y');
-            $birth_location = $request->input('birth_location');
-            $full_name = $first_name . ' ' . $last_name;
+            $participant_dto = new ParticipantDTO(
+                $genders->firstWhere('value', $request->input('gender'))['salutation'],
+                $request->input('first_name'),
+                $request->input('last_name'),
+                Carbon::create($request->input('date_of_birth')),
+                $request->input('birth_location'),
+            );
         }
         $trainer = Account::findOrFail($request->input('trainer'));
         $training_date = Carbon::create($request->input('training_date'))->format('d.m.Y');
         $qualification = Qualification::findOrfail($request->input('qualification'));
 
-        $certificate_name = 'Zertifikat_' . str_replace(' ', '_', $full_name);
-        $qualification_name = str_replace(['ä', 'ö', 'ü', 'Ä', 'Ö', 'Ü'], ['ae', 'oe', 'ue', 'Ae', 'Oe', 'Ue'], $qualification->getName());
-        $certificate_name = $certificate_name . '_' . $qualification_name;
-        $certificate_name = $certificate_name . '_' . now()->format('Y_m_d_His');
+        $trainer_dto = TrainerDTO::fromModel($trainer);
 
-        $certificate_path = Storage::disk('certificates')->path($certificate_name . '.pdf');
+        $document_url = app(DocumentService::class)
+            ->createCertificate(
+                $participant_dto,
+                $trainer_dto,
+                $qualification->getName(),
+                $training_date,
+            );
+        Document::createDocument(
+            'Zertifikat: ' . $qualification->getName(),
+            $document_url,
+            null,
+            $user?->getUserId() ?? null,
+            'ACCOUNT',
+        );
 
-        try {
-            Pdf::view('certificate.index', [
-                'trainer_name' => $trainer->getFullName(),
-                'training_date' => $training_date,
-                'name' => $full_name,
-                'birth_date' => $birth_date,
-                'birth_location' => $birth_location,
-                'qualification' => $qualification->getName(),
-                'salutation' => $salutation,
-                'salutation_trainer' => $trainer->getSalutation(),
-            ])
-                ->format('A4')
-                ->paperSize(210, 297)
-                ->save($certificate_path);
-
-            $pdf_service = new PdfService();
-            $pdf_service->sign($certificate_path);
-
-            $url = Storage::disk('certificates')->path($certificate_name . '.pdf');
-
-            $document_model = new Document();
-            $document_model->setTitle('Zertifikat: ' . $qualification->getName());
-            $document_model->setUrl($url);
-            $document_model->save();
-
-            if (!empty($user)) {
-                $document_link = new DocumentLink();
-                $document_link->setDocumentId($document_model->getId());
-                $document_link->setLinkId($user->getId());
-                $document_link->setLinkType('ACCOUNT');
-                $document_link->save();
-            }
-        } catch (Exception $e) {
-            if (!empty($document_model)) {
-                if ($document_model->exists) {
-                    $document_model->delete();
-                }
-            }
-            if (!empty($certificate_path)) {
-                if (file_exists($certificate_path)) {
-                    unlink($certificate_path);
-                }
-            }
-            Log::error($e);
-            throw new Exception($e->getMessage());
-        }
         Alert::addAlert(__('general.erfolgreich_angelegt'), 'success');
 
         return redirect()->back();
