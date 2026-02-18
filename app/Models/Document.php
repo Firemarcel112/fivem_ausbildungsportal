@@ -36,6 +36,37 @@ class Document extends BaseModel
     # CUSTOM FUNCTIONS
     #########################
 
+    /**
+     * Erstellt ein Dokumenteneintrag in der Datenbank
+     * @param string $title
+     * @param string $url
+     * @param mixed $description
+     * @return Document
+     */
+    public static function createDocument(
+        string $title,
+        string $url,
+        ?string $description = null,
+        ?int $link_id = null,
+        ?string $link_type = null,
+    ): Document {
+        $document = new self();
+        $document->setTitle($title);
+        $document->setUrl($url);
+        $document->setDescription($description);
+        $document->save();
+
+        if (!is_null($link_id) && !is_null($link_type)) {
+            $document_link = new DocumentLink();
+            $document_link->setDocumentId($document->getDocumentId());
+            $document_link->setLinkId($link_id);
+            $document_link->setLinkType($link_type);
+            $document_link->save();
+        }
+
+        return $document;
+    }
+
     #########################
     # SCOPES
     #########################

@@ -4,7 +4,7 @@ namespace {{ namespace }};
 
 {{ factoryImport }}
 use App\Models\BaseModel;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
 class {{ class }} extends BaseModel
