@@ -375,7 +375,7 @@ class User extends Authenticatable implements Auditable
     public function scopeWithIsTrainer(Builder $query): Builder
     {
         return $query
-            ->with(['permissions', 'roles.permissions'])
+            ->with(['roles.permissions'])
             ->where(function (Builder $q) {
                 $q->whereHas('permissions', function ($q2) {
                     $q2->where('name', 'is_trainer');

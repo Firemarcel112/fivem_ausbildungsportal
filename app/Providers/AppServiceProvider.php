@@ -6,6 +6,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Policies\GeneralPolicy;
 use App\Services\AlertService;
+use App\Services\DocumentService;
 use App\Traits\ClockworkTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Blade;
@@ -24,6 +25,10 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton('alert', function ($app) {
             return new AlertService();
+        });
+
+        $this->app->singleton(DocumentService::class, function ($app) {
+            return new DocumentService();
         });
     }
 

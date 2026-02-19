@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Exception;
 use App\DTO\ParticipantDTO;
 use App\DTO\TrainerDTO;
+use App\Enums\Gender;
 use App\Facades\Alert;
 use App\Models\Document;
 use App\Models\DocumentLink;
@@ -13,13 +14,18 @@ use App\Models\User;
 use App\Models\User\Account;
 use App\Services\DocumentService;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class DocumentsController extends Controller
 {
+
+    public DocumentService $document_service;
+
+    public function __construct(DocumentService $document_service)
+    {
+        $this->document_service = $document_service;
+    }
 
     /**
      * Zeigt die Seite an
@@ -29,15 +35,8 @@ class DocumentsController extends Controller
      */
     public function index(Request $request)
     {
-        $link_types = [
-            'edit_permission' => auth()->user()->can('documents.edit'),
-            'ACCOUNT' => auth()->user()->can('documents.show.account'),
-        ];
-        if (!auth()->user()->canAny([
-            'documents.show.account',
-        ])) {
-            abort(403);
-        }
+        $this->checkPermission(['documents.show.account']);
+
         if ($request->isMethod('POST')) {
             $request->flash();
         }
@@ -45,92 +44,44 @@ class DocumentsController extends Controller
         $items_per_page = $request->input('items_per_page', 20);
         $sort_by = $request->input('sort_by', 'created_at');
 
-        $documents = Document::with('documentAssign')
-            ->when(!empty($search), function ($query) use ($search) {
-                $query->whereLike('title', '%' . $search . '%');
-            })
-            ->get()
-            ->filter(function ($document) use ($link_types) {
-                if (empty($document->documentAssign) && !$link_types['edit_permission']) {
-                    return null;
-                }
-                if (empty($document->documentAssign) && $link_types['edit_permission']) {
-                    return $document;
-                }
-                $doc_link = $document->documentAssign->getLinkType();
-                if (empty($link_types[$doc_link] ?? false)) {
-                    return null;
-                }
-                return $document;
-            })
-            ->each(function ($document) {
-                if (Str::contains($document->getTitle(), 'Zertifikat')) {
-                    $document->type = 'ZERTIFIKAT';
-                }
-                if ($document?->documentAssign) {
-                    $assign = $document->documentAssign;
-                    if ($assign->getLinkType() == 'ACCOUNT') {
-                        $assign_model = Account::find($assign->getLinkId());
-                        $document->assign = [
-                            'name' => $assign_model->getFullName(),
-                            'url' => route('profile.show', $assign_model->getId()),
-                        ];
-                    }
-                } else {
-                    $document->assign = [
-                        'name' => __('general.nicht_zugeordnet'),
-                        'url' => null,
-                    ];
-                }
-                return $document;
-            });
-
-        switch ($sort_by) {
-            case 'created_at':
-                $documents = $documents->sortByDesc('created_at');
-                break;
-            case 'assigned':
-                $documents = $documents->sortBy(function ($document) {
-                    return $document->assign['url'];
-                });
+        $can_edit = Auth::user()->can('documents.edit');
+        $allowed_types = [];
+        if (Auth::user()->can('documents.show.account')) {
+            $allowed_types[] = 'ACCOUNT';
         }
 
-        $genders = [
-            [
-                'name' => __('general.maennlich') . ' (' . __('general.anrede') . ': ' . __('general.herr') . ')',
-                'value' => 'M',
-            ],
-            [
-                'name' => __('general.weiblich') . ' (' . __('general.anrede') . ': ' . __('general.frau') . ')',
-                'value' => 'W',
-            ],
-            [
-                'name' => __('general.divers') . ' (' . __('general.anrede') . ': ' . __('general.ohne') . ')',
-                'value' => 'D',
-            ],
-        ];
+        $documents = Document::with([
+            'documentAssign',
+            'linkedAccount'
+        ])
+            ->isSearch($search)
+            ->joinDocumentAssign()
+            ->where(function ($query) use ($can_edit, $allowed_types) {
+                $query->when($can_edit, function ($query) use ($can_edit) {
+                    return $query->orWhereNull(DocumentLink::getTableName() . '.id');
+                })
+                    ->when(!empty($allowed_types), function ($query) use ($allowed_types) {
+                        return $query->orWhereIn(DocumentLink::getTableName() . '.link_type', $allowed_types);
+                    });
+            })
+            ->when($sort_by == 'assigned', function ($query) {
+                return $query->orderByAssigned();
+            }, function ($query) use ($sort_by) {
+                return $query->orderBy($sort_by, 'desc');
+            })
+            ->paginate($items_per_page);
+
+        $genders = Gender::forSelect();
 
         $users = Account::get();
 
-        $trainers = User::with(['permissions', 'account'])
-            ->withIsTrainer()
+        $trainers = User::withIsTrainer()
             ->get();
 
-        $data = new LengthAwarePaginator(
-            $documents->forPage($request->input('page', 1), $items_per_page),
-            $documents->count(),
-            $items_per_page,
-            $request->input('page', 1),
-            ['path' => $request->url(), 'query' => $request->query()]
-        );
-
-        $qualifications = Cache::rememberForever('qualifications_all', function () {
-            return Qualification::isOrderByDefault()
-                ->get();
-        });
+        $qualifications = Qualification::getAllQualifications();
 
         return view('documents.index', [
-            'data' => $data,
+            'data' => $documents,
             'items_per_page' => $items_per_page,
             'genders' => $genders,
             'users' => $users,
@@ -155,26 +106,10 @@ class DocumentsController extends Controller
             $user = Account::findOrFail($request->input('participant'));
             $participant_dto = ParticipantDTO::fromModel($user);
         } else {
-            $genders = [
-                [
-                    'name' => __('general.maennlich') . ' (' . __('general.anrede') . ': ' . __('general.herr') . ')',
-                    'value' => 'M',
-                    'salutation' => __('general.herr'),
-                ],
-                [
-                    'name' => __('general.weiblich') . ' (' . __('general.anrede') . ': ' . __('general.frau') . ')',
-                    'value' => 'W',
-                    'salutation' => __('general.frau'),
-                ],
-                [
-                    'name' => __('general.divers') . ' (' . __('general.anrede') . ': ' . __('general.ohne') . ')',
-                    'value' => 'D',
-                    'salutation' => '',
-                ],
-            ];
-            $genders = collect($genders);
+
+            $salutation = Gender::tryFrom($request->input('gender'))->salutation();
             $participant_dto = new ParticipantDTO(
-                $genders->firstWhere('value', $request->input('gender'))['salutation'],
+                $salutation,
                 $request->input('first_name'),
                 $request->input('last_name'),
                 Carbon::create($request->input('date_of_birth')),
@@ -187,7 +122,7 @@ class DocumentsController extends Controller
 
         $trainer_dto = TrainerDTO::fromModel($trainer);
 
-        $document_url = app(DocumentService::class)
+        $document_url = $this->document_service
             ->createCertificate(
                 $participant_dto,
                 $trainer_dto,
@@ -267,7 +202,7 @@ class DocumentsController extends Controller
     {
         $this->checkPermission('documents.edit');
 
-        $document->setTitle($request->input('title', $document->getTitle()));
+        $document->title = $request->input('title', $document->title);
         if (!empty($request->input('assign'))) {
             $assign = $request->input('assign', $document->documentAssign?->getId() ?? 0);
             if (!empty($document->documentAssign)) {
@@ -303,8 +238,8 @@ class DocumentsController extends Controller
         if (!empty($document->documentAssign)) {
             $document->documentAssign->delete();
         }
-        if (file_exists($document->getUrl())) {
-            unlink($document->getUrl());
+        if (file_exists($document->url)) {
+            unlink($document->url);
         }
         $document->delete();
         Alert::addAlert(__('general.erfolgreich_geloescht'), 'success');
