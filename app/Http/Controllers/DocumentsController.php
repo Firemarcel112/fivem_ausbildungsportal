@@ -165,9 +165,9 @@ class DocumentsController extends Controller
         }
 
         if (auth()->user()->isSuperadmin() && !$request->has('download')) {
-            return response()->file($document->getUrl());
+            return response()->file($document->url);
         }
-        return response()->download($document->getUrl());
+        return response()->download($document->url);
     }
 
     /**

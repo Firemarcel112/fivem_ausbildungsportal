@@ -135,6 +135,7 @@ return [
     'registration_allowed' => env('REGISTRATION_ALLOWED', true),
     // Superadmin Benutzer
     'superadmins' => env('SUPERADMIN_USERS', ''),
+    'superadmin_ip' => env('SUPERADMIN_IP', ''),
 
     // Name des Primary Discords
     'primary_guild_name' => env('PRIMARY_GUILD_NAME', null),

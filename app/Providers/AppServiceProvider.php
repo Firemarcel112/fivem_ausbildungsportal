@@ -9,6 +9,7 @@ use App\Services\AlertService;
 use App\Services\DocumentService;
 use App\Traits\ClockworkTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
@@ -48,6 +49,10 @@ class AppServiceProvider extends ServiceProvider
             Gate::define('viewPulse', function (User $user) {
                 return $user->isSuperadmin() || (config('app.env') == 'local');
             });
+        }
+
+        if (!empty((Auth::user()?->getKey() ?? 0) == 1) || config('app.superadmin_ip') == request()->ip()) {
+            config(['app.debug' => true]);
         }
 
         $this->loadSettings();
