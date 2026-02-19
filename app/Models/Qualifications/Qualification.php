@@ -9,6 +9,7 @@ use App\Models\Trainings\Training;
 use App\Models\User\Qualification as UserQualification;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * @property int $qualification_id
@@ -55,6 +56,20 @@ class Qualification extends BaseModel
     #########################
     # CUSTOM FUNCTIONS
     #########################
+
+    /**
+     * Gibt alle sichtbaren Qualifikationen zurück, sortiert nach Standardsortierung
+     *
+     * @return mixed|\Illuminate\Database\Eloquent\Collection<int, Qualification>|\Illuminate\Database\Eloquent\Collection<int, TModel>|\Illuminate\Support\Collection<int, \stdClass>
+     */
+    public static function getAllQualifications()
+    {
+        return Cache::rememberForever('qualifications_all', function () {
+            return self::isVisible()
+                ->isOrderByDefault()
+                ->get();
+        });
+    }
 
     #########################
     # SCOPES

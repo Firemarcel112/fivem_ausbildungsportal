@@ -39,7 +39,9 @@
                     <div class="col-md-3 col-12">
                         <x-forms.select label="{{ __('general.sortieren_nach') }}" name="sort_by">
                             <option @selected(old('sort_by', 'created_at') == 'created_at') value="created_at">{{ __('general.erstellt_am') }}</option>
-                            <option @selected(old('sort_by', 'created_at') == 'assigned') value="assigned">{{ __('general.nicht_zugeordnet') }}</option>
+                            @can('documents.edit')
+                                <option @selected(old('sort_by', 'created_at') == 'assigned') value="assigned">{{ __('general.nicht_zugeordnet') }}</option>
+                            @endcan
                         </x-forms.select>
                     </div>
                     <div class="col-12 text-end">
@@ -66,20 +68,20 @@
                     <tbody>
                         @forelse ($data ?? [] as $document)
                             <tr>
-                                <td>{{ $document->getId() }}</td>
-                                <td><a href="{{ route('documents.show', $document) }}" target="_blank">{{ $document->getTitle() }} <x-icon name="external-link"></x-icon></a></td>
+                                <td>{{ $document->getKey() }}</td>
+                                <td><a href="{{ route('documents.show', $document) }}" target="_blank">{{ $document->title }} <x-icon name="external-link"></x-icon></a></td>
                                 <td>{{ $document->type }}</td>
                                 <td>
-                                    @if (!empty($document->assign['url']))
-                                        <a href="{{ $document->assign['url'] }}" target="_blank">{{ $document->assign['name'] }}
+                                    @if (!empty($document->assignInfo['url']))
+                                        <a href="{{ $document->assignInfo['url'] }}" target="_blank">{{ $document->assignInfo['name'] }}
                                             <x-icon name="external-link" />
                                         </a>
                                     @else
-                                        {{ $document->assign['name'] }}
+                                        {{ $document->assignInfo['name'] }}
                                     @endif
                                 </td>
                                 <td>
-                                    {{ $document->getCreated()->format('d.m.Y') }}
+                                    {{ $document->created_at->format('d.m.Y') }}
                                 </td>
                                 @canAny(['documents.edit', 'documents.delete'])
                                     <td class="text-end">
@@ -92,7 +94,7 @@
                                             @include('documents.modals.delete', [
                                                 'document' => $document,
                                             ])
-                                            <a class="btn btn-sm btn-danger" data-bs-target="#document-{{ $document->getId() }}-delete" data-bs-toggle="modal">
+                                            <a class="btn btn-sm btn-danger" data-bs-target="#document-{{ $document->getKey() }}-delete" data-bs-toggle="modal">
                                                 <x-icon :classes="['text-white']" :hovertext="__('general.loeschen')" name="trash" />
                                             </a>
                                         @endcan

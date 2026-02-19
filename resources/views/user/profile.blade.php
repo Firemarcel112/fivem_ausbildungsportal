@@ -69,8 +69,8 @@
                             @forelse ($user->account->certificates as $document)
                                 <li>
                                     <a href="{{ route('documents.show', $document) }}" target="_blank">
-                                        {{ $document->getTitle() }}
-                                        ({{ __('general.dokument_erstellt_am') }} {{ now()->parse($document->getCreated())->format('d.m.Y') }})
+                                        {{ $document->title }}
+                                        ({{ __('general.dokument_erstellt_am') }} {{ $document->created_at->format('d.m.Y') }})
                                     </a>
                                 </li>
                             @empty

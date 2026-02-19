@@ -14,12 +14,14 @@ use Illuminate\Support\Facades\Log;
 
 class AddQualification implements ShouldQueue
 {
+    public DocumentService $document_service;
+
     /**
      * Create the event listener.
      */
-    public function __construct()
+    public function __construct(DocumentService $document_service)
     {
-        //
+        $this->document_service = $document_service;
     }
 
     /**
@@ -43,7 +45,7 @@ class AddQualification implements ShouldQueue
         }
 
         try {
-            $document_url = app(DocumentService::class)
+            $document_url = $this->document_service
                 ->createCertificate(
                     ParticipantDTO::fromModel($participant->account),
                     TrainerDTO::fromModel($training->trainer),

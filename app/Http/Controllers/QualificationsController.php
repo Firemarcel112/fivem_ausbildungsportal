@@ -55,7 +55,7 @@ class QualificationsController extends Controller
         foreach ($qualifications as $qualification) {
             try {
                 $document = $user->account->certificates->where('title', 'LIKE', 'Zertifikat: ' . $qualification->getName())->first();
-                $document_id = $document->getId();
+                $document_id = $document->getKey();
                 DocumentLink::firstWhere('document_id', $document_id)?->delete();
 
                 $user_qualification = $user->account->directQualifications->where('qualification_id', $qualification->getId())

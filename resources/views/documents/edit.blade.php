@@ -8,7 +8,7 @@
                     {{ __('general.dokumente') }}
                 </div>
                 <h2 class="page-title">
-                    {{ $document->getTitle() }}
+                    {{ $document->title }}
                 </h2>
             </div>
             <div class="col-auto ms-auto d-print-none">
@@ -24,7 +24,7 @@
             <x-slot:body>
                 <form action="{{ route('documents.update', $document) }}" class="space-y" method="POST">
                     @csrf
-                    <x-forms.input :default="$document->gettitle()" name="title" required>
+                    <x-forms.input :default="$document->title" name="title" required>
                         {{ __('general.name') }}
                     </x-forms.input>
 

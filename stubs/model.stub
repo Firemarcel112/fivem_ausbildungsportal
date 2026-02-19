@@ -25,6 +25,6 @@ class {{ class }} extends BaseModel
 	#########################
 
 	#########################
-	# GET & SET
+	# Accessor & Mutators
 	#########################
 }
