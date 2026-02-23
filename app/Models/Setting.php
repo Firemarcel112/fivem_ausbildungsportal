@@ -3,7 +3,8 @@
 namespace App\Models;
 
 use App\Models\BaseModel;
-use Carbon\Carbon;
+use App\Observers\SettingsObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -27,6 +28,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder<static>|Setting whereValue($value)
  * @mixin \Eloquent
  */
+#[ObservedBy(SettingsObserver::class)]
 class Setting extends BaseModel
 {
     protected $table = 'settings';
@@ -43,7 +45,7 @@ class Setting extends BaseModel
      * @param string|null $default
      * @return string|null
      */
-    public static function value(string $key, ?string $default = null): ?string
+    public static function getValue(string $key, ?string $default = null): ?string
     {
         $setting = self::isKey($key)?->first()?->value;
         return $setting ?? $default;
@@ -57,7 +59,7 @@ class Setting extends BaseModel
      */
     public function transformAudit(array $data): array
     {
-        $data['auditable_id'] = $this->getId();
+        $data['auditable_id'] = $this->getKey();
 
         return $data;
     }
@@ -83,153 +85,6 @@ class Setting extends BaseModel
     #########################
 
     #########################
-    # GET & SET
+    # ACCESSORS & MUTATORS
     #########################
-
-    /**
-     * Get the setting_id attribute.
-     *
-     * @return int
-     */
-    public function getId(): int
-    {
-        return $this->setting_id;
-    }
-
-    /**
-     * Set the setting_id attribute.
-     *
-     * @param int $value
-     * @return void
-     */
-    public function setId(int $value)
-    {
-        $this->setting_id = $value;
-    }
-
-    /**
-     * Get the setting_id attribute.
-     *
-     * @return int
-     */
-    public function getSettingId(): int
-    {
-        return $this->setting_id;
-    }
-
-    /**
-     * Set the setting_id attribute.
-     *
-     * @param int $value
-     * @return void
-     */
-    public function setSettingId(int $value)
-    {
-        $this->setting_id = $value;
-    }
-
-    /**
-     * Get the key attribute.
-     *
-     * @return string
-     */
-    public function getKey(): string
-    {
-        return $this->key;
-    }
-
-    /**
-     * Set the key attribute.
-     *
-     * @param string $value
-     * @return void
-     */
-    public function setKey(string $value)
-    {
-        $this->key = $value;
-    }
-
-    /**
-     * Get the value attribute.
-     *
-     * @return ?string
-     */
-    public function getValue(): ?string
-    {
-        return $this->value;
-    }
-
-    /**
-     * Set the value attribute.
-     *
-     * @param ?string $value
-     * @return void
-     */
-    public function setValue(?string $value)
-    {
-        $this->value = $value;
-    }
-
-    /**
-     * Get the description attribute.
-     *
-     * @return ?string
-     */
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    /**
-     * Set the description attribute.
-     *
-     * @param ?string $value
-     * @return void
-     */
-    public function setDescription(?string $value)
-    {
-        $this->description = $value;
-    }
-
-    /**
-     * Get the created_at attribute.
-     *
-     * @return ?Carbon
-     */
-    public function getCreated(): ?Carbon
-    {
-        return is_null($this->created_at) ? null : Carbon::parse($this->created_at);
-    }
-
-    /**
-     * Set the created_at attribute.
-     *
-     * @param ?Carbon $value
-     * @return void
-     */
-    public function setCreated(?Carbon $value)
-    {
-        $this->created_at = $value;
-    }
-
-    /**
-     * Get the updated_at attribute.
-     *
-     * @return ?Carbon
-     */
-    public function getUpdated(): ?Carbon
-    {
-        return is_null($this->updated_at) ? null : Carbon::parse($this->updated_at);
-    }
-
-    /**
-     * Set the updated_at attribute.
-     *
-     * @param ?Carbon $value
-     * @return void
-     */
-    public function setUpdated(?Carbon $value)
-    {
-        $this->updated_at = $value;
-    }
 }

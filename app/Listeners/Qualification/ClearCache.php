@@ -19,6 +19,7 @@ class ClearCache
      */
     public function handle(QualificationAction $event): void
     {
-        cache()->forget('qualifications_all');
+        cache()->forget('qualifications.all');
+        cache()->forget('qualifications.all.with_hidden');
     }
 }

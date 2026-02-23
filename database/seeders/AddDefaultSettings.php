@@ -48,8 +48,8 @@ class AddDefaultSettings extends Seeder
             ]);
 
             if (!$model->exists) {
-                $model->setValue($setting['value']);
-                $model->setDescription($setting['description']);
+                $model->value = $setting['value'];
+                $model->description = $setting['description'];
             }
             $model->save();
         }

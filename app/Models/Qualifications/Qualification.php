@@ -14,31 +14,31 @@ use Illuminate\Support\Facades\Cache;
 /**
  * @property int $qualification_id
  * @property string $name
+ * @property int $generate_certificate Wenn 1 dann werden automatisch bei abschluss dieser Qualifikation Zertifikate erstellt
  * @property int $rank
+ * @property int $hide
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
- * @method static Builder<static>|Qualification isOrderByDefault()
- * @method static Builder<static>|Qualification newModelQuery()
- * @method static Builder<static>|Qualification newQuery()
- * @method static Builder<static>|Qualification query()
- * @method static Builder<static>|Qualification whereCreatedAt($value)
- * @method static Builder<static>|Qualification whereName($value)
- * @method static Builder<static>|Qualification whereQualificationId($value)
- * @method static Builder<static>|Qualification whereRank($value)
- * @method static Builder<static>|Qualification whereUpdatedAt($value)
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Requirement> $requirements
  * @property-read int|null $requirements_count
- * @property int $generate_certificate Wenn 1 dann werden automatisch bei abschluss dieser Qualifikation Zertifikate erstellt
- * @property int $hide
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Training> $trainings
  * @property-read int|null $trainings_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, UserQualification> $userQualifications
  * @property-read int|null $user_qualifications_count
+ * @method static Builder<static>|Qualification isOrderByDefault()
  * @method static Builder<static>|Qualification isVisible(bool $value = true)
+ * @method static Builder<static>|Qualification newModelQuery()
+ * @method static Builder<static>|Qualification newQuery()
+ * @method static Builder<static>|Qualification query()
+ * @method static Builder<static>|Qualification whereCreatedAt($value)
  * @method static Builder<static>|Qualification whereGenerateCertificate($value)
  * @method static Builder<static>|Qualification whereHide($value)
+ * @method static Builder<static>|Qualification whereName($value)
+ * @method static Builder<static>|Qualification whereQualificationId($value)
+ * @method static Builder<static>|Qualification whereRank($value)
+ * @method static Builder<static>|Qualification whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class Qualification extends BaseModel
@@ -60,11 +60,18 @@ class Qualification extends BaseModel
     /**
      * Gibt alle sichtbaren Qualifikationen zurück, sortiert nach Standardsortierung
      *
+     * @param $with_hidden Wenn true, werden auch ausgeblendete Qualifikationen zurückgegeben
      * @return mixed|\Illuminate\Database\Eloquent\Collection<int, Qualification>|\Illuminate\Database\Eloquent\Collection<int, TModel>|\Illuminate\Support\Collection<int, \stdClass>
      */
-    public static function getAllQualifications()
+    public static function getAllQualifications($with_hidden = false)
     {
-        return Cache::rememberForever('qualifications_all', function () {
+        if ($with_hidden) {
+            return Cache::rememberForever('qualifications.all.with_hidden', function () {
+                return self::isOrderByDefault()
+                    ->get();
+            });
+        }
+        return Cache::rememberForever('qualifications.all', function () {
             return self::isVisible()
                 ->isOrderByDefault()
                 ->get();

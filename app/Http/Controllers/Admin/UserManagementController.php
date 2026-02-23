@@ -42,7 +42,7 @@ class UserManagementController extends Controller
             $fraction = array_map('intval', $fraction);
         }
         $sort_by = $request->sort_by ?? 'first_name';
-        $qualifications = Cache::rememberForever('qualifications_all', function () {
+        $qualifications = Cache::rememberForever('qualifications.all.with_hidden', function () {
             return Qualification::isOrderByDefault()
                 ->get();
         });
@@ -52,7 +52,9 @@ class UserManagementController extends Controller
             'discord',
             'account.fractions',
             'account.qualifications',
-            'activeTrainingBan.issuer.account'
+            'activeTrainingBan.issuer.account',
+            'permissions',
+            'roles.permissions',
         ])
             ->when(!empty($search), function ($query) use ($search) {
                 $query->whereHas('account', function ($query) use ($search) {

@@ -29,7 +29,7 @@ class Create extends Component
 
     public function getQualifications(): Collection
     {
-        return Cache::rememberForever('qualifications_all', function () {
+        return Cache::rememberForever('qualifications.all', function () {
             return Qualification::isVisible()
                 ->isOrderByDefault()
                 ->get();

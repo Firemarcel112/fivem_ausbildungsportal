@@ -13,7 +13,7 @@ use Carbon\Carbon;
  * @property int $user_id
  * @property string $date_from
  * @property string $date_to
- * @property \App\Models\Training\TrainingBanReason|null $reason
+ * @property string $reason
  * @property int $issuer_id
  * @property string|null $internal_note
  * @property \Illuminate\Support\Carbon|null $created_at

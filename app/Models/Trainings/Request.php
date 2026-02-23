@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
- * @property-read Qualifikation|null $qualification
+ * @property-read Qualification|null $qualification
  * @property-read User|null $user
  * @method static Builder<static>|Request newModelQuery()
  * @method static Builder<static>|Request newQuery()

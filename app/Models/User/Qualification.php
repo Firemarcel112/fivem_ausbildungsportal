@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
+ * @method static Builder<static>|Qualification isQualificationId(int $qualification_id)
  * @method static Builder<static>|Qualification newModelQuery()
  * @method static Builder<static>|Qualification newQuery()
  * @method static Builder<static>|Qualification query()
@@ -26,7 +27,6 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder<static>|Qualification whereUpdatedAt($value)
  * @method static Builder<static>|Qualification whereUserId($value)
  * @method static Builder<static>|Qualification whereUserQualificationId($value)
- * @method static Builder<static>|Qualification isQualificationId(int $qualification_id)
  * @mixin \Eloquent
  */
 class Qualification extends BaseModel

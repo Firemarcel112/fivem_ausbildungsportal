@@ -17,8 +17,12 @@ use Illuminate\Database\Eloquent\Builder;
  * @property string|null $notices
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read Account|null $account
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
+ * @property-read \App\Models\Trainings\Training|null $training
+ * @method static Builder<static>|Participant isTrainingId(int $training_id)
+ * @method static Builder<static>|Participant isUserId(int $user_id)
  * @method static Builder<static>|Participant newModelQuery()
  * @method static Builder<static>|Participant newQuery()
  * @method static Builder<static>|Participant query()
@@ -31,10 +35,6 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder<static>|Participant whereTrainingParticipantId($value)
  * @method static Builder<static>|Participant whereUpdatedAt($value)
  * @method static Builder<static>|Participant whereUserId($value)
- * @property-read Account|null $account
- * @property-read \App\Models\Trainings\Training|null $training
- * @method static Builder<static>|Participant isTrainingId(int $training_id)
- * @method static Builder<static>|Participant isUserId(int $user_id)
  * @mixin \Eloquent
  */
 class Participant extends BaseModel
