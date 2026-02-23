@@ -10,28 +10,25 @@ use Illuminate\Database\Eloquent\Builder;
 /**
  * @property int $requirement_id
  * @property int $qualification_id
- * @property int $fraktion_id
+ * @property int $fraction_id
  * @property string $name
  * @property int $rank
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
- * @method static Builder<static>|Requirement isOrderByDefault()
+ * @property-read Fraction|null $fraction
  * @method static Builder<static>|Requirement newModelQuery()
  * @method static Builder<static>|Requirement newQuery()
+ * @method static Builder<static>|Requirement orderByDefault()
  * @method static Builder<static>|Requirement query()
  * @method static Builder<static>|Requirement whereCreatedAt($value)
- * @method static Builder<static>|Requirement whereFraktionId($value)
+ * @method static Builder<static>|Requirement whereFractionId($value)
  * @method static Builder<static>|Requirement whereName($value)
  * @method static Builder<static>|Requirement whereQualificationId($value)
  * @method static Builder<static>|Requirement whereRank($value)
  * @method static Builder<static>|Requirement whereRequirementId($value)
  * @method static Builder<static>|Requirement whereUpdatedAt($value)
- * @property int $fraction_id
- * @method static Builder<static>|Requirement orderByDefault()
- * @method static Builder<static>|Requirement whereFractionId($value)
- * @property-read Fraction|null $fraction
  * @mixin \Eloquent
  */
 class Requirement extends BaseModel

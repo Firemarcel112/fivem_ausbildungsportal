@@ -13,12 +13,15 @@ use App\Models\Qualifications\Qualification;
 use App\Models\User;
 use App\Models\User\Account;
 use App\Services\DocumentService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class DocumentsController extends Controller
 {
+
+    use AuthorizesRequests;
 
     public DocumentService $document_service;
 
@@ -50,25 +53,10 @@ class DocumentsController extends Controller
             $allowed_types[] = 'ACCOUNT';
         }
 
-        $documents = Document::with([
-            'documentAssign',
-            'linkedAccount'
+        $documents = Document::filteredList($can_edit, $allowed_types, [
+            'search' => $search,
+            'sort_by' => $sort_by,
         ])
-            ->isSearch($search)
-            ->joinDocumentAssign()
-            ->where(function ($query) use ($can_edit, $allowed_types) {
-                $query->when($can_edit, function ($query) use ($can_edit) {
-                    return $query->orWhereNull(DocumentLink::getTableName() . '.id');
-                })
-                    ->when(!empty($allowed_types), function ($query) use ($allowed_types) {
-                        return $query->orWhereIn(DocumentLink::getTableName() . '.link_type', $allowed_types);
-                    });
-            })
-            ->when($sort_by == 'assigned', function ($query) {
-                return $query->orderByAssigned();
-            }, function ($query) use ($sort_by) {
-                return $query->orderBy($sort_by, 'desc');
-            })
             ->paginate($items_per_page);
 
         $genders = Gender::forSelect();
@@ -102,7 +90,7 @@ class DocumentsController extends Controller
     {
         $this->checkPermission('documents.create');
 
-        if ($request->has('participant') && !empty($request->input('participant'))) {
+        if ($request->filled('participant')) {
             $user = Account::findOrFail($request->input('participant'));
             $participant_dto = ParticipantDTO::fromModel($user);
         } else {
@@ -151,20 +139,9 @@ class DocumentsController extends Controller
      */
     public function show(Request $request, Document $document)
     {
-        $document->load('documentAssign');
-        $document_assign = $document->documentAssign;
-        if (!empty($document_assign)) {
-            $link_type = strtolower($document->documentAssign->getLinkType());
-            $is_own_file = auth()->user()->getId() == $document_assign->getLinkId();
-            $has_permission = auth()->user()->hasPermissionTo('documents.show.' . $link_type);
-            if ($link_type == 'ACCOUNT' && (!$is_own_file || !$has_permission)) {
-                abort(403);
-            }
-        } else if (!auth()->user()->hasPermissionTo('documents.edit')) {
-            abort(403);
-        }
+        $this->authorize('view', $document);
 
-        if (auth()->user()->isSuperadmin() && !$request->has('download')) {
+        if (Auth::user()->isSuperadmin() && !$request->has('download')) {
             return response()->file($document->url);
         }
         return response()->download($document->url);
@@ -204,19 +181,20 @@ class DocumentsController extends Controller
 
         $document->title = $request->input('title', $document->title);
         if (!empty($request->input('assign'))) {
-            $assign = $request->input('assign', $document->documentAssign?->getId() ?? 0);
+            $assign = $request->input('assign', $document->documentAssign?->getKey() ?? 0);
             if (!empty($document->documentAssign)) {
-                $assign_id = $document->documentAssign->getId();
+                $assign_id = $document->documentAssign->getKey();
                 if ($assign_id != $assign) {
                     $document->documentAssign->delete();
                 }
             }
 
             if (!empty($assign)) {
-                $model = new DocumentLink();
-                $model->setLinkId($assign);
-                $model->setLinkType('ACCOUNT');
-                $model->setDocumentId($document->getId());
+                $model = DocumentLink::create([
+                    'document_id' => $document->getKey(),
+                    'link_id' => $assign,
+                    'link_type' => 'ACCOUNT',
+                ]);
                 $model->save();
             }
         }

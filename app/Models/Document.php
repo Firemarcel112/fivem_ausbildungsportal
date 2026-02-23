@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
+
 /**
  * @property int $document_id
  * @property string $title
@@ -16,11 +17,18 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
  * @property string $url
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read mixed $assign_info
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \App\Models\DocumentLink|null $documentAssign
+ * @property-read Account|null $linkedAccount
+ * @property-read mixed $type
+ * @method static Builder<static>|Document filteredList(bool $can_edit = false, array $allowed_types = [], array $filters = [])
+ * @method static Builder<static>|Document isSearch(?string $search)
+ * @method static Builder<static>|Document joinDocumentAssign()
  * @method static Builder<static>|Document newModelQuery()
  * @method static Builder<static>|Document newQuery()
+ * @method static Builder<static>|Document orderByAssigned(string $direction = 'asc')
  * @method static Builder<static>|Document query()
  * @method static Builder<static>|Document whereCreatedAt($value)
  * @method static Builder<static>|Document whereDescription($value)
@@ -28,12 +36,6 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
  * @method static Builder<static>|Document whereTitle($value)
  * @method static Builder<static>|Document whereUpdatedAt($value)
  * @method static Builder<static>|Document whereUrl($value)
- * @property-read mixed $assign_info
- * @property-read Account|null $linkedAccount
- * @property-read mixed $type
- * @method static Builder<static>|Document isSearch(?string $search)
- * @method static Builder<static>|Document joinDocumentAssign()
- * @method static Builder<static>|Document orderByAssigned(string $direction = 'asc')
  * @mixin \Eloquent
  */
 class Document extends BaseModel
@@ -147,6 +149,42 @@ class Document extends BaseModel
         if (!$joins->pluck('table')->contains($tableName)) {
             $query->leftJoin($tableName, 'documents.document_id', '=', $tableName . '.document_id');
         }
+    }
+
+    /**
+     * Scope für Filterung der Dokumenten Liste
+     *
+     * @param Builder $query
+     * @param bool $can_edit
+     * @param array $allowed_types
+     * @param array $filters
+     */
+    public function scopeFilteredList(Builder $query, bool $can_edit = false, array $allowed_types = [], array $filters = [])
+    {
+        $search = $filters['search'] ?? null;
+        $sortBy = $filters['sort_by'] ?? 'created_at';
+
+        return $query->with(['documentAssign', 'linkedAccount'])
+            ->when($search, function ($q) use ($search) {
+                return $q->isSearch($search);
+            })
+            ->joinDocumentAssign()
+            ->where(function ($q) use ($can_edit, $allowed_types) {
+                $tableName = DocumentLink::getTableName();
+
+                $q->when($can_edit, function ($sq) use ($tableName) {
+                    return $sq->orWhereNull($tableName . '.id');
+                })
+                    ->when(!empty($allowed_types), function ($sq) use ($allowed_types, $tableName) {
+                        return $sq->orWhereIn($tableName . '.link_type', $allowed_types);
+                    });
+            })
+
+            ->when(
+                $sortBy == 'assigned',
+                fn($q) => $q->orderByAssigned(),
+                fn($q) => $q->orderBy($sortBy, 'desc')
+            );
     }
 
     #########################

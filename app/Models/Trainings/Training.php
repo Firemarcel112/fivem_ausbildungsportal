@@ -35,10 +35,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read int|null $requirements_count
  * @property-read User|null $trainer
  * @method static Builder<static>|Training isAvailable()
- * @method static Builder<static>|Training isCompleted(bool $available = true)
+ * @method static Builder<static>|Training isCompletedBuilder(int $available = 1)
  * @method static Builder<static>|Training newModelQuery()
  * @method static Builder<static>|Training newQuery()
- * @method static Builder<static>|Training orderByDefault()
+ * @method static Builder<static>|Training orderByDefault(string $direction = 'asc')
  * @method static Builder<static>|Training query()
  * @method static Builder<static>|Training whereAdditionalInformation($value)
  * @method static Builder<static>|Training whereCanceled($value)
@@ -52,10 +52,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static Builder<static>|Training whereQualificationId($value)
  * @method static Builder<static>|Training whereTime($value)
  * @method static Builder<static>|Training whereTrainerId($value)
- * @method static Builder<static>|Training where1TrainingId($value)
- * @method static Builder<static>|Training whereUpdatedAt($value)
- * @method static Builder<static>|Training isCompletedBuilder(int $available = 1)
  * @method static Builder<static>|Training whereTrainingId($value)
+ * @method static Builder<static>|Training whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class Training extends BaseModel

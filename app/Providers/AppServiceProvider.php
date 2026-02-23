@@ -27,10 +27,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('alert', function ($app) {
             return new AlertService();
         });
-
-        $this->app->singleton(DocumentService::class, function ($app) {
-            return new DocumentService();
-        });
     }
 
     /**
@@ -45,6 +41,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('is_trainer', [GeneralPolicy::class, 'isTrainer']);
+
         if (app()->environment('production')) {
             Gate::define('viewPulse', function (User $user) {
                 return $user->isSuperadmin() || (config('app.env') == 'local');
@@ -67,7 +64,7 @@ class AppServiceProvider extends ServiceProvider
         $this->beginClockwork('Load Settings');
         $settings = Setting::all();
         foreach ($settings as $setting) {
-            config(['settings.' . $setting->getKey() => $setting->getValue()]);
+            config(['settings.' . $setting->key => $setting->value]);
         }
         $this->endClockwork('Load Settings');
     }

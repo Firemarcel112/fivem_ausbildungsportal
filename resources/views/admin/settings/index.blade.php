@@ -31,16 +31,16 @@
                     <tbody>
                         @foreach ($settings as $setting)
                             <tr>
-                                <td>{{ $setting->getKey() }}</td>
+                                <td>{{ $setting->key }}</td>
                                 <td>
-                                    @if (empty($setting->getValue()))
+                                    @if (empty($setting->value))
                                         <span class="text-muted">{{ __('general.kein_wert') }}</span>
                                     @else
-                                        {{ $setting->getValue() }}
+                                        {{ $setting->value }}
                                     @endif
                                 </td>
                                 <td>
-                                    {{ $setting->getDescription() }}
+                                    {{ $setting->description }}
                                 </td>
                                 <td class="text-end">
                                     <a class="btn btn-sm btn-primary" data-bs-target="#edit-settings-{{ $setting->getKey() }}" data-bs-toggle="modal">

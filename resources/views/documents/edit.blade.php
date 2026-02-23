@@ -30,7 +30,7 @@
 
                     <x-forms.select :label="__('general.zugeordnet_zu')" name="assign">
                         @foreach ($users as $user)
-                            <option @selected(!empty($document->documentAssign) && $document->documentAssign->getLinkId() == $user->getId()) value="{{ $user->getId() }}">{{ $user->getSalutation() }} {{ $user->getFullName() }} ({{ $user->getId() }})</option>
+                            <option @selected(!empty($document->documentAssign) && $document->documentAssign->link_id == $user->getKey()) value="{{ $user->getKey() }}">{{ $user->getSalutation() }} {{ $user->getFullName() }} ({{ $user->getId() }})</option>
                         @endforeach
                     </x-forms.select>
 
