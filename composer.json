@@ -15,6 +15,7 @@
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.6",
         "owen-it/laravel-auditing": "^14.0",
+        "sentry/sentry-laravel": "^4.20",
         "socialiteproviders/discord": "^4.2",
         "spatie/laravel-pdf": "^1.8",
         "spatie/laravel-permission": "^6.15",
