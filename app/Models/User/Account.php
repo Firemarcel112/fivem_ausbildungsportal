@@ -171,7 +171,7 @@ class Account extends BaseModel
      */
     public function getDefaultFractionId(): int
     {
-        return $this->fractions->firstWhere('pivot.default', 1)->getId();
+        return $this->fractions->firstWhere('pivot.default', 1)->getKey();
     }
 
     public function getDefaultFraction()

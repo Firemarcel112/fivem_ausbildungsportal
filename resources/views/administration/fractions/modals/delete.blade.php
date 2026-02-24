@@ -1,5 +1,5 @@
 @can('administration.fractions.delete')
-    <x-modal body_classes="text-center" form_action="{{ route('administration.fractions.destroy', [$fraction]) }}" id="fraction-{{ $fraction->getId() }}-delete">
+    <x-modal body_classes="text-center" form_action="{{ route('administration.fractions.destroy', [$fraction]) }}" id="fraction-{{ $fraction->getKey() }}-delete">
 
         <x-slot:title>{{ __('general.loeschen') }}</x-slot:title>
         <x-slot:body>
@@ -8,7 +8,7 @@
             </div>
             <p class="text-warning">{!! __('general.fraktion_sicher_loeschen', [
                 'br' => '<br/>',
-                'name' => $fraction->getName(),
+                'name' => $fraction->name,
             ]) !!}</p>
         </x-slot:body>
         <x-slot:footer>

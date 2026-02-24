@@ -31,13 +31,13 @@ class FractionsController extends Controller
      */
     public function store(CreateRequest $request)
     {
-        $fraction = new Fraction();
-        $fraction->setName($request->input('name'));
-        $fraction->setShortName($request->input('short_name'));
-        $fraction->setDiscordWebhook($request->input('discord_webhook'));
-        $fraction->setDiscordWebhookCompleted($request->input('discord_webhook_completed'));
-        $fraction->setMaster($request->has('master') ? 1 : 0);
-        $fraction->save();
+        Fraction::create([
+            'name' => $request->input('name'),
+            'short_name' => $request->input('short_name'),
+            'discord_webhook' => $request->input('discord_webhook'),
+            'discord_webhook_completed' => $request->input('discord_webhook_completed'),
+            'master' => $request->has('master') ? 1 : 0,
+        ]);
 
         Alert::addAlert(__('general.erfolgreich_angelegt'), 'success');
         return redirect()->back();
@@ -68,12 +68,13 @@ class FractionsController extends Controller
     {
         $this->checkPermission('administration.fractions.edit');
 
-        $fraction->setName($request->input('name'));
-        $fraction->setShortName($request->input('short_name'));
-        $fraction->setDiscordWebhook($request->input('discord_webhook'));
-        $fraction->setDiscordWebhookCompleted($request->input('discord_webhook_completed'));
-        $fraction->setMaster($request->has('master') ? 1 : 0);
-        $fraction->save();
+        $fraction->update([
+            'name' => $request->input('name'),
+            'short_name' => $request->input('short_name'),
+            'discord_webhook' => $request->input('discord_webhook'),
+            'discord_webhook_completed' => $request->input('discord_webhook_completed'),
+            'master' => $request->has('master') ? 1 : 0,
+        ]);
 
         Alert::addAlert(__('general.erfolgreich_aktualisiert'), 'success');
         return redirect()->route('administration.fractions.index');
@@ -89,11 +90,11 @@ class FractionsController extends Controller
     {
         $this->checkPermission('administration.fractions.delete');
 
-        $user_with_fraction_exists = UserFraction::where('fraction_id', $fraction->getFractionId())->exists();
+        $user_with_fraction_exists = UserFraction::where('fraction_id', $fraction->fraction_id)->exists();
 
         if ($user_with_fraction_exists) {
             Alert::addAlert(__('texte.administration.fraktion_nicht_loeschbar', [
-                'name' => $fraction->getName()
+                'name' => $fraction->name
             ]), 'danger');
             return redirect()->back();
         }

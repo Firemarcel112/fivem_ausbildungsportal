@@ -34,8 +34,8 @@
                     <div class="col-md-3 col-12">
                         <x-forms.select :title="__('general.alle')" label="{{ __('general.fraktion') }}" multiple name="fraction">
                             @foreach ($fractions as $fraction)
-                                <option @selected(in_array($fraction->getId(), old('fraction', []))) value="{{ $fraction->getId() }}">
-                                    {{ $fraction->getFullName() }}
+                                <option @selected(in_array($fraction->getKey(), old('fraction', []))) value="{{ $fraction->getKey() }}">
+                                    {{ $fraction->full_name }}
                                 </option>
                             @endforeach
                         </x-forms.select>
@@ -88,7 +88,7 @@
                                                     <x-icon :hovertext="__('general.discord_account_verknuepft')" name="discord" />
                                                 @endif
                                                 <div class="text-secondary">
-                                                    {{ $user->account->fractions->firstWhere('pivot.default', 1)->getFullName() }}
+                                                    {{ $user->account->fractions->firstWhere('pivot.default', 1)->full_name }}
                                                 </div>
                                             </div>
                                         </div>
@@ -111,7 +111,7 @@
                                                     <ul style="list-style: none; padding-left: 0;">
                                                         @foreach ($user->account->fractions as $fraction)
                                                             <li>
-                                                                {{ $fraction->getFullName() }}
+                                                                {{ $fraction->full_name }}
                                                                 @if ($fraction->default)
                                                                     {{ __('general.standard') }}
                                                                 @endif

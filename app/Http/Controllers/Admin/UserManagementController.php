@@ -13,7 +13,7 @@ use App\Models\Qualifications\Qualification;
 use App\Models\User;
 use App\Models\User\Account;
 use App\Models\User\Fraction as UserFraction;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;

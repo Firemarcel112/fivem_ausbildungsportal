@@ -36,15 +36,15 @@ class AddUser extends Seeder
 
             $fraction_model = new UserFraction();
             $fraction_model->setUserId($account_model->getQueueableId());
-            $fraction_model->setFractionId($fractions->random()->getId());
+            $fraction_model->setFractionId($fractions->random()->getKey());
             $fraction_model->setDefault(true);
             $fraction_model->save();
             $additional_fraction = fake()->boolean(50);
 
             if ($additional_fraction) {
-                $fraction_id = $fractions->random()->getId();
-                while ($fraction_id == $fraction_model->getFractionId()) {
-                    $fraction_id = $fractions->random()->getId();
+                $fraction_id = $fractions->random()->getKey();
+                while ($fraction_id == $fraction_model->fraction_id) {
+                    $fraction_id = $fractions->random()->getKey();
                 }
                 $fraction_model = new UserFraction();
                 $fraction_model->setUserId($account_model->getQueueableId());

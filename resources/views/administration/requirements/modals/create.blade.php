@@ -5,7 +5,7 @@
         <x-forms.input name="name" required>{{ __('general.name') }}</x-forms.input>
         <x-forms.select label="{{ __('general.fraktion') }}" name="fraction_id" required>
             @foreach ($fractions as $fraction)
-                <option value="{{ $fraction->getId() }}">{{ $fraction->getFullName() }}</option>
+                <option value="{{ $fraction->getKey() }}">{{ $fraction->full_name }}</option>
             @endforeach
         </x-forms.select>
         <x-forms.input name="rank" value="0">{{ __('general.rank') }}</x-forms.input>
