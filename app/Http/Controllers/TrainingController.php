@@ -180,6 +180,12 @@ class TrainingController extends Controller
             return redirect()->back();
         }
 
+        $time = SupportCarbon::createFromFormat('Y-m-d H:i', $date . ' ' . $time);
+        if ($time <= now()->addMinutes((int)config('settings.training_creation_time_limit'))) {
+            Alert::addAlert(__('general.ausbildung_kann_nicht_in_vergangenheit_liegen'), 'danger');
+            return redirect()->back();
+        }
+
         $old_values = $training->only([
             'trainer_id',
             'date',
