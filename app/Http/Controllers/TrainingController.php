@@ -15,6 +15,7 @@ use App\Models\User\Account;
 use App\Traits\DiscordTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon as SupportCarbon;
 use Illuminate\Support\Facades\Auth;
 
 class TrainingController extends Controller
@@ -66,9 +67,15 @@ class TrainingController extends Controller
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
             return redirect()->back();
         }
+
         $request->flash();
         if (empty($request->get('trainer_id'))) {
             Alert::addAlert(__('general.bitte_waehle_einen_ausbilder_aus'), 'danger');
+            return redirect()->back();
+        }
+        $time = SupportCarbon::createFromFormat('Y-m-d H:i', $request->input('date') . ' ' . $request->input('time'));
+        if ($time <= now()->addMinutes((int)config('settings.training_creation_time_limit'))) {
+            Alert::addAlert(__('general.ausbildung_kann_nicht_in_vergangenheit_liegen'), 'danger');
             return redirect()->back();
         }
         $model = new Training();

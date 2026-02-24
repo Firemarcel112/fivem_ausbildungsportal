@@ -38,6 +38,7 @@ return [
     'ausbildungswunsch' => 'Ausbildungswunsch',
     'ausbildungswuensche' => 'Ausbildungswünsche',
     'ausbildung' => 'Ausbildung',
+    'ausbildung_kann_nicht_in_vergangenheit_liegen' => 'Die Ausbildung kann nicht erstellt werden, da der Zeitraum zu kurz oder in der Vergangenheit liegt',
     'ausbildung_auswaehlen' => 'Ausbildung auswählen',
     'einreichen' => 'Einreichen',
     'ausgestellt_von' => 'Ausgestellt von :name',
