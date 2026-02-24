@@ -32,7 +32,7 @@ class TrainingRequestController extends Controller
             }
             $grouped[$date][$qualification_name]['users'][] = [
                 'id' => $item->user->id,
-                'name' => $item->user->getFullName() . ' (' . $item->user->account->getDefaultFraction()->getShortName() . ')',
+                'name' => $item->user->getFullName() . ' (' . $item->user->account->getDefaultFraction()->short_name . ')',
             ];
         });
 
