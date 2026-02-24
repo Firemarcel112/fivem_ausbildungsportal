@@ -7,6 +7,7 @@ use App\Models\Document;
 use App\Models\Fractions\Fraction;
 use App\Models\Qualifications\Qualification;
 use App\Models\Trainings\Participant;
+use App\Models\User;
 use App\Models\User\Fraction as UserFraction;
 use App\Models\User\Qualification as UserQualification;
 use Illuminate\Support\Carbon;
@@ -36,6 +37,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $qualifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Participant> $trainings
  * @property-read int|null $trainings_count
+ * @property-read User|null $user
  * @method static Builder<static>|Account isSearch(string $search)
  * @method static Builder<static>|Account newModelQuery()
  * @method static Builder<static>|Account newQuery()
@@ -109,6 +111,11 @@ class Account extends BaseModel
     #########################
     # RELATIONS
     #########################
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 
     public function trainings()
     {

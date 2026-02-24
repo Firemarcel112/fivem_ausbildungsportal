@@ -160,7 +160,7 @@ class Training extends BaseModel
      */
     public function getSortParticipants(): mixed
     {
-        return $this->participants->load(['account.fractions', 'account.qualifications'])
+        return $this->participants->load(['account.fractions', 'account.qualifications', 'account.user'])
             ->sortBy('account.first_name');
     }
 
