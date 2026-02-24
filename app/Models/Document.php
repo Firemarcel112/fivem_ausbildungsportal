@@ -77,11 +77,11 @@ class Document extends BaseModel
         $document->save();
 
         if (!is_null($link_id) && !is_null($link_type)) {
-            $document_link = new DocumentLink();
-            $document_link->setDocumentId($document->getKey());
-            $document_link->setLinkId($link_id);
-            $document_link->setLinkType($link_type);
-            $document_link->save();
+            DocumentLink::create([
+                'document_id' => $document->getKey(),
+                'link_id' => $link_id,
+                'link_type' => $link_type,
+            ]);
         }
 
         return $document;
