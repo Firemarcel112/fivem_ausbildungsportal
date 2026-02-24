@@ -143,7 +143,7 @@
                             @forelse ($training->getSortParticipants() as $participant)
                                 <tr>
                                     <td>
-                                        {{ $participant->account->getSalutation() }} {{ $participant->getFullName() }} ({{ $participant->account->getDefaultFraction()->getShortName() }})
+                                        {{ $participant->account->getSalutation() }} {{ $participant->getFullName() }} ({{ $participant->account->getDefaultFraction()->short_name }})
                                         @if (!empty($participant->account))
                                             @can('usermanagement.index')
                                                 <a href="{{ route('profile.show', $participant->account) }}" target="_blank">

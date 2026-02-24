@@ -152,20 +152,20 @@ class TrainingCompleted implements ShouldQueue
             }
         }
         foreach ($fractions as $fraction) {
-            if (empty($fraction->getDiscordWebhookCompleted())) {
+            if (empty($fraction->discord_webhook_completed)) {
                 continue;
             }
             $fields = [];
             $fields = $default_fields;
             $formated_data = [];
-            switch ($fraction->getShortName()) {
+            switch ($fraction->short_name) {
                 default:
                     foreach ($cases as $case) {
                         $formated_data[$case] = $results[$case]
                             ->filter(function ($data) use ($fraction) {
-                                return empty($data['fraction']) ? false : ($data['fraction'] == $fraction->getShortName() || $fraction->getMaster());
+                                return empty($data['fraction']) ? false : ($data['fraction'] == $fraction->short_name || $fraction->master);
                             });
-                        if ($case == 'Notizen' && $fraction->getMaster()) {
+                        if ($case == 'Notizen' && $fraction->master) {
                             $formated_data[$case] = $formated_data[$case]->map(function ($data) {
                                 return '* ' . $data['name'] . " ({$data['fraction']}) \n" . $data['notice'];
                             })
@@ -195,7 +195,7 @@ class TrainingCompleted implements ShouldQueue
                     description: $model->getName() . ' - Lehrgangs-ID:' . $model->getTrainingId(),
                     fields: $fields,
                 );
-                $this->sendToDiscord($fraction->getDiscordWebhookCompleted(), $embed);
+                $this->sendToDiscord($fraction->discord_webhook_completed, $embed);
             }
         }
     }
