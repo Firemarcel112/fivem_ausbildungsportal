@@ -67,7 +67,7 @@
                     <div>
                         <x-forms.select label="{{ __('general.default_fraktion') }}" name="default_fraction" required>
                             @foreach ($fractions as $fraction)
-                                <option @selected($user->account->getDefaultFractionId() == $fraction->getId()) value="{{ $fraction->getId() }}">{{ $fraction->getFullName() }}</option>
+                                <option @selected($user->account->getDefaultFractionId() == $fraction->getKey()) value="{{ $fraction->getKey() }}">{{ $fraction->full_name }}</option>
                             @endforeach
                         </x-forms.select>
                     </div>
