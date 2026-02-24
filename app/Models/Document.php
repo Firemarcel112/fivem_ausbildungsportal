@@ -237,7 +237,7 @@ class Document extends BaseModel
                 if ($this->linkedAccount) {
                     return [
                         'name' => $this->linkedAccount->getFullName(),
-                        'url' => route('profile.show', $this->linkedAccount),
+                        'url' => route('profile.show', $this->linkedAccount->user),
                     ];
                 }
                 return [

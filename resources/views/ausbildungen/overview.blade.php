@@ -146,7 +146,7 @@
                                         {{ $participant->account->getSalutation() }} {{ $participant->getFullName() }} ({{ $participant->account->getDefaultFraction()->short_name }})
                                         @if (!empty($participant->account))
                                             @can('usermanagement.index')
-                                                <a href="{{ route('profile.show', $participant->account) }}" target="_blank">
+                                                <a href="{{ route('profile.show', $participant->account->user) }}" target="_blank">
                                                     <x-icon name="external-link" />
                                                 </a>
                                             @endcan
