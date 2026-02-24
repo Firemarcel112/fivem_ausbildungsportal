@@ -34,6 +34,11 @@ class AddDefaultSettings extends Seeder
             'key' => 'certificate_organization_sub_name',
             'value' => null,
             'description' => 'Untertitel der Organisation die auf den Zertifikaten angezeigt wird',
+        ],
+        [
+            'key' => 'training_creation_time_limit',
+            'value' => 1440,
+            'description' => 'Zeit in Minuten bevor die Ausbildung beginnt, bis zu der diese erstellt werden darf',
         ]
     ];
 
