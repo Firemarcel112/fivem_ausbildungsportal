@@ -284,7 +284,7 @@ class TrainingController extends Controller
                 $participant->getId() => [
                     'id' => $participant->getId(),
                     'name' => $participant->getFullName(),
-                    'fraction' => $participant->account->getDefaultFraction()->getShortName(),
+                    'fraction' => $participant->account->getDefaultFraction()->short_name,
                 ],
             ];
         });

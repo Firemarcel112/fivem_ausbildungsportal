@@ -232,7 +232,7 @@
                                     @csrf
                                     <x-forms.select label="{{ __('general.teilnehmer') }}" multiple name="user_ids" required>
                                         @foreach ($users_not_in_training as $user)
-                                            <option value="{{ $user->getId() }}">{{ $user->getFullName() }} ({{ $user->account->getDefaultFraction()->getShortName() }})</option>
+                                            <option value="{{ $user->getId() }}">{{ $user->getFullName() }} ({{ $user->account->getDefaultFraction()->short_name }})</option>
                                         @endforeach
                                     </x-forms.select>
 
