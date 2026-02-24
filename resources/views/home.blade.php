@@ -134,7 +134,7 @@
                                                             @foreach ($training->getSortParticipants() as $participant)
                                                                 <li class="mb-2 list-group-item d-flex justify-content-between align-items-center">
                                                                     <div>
-                                                                        <span class="d-block">{{ $participant->getFullName() }} ({{ $participant->account->getDefaultFraction()->getShortName() }})
+                                                                        <span class="d-block">{{ $participant->getFullName() }} ({{ $participant->account->getDefaultFraction()->short_name }})
                                                                         </span>
                                                                     </div>
                                                                 </li>
