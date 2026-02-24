@@ -44,7 +44,7 @@
                                     {{ $requirement->getName() }}
                                 </td>
                                 <td>
-                                    {{ $requirement->fraction->getName() }}
+                                    {{ $requirement->fraction->name }}
                                 </td>
                                 <td>
                                     {{ $requirement->getRank() }}

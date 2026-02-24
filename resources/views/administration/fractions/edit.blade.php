@@ -8,7 +8,7 @@
                     {{ __('general.administration') }}
                 </div>
                 <h2 class="page-title">
-                    {{ __('general.fraktionen') }} / {{ $fraction->getName() }}
+                    {{ __('general.fraktionen') }} / {{ $fraction->name }}
                 </h2>
             </div>
         </div>
@@ -20,11 +20,11 @@
             <x-slot:body>
                 <form action="{{ route('administration.fractions.update', $fraction) }}" class="space-y" method="POST">
                     @csrf
-                    <x-forms.input :default="$fraction->getName()" name="name" required>{{ __('general.name') }}</x-forms.input>
-                    <x-forms.input :default="$fraction->getShortName()" maxlength="5" name="short_name" required>{{ __('general.kuerzel') }} ({{ __('general.maximal_zeichen', ['count' => 5]) }})</x-forms.input>
-                    <x-forms.input :default="$fraction->getDiscordWebhook()" name="discord_webhook">{{ __('general.discord_webhook') }}</x-forms.input>
-                    <x-forms.input :default="$fraction->getDiscordWebhookCompleted()" name="discord_webhook_completed">{{ __('general.discord_webhook_abschluss') }}</x-forms.input>
-                    <x-forms.checkbox :value="$fraction->getMaster()" name="master">
+                    <x-forms.input :default="$fraction->name" name="name" required>{{ __('general.name') }}</x-forms.input>
+                    <x-forms.input :default="$fraction->short_name" maxlength="5" name="short_name" required>{{ __('general.kuerzel') }} ({{ __('general.maximal_zeichen', ['count' => 5]) }})</x-forms.input>
+                    <x-forms.input :default="$fraction->discord_webhook" name="discord_webhook">{{ __('general.discord_webhook') }}</x-forms.input>
+                    <x-forms.input :default="$fraction->discord_webhook_completed" name="discord_webhook_completed">{{ __('general.discord_webhook_abschluss') }}</x-forms.input>
+                    <x-forms.checkbox :value="$fraction->master" name="master">
                         {{ __('general.hauptfraktion') }}
                         <x-icon :hovertext="__('texte.administration.erklaerung_hauptfraktion')" name="info-circle" />
                     </x-forms.checkbox>

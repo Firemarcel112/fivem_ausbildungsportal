@@ -40,40 +40,40 @@
                         @foreach ($fractions as $fraction)
                             <tr>
                                 <td>
-                                    {{ $fraction->getId() }}
+                                    {{ $fraction->getKey() }}
                                 </td>
                                 <td>
-                                    {{ $fraction->getName() }}
+                                    {{ $fraction->name }}
                                 </td>
                                 <td>
-                                    {{ $fraction->getShortName() }}
+                                    {{ $fraction->short_name }}
                                 </td>
-                                <td data-bs-title="{{ $fraction->getDiscordWebhook() }}" data-bs-toggle="tooltip">
+                                <td data-bs-title="{{ $fraction->discord_webhook }}" data-bs-toggle="tooltip">
                                     <div class="text-truncate" style="max-width:200px">
-                                        @if (empty($fraction->getDiscordWebhook()))
+                                        @if (empty($fraction->discord_webhook))
                                             <span class="text-muted">{{ __('general.nicht_festgelegt') }}</span>
                                         @else
-                                            {{ $fraction->getDiscordWebhook() }}
+                                            {{ $fraction->discord_webhook }}
                                         @endif
                                     </div>
                                 </td>
-                                <td data-bs-title="{{ $fraction->getDiscordWebhookCompleted() }}" data-bs-toggle="tooltip">
+                                <td data-bs-title="{{ $fraction->discord_webhook_completed }}" data-bs-toggle="tooltip">
                                     <div class="text-truncate" style="max-width:200px">
-                                        @if (empty($fraction->getDiscordWebhookCompleted()))
+                                        @if (empty($fraction->discord_webhook_completed))
                                             <span class="text-muted">{{ __('general.nicht_festgelegt') }}</span>
                                         @else
-                                            {{ $fraction->getDiscordWebhookCompleted() }}
+                                            {{ $fraction->discord_webhook_completed }}
                                         @endif
                                     </div>
                                 </td>
                                 <td>
-                                    {{ $fraction->getMaster() ? __('general.ja') : __('general.nein') }}
+                                    {{ $fraction->master ? __('general.ja') : __('general.nein') }}
                                 </td>
                                 <td class="text-end">
                                     <a class="btn btn-primary btn-sm me-2" href="{{ route('administration.fractions.edit', $fraction) }}">
                                         <x-icon :hovertext="__('general.bearbeiten')" name="edit" />
                                     </a>
-                                    <a class="btn btn-danger btn-sm" data-bs-target="#fraction-{{ $fraction->getId() }}-delete" data-bs-toggle="modal">
+                                    <a class="btn btn-danger btn-sm" data-bs-target="#fraction-{{ $fraction->getKey() }}-delete" data-bs-toggle="modal">
                                         <x-icon :hovertext="__('general.loeschen')" name="trash" />
                                     </a>
                                 </td>

@@ -103,7 +103,7 @@ class AddQualifications extends Seeder
             $model_id = $model->getId();
             if (!empty($qualification['requirements'])) {
                 foreach ($qualification['requirements'] as $requirement) {
-                    $fraction_id = Fraction::firstWhere('short_name', $requirement['fraction'])->getId();
+                    $fraction_id = Fraction::firstWhere('short_name', $requirement['fraction'])->getKey();
                     $model = Requirement::firstOrNew([
                         'name' => $requirement['name'],
                         'qualification_id' => $model_id,

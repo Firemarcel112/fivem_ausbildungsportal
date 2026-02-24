@@ -151,13 +151,13 @@
                                             <details>
                                                 <summary><b>{{ __('general.voraussetzungen') }}:</b></summary>
                                                 @foreach ($fractions as $fraction)
-                                                    @continue($training->requirements->where('fraction_id', $fraction->getId())->count() == 0)
+                                                    @continue($training->requirements->where('fraction_id', $fraction->getKey())->count() == 0)
 
                                                     <details class="mt-2 mb-2 ms-4">
-                                                        <summary><b>{{ $fraction->getFullName() }}</b></summary>
+                                                        <summary><b>{{ $fraction->full_name }}</b></summary>
                                                         <ul class="ms-2">
                                                             @foreach ($training->requirements as $requirement)
-                                                                @continue($requirement->getFractionId() != $fraction->getId())
+                                                                @continue($requirement->getFractionId() != $fraction->getKey())
                                                                 <li>{{ $requirement->getName() }}</li>
                                                             @endforeach
                                                         </ul>

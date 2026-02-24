@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 use App\Models\Fractions\Fraction;
+use Illuminate\Database\Eloquent\Collection;
 
 class DiscordNotification extends Component
 {
@@ -15,7 +16,11 @@ class DiscordNotification extends Component
      */
     public function __construct() {}
 
-    public function getFractions()
+    /**
+     * Get the fractions for the component.
+     * @return Collection<int, Fraction>|Collection<int, Fraction>
+     */
+    public function getFractions(): Collection
     {
         return Fraction::get();
     }

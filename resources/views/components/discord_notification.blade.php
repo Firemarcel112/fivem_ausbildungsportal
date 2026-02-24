@@ -11,10 +11,10 @@
     </div>
     @foreach ($getFractions ?? [] as $fraction)
         <div class="form-check form-switch d-block">
-            <input @disabled(empty($fraction->getDiscordWebhook())) class="form-check-input discord_notification-checkbox" id="discord_notification_{{ $fraction->getId() }}" name="discord_notification[]" type="checkbox" value="{{ $fraction->getId() }}">
-            <label class="form-check-label" for="discord_notification_{{ $fraction->getId() }}">
-                {{ $fraction->getFullName() }}
-                @empty($fraction->getDiscordWebhook())
+            <input @disabled(empty($fraction->discord_webhook)) class="form-check-input discord_notification-checkbox" id="discord_notification_{{ $fraction->getKey() }}" name="discord_notification[]" type="checkbox" value="{{ $fraction->getKey() }}">
+            <label class="form-check-label" for="discord_notification_{{ $fraction->getKey() }}">
+                {{ $fraction->full_name }}
+                @empty($fraction->discord_webhook)
                     <x-icon :classes="['text-danger']" :hovertext="__('general.keine_url_discord')" name="alert-triangle" />
                 @endempty
             </label>
