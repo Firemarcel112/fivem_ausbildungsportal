@@ -30,9 +30,8 @@ class DocumentPolicy
         }
 
         $link_type = strtolower($linked_document->link_type);
-        $is_own_file = $user->getKey() == $linked_document->link_id;
+        $is_own_file = $user->account->getKey() == $linked_document->link_id;
         $has_show_permission = $user->can('documents.show.' . $link_type);
-
 
         return ($link_type == 'account' && ($is_own_file || $has_show_permission)) || $documents_edit_permission;
     }
