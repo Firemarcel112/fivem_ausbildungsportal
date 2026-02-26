@@ -263,10 +263,10 @@ class TrainingController extends Controller
 
         $notifications = [];
         foreach ($fraktionen as $fraktion) {
-            if (empty($fraktion->getDiscordWebhookCompleted())) {
+            if (empty($fraktion->discord_webhook_completed)) {
                 continue;
             }
-            $notifications[] = $fraktion->getDiscordWebhookCompleted();
+            $notifications[] = $fraktion->discord_webhook_completed;
         }
 
         if ($request->has('cancelled')) {
