@@ -8,13 +8,18 @@ use Illuminate\View\Component;
 
 class Select extends Component
 {
-
     public mixed $value;
+
     public string $name;
+
     public array $classes;
+
     public string $label;
+
     public bool $required;
+
     public bool $multiple;
+
     public ?string $title;
 
     /**

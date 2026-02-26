@@ -9,9 +9,9 @@ class AlertService
     /**
      * Fügt einen neuen Alert hinzu.
      *
-     * @param string $message
-     * @param string $type
-     * @param bool $static
+     * @param  string $message
+     * @param  string $type
+     * @param  bool   $static
      * @return void
      */
     public function addAlert(string $message, string $type = 'info', bool $static = false)
@@ -52,7 +52,7 @@ class AlertService
     /**
      * Löscht die Alerts eines bestimmten Typs.
      *
-     * @param string $type
+     * @param  string $type
      * @return void
      */
     public function clearAlertsByType(string $type)

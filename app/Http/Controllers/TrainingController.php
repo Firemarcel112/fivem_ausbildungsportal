@@ -7,8 +7,8 @@ use App\Events\DiscordNotify;
 use App\Facades\Alert;
 use App\Models\Ausbildung;
 use App\Models\Fractions\Fraction;
-use App\Models\Trainings\Request as TrainingRequest;
 use App\Models\Trainings\Participant;
+use App\Models\Trainings\Request as TrainingRequest;
 use App\Models\Trainings\Training;
 use App\Models\User;
 use App\Models\User\Account;
@@ -21,7 +21,6 @@ use Illuminate\Support\Facades\Auth;
 class TrainingController extends Controller
 {
     use DiscordTrait;
-
 
     /**
      * Display a listing of the resource.
@@ -58,27 +57,30 @@ class TrainingController extends Controller
     /**
      * Summary of store
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request          $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
         if (!Auth::check() && !Auth::user()->can('trainings.show')) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+
             return redirect()->back();
         }
 
         $request->flash();
         if (empty($request->get('trainer_id'))) {
             Alert::addAlert(__('general.bitte_waehle_einen_ausbilder_aus'), 'danger');
+
             return redirect()->back();
         }
         $time = SupportCarbon::createFromFormat('Y-m-d H:i', $request->input('date') . ' ' . $request->input('time'));
-        if ($time <= now()->addMinutes((int)config('settings.training_creation_time_limit'))) {
+        if ($time <= now()->addMinutes((int) config('settings.training_creation_time_limit'))) {
             Alert::addAlert(__('general.ausbildung_kann_nicht_in_vergangenheit_liegen'), 'danger');
+
             return redirect()->back();
         }
-        $model = new Training();
+        $model = new Training;
         $model->setQualificationId($request->input('qualification_id'));
         $model->setTrainerId($request->input('trainer_id'));
         $model->setMeetingPoint($request->input('meeting_point'));
@@ -111,9 +113,11 @@ class TrainingController extends Controller
             }
 
             Alert::addAlert(__('general.ausbildung_erfolgreich_angelegt'), 'success');
+
             return redirect()->back();
         }
         Alert::addAlert(__('general.fehler_bei_der_erstellung'), 'danger');
+
         return redirect()->back();
     }
 
@@ -125,6 +129,7 @@ class TrainingController extends Controller
         $training->load(['trainer', 'participants.account.fractions']);
         if (!Auth::user()->can('trainings.show')) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+
             return redirect()->back();
         }
 
@@ -157,13 +162,14 @@ class TrainingController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
+     * @param Request  $request
      * @param Training $training
      */
     public function update(Request $request, Training $training)
     {
         if (!Auth::user()->isTrainer()) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+
             return redirect()->back();
         }
         $request->flash();
@@ -177,12 +183,14 @@ class TrainingController extends Controller
 
         if (empty($trainer)) {
             Alert::addAlert(__('general.ausbilder_auswaehlen'), 'danger');
+
             return redirect()->back();
         }
 
         $time = SupportCarbon::createFromFormat('Y-m-d H:i', $date . ' ' . $time);
-        if ($time <= now()->addMinutes((int)config('settings.training_creation_time_limit'))) {
+        if ($time <= now()->addMinutes((int) config('settings.training_creation_time_limit'))) {
             Alert::addAlert(__('general.ausbildung_kann_nicht_in_vergangenheit_liegen'), 'danger');
+
             return redirect()->back();
         }
 
@@ -193,7 +201,7 @@ class TrainingController extends Controller
             'min_participants',
             'max_participants',
             'meeting_point',
-            'additional_informations'
+            'additional_informations',
         ]);
 
         $training->setTrainerId($trainer);
@@ -241,13 +249,14 @@ class TrainingController extends Controller
     /**
      * Schließt die Ausbildung ab
      *
-     * @param Request $request
+     * @param Request    $request
      * @param Ausbildung $ausbildung
      */
     public function complete(Request $request, Training $training)
     {
         if (!Auth::user()->isTrainer()) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+
             return redirect()->back();
         }
         $fraktionen = Fraction::get();
@@ -274,6 +283,7 @@ class TrainingController extends Controller
                     ]
                 ));
                 Alert::addAlert(__('general.ausbildung_abgeschlossen'), 'success');
+
                 return redirect()->route('ausbilder.index');
             }
         }
@@ -304,23 +314,26 @@ class TrainingController extends Controller
             ));
 
             Alert::addAlert(__('general.ausbildung_abgeschlossen'), 'success');
+
             return redirect()->route('ausbilder.index');
         }
         Alert::addAlert('Es ist ein Fehler aufgetreten', 'error');
+
         return redirect()->back();
     }
 
     /**
      * Fügt Teilnehmer zur Ausbildung hinzu
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Trainings\Training $training
+     * @param  \Illuminate\Http\Request          $request
+     * @param  \App\Models\Trainings\Training    $training
      * @return \Illuminate\Http\RedirectResponse
      */
     public function addParticipants(Request $request, Training $training)
     {
         if (!Auth::user()->isTrainer()) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+
             return redirect()->back();
         }
         $success = false;
@@ -330,6 +343,7 @@ class TrainingController extends Controller
                 Alert::addAlert(__('general.teilnehmer_nicht_gefunden', [
                     'name' => $user?->getFullName() ?? __('general.unbekannt'),
                 ]), 'danger');
+
                 continue;
             }
 
@@ -341,12 +355,13 @@ class TrainingController extends Controller
                 Alert::addAlert(__('general.teilnehmer_bereits_angemeldet', [
                     'name' => $user->getFullName(),
                 ]), 'warning');
+
                 continue;
             }
 
             if ($model->save()) {
                 $success = true;
-            };
+            }
         }
 
         if ($success) {
@@ -359,23 +374,26 @@ class TrainingController extends Controller
     /**
      * Teilnehmer von der Ausbildung entfernen
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Trainings\Participant $participant
+     * @param  \Illuminate\Http\Request          $request
+     * @param  \App\Models\Trainings\Participant $participant
      * @return \Illuminate\Http\RedirectResponse
      */
     public function removeParticipant(Request $request, Participant $participant)
     {
         if (!Auth::user()->isTrainer()) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+
             return redirect()->back();
         }
 
         if ($participant->delete()) {
             Alert::addAlert('Teilnehmer vom Lehrgang entfernt!', 'success');
+
             return redirect()->back();
         }
 
         Alert::addAlert('Kein Teilnehmer entfernt', 'error');
+
         return redirect()->back();
     }
 
@@ -388,6 +406,7 @@ class TrainingController extends Controller
 
         if ($training->isCompleted()) {
             Alert::addAlert(__('general.ausbildung_bereits_abgeschlossen'), 'danger');
+
             return redirect()->back();
         }
 
@@ -399,6 +418,7 @@ class TrainingController extends Controller
         }
         if ($training->delete()) {
             Alert::addAlert(__('general.ausbildung_geloescht'), 'success');
+
             return redirect()->back();
         }
     }
@@ -406,8 +426,8 @@ class TrainingController extends Controller
     /**
      * Sperrt einen Benutzer für Ausbildungen
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\User $user
+     * @param  \Illuminate\Http\Request          $request
+     * @param  \App\Models\User                  $user
      * @return \Illuminate\Http\RedirectResponse
      */
     public function ban(Request $request, User $user)
@@ -439,8 +459,8 @@ class TrainingController extends Controller
     /**
      * Registrierung zur Ausbildung
      *
-     * @param Request $request
-     * @param Ausbildung $training
+     * @param  Request    $request
+     * @param  Ausbildung $training
      * @return mixed
      */
     public function register(Request $request, Training $training)
@@ -452,6 +472,7 @@ class TrainingController extends Controller
 
         if ($model->exists) {
             Alert::addAlert(__('general.bereits_zum_lehrgang_angemeldet'), 'warning');
+
             return redirect()->back();
         }
         if ($model->save()) {
@@ -462,6 +483,7 @@ class TrainingController extends Controller
                 ]),
                 'success',
             );
+
             return redirect()->back();
         }
 
@@ -470,14 +492,16 @@ class TrainingController extends Controller
 
     /**
      * Abmelden von der Ausbildung
-     * @param Request $request
-     * @param Ausbildung $Ausbildung
+     *
+     * @param  Request    $request
+     * @param  Ausbildung $Ausbildung
      * @return mixed
      */
     public function signOut(Request $request, Training $training)
     {
         if ($training->isCompleted()) {
             Alert::addAlert('Ausbildung bereits abgeschlossen', 'danger');
+
             return redirect()->back();
         }
 
@@ -498,7 +522,7 @@ class TrainingController extends Controller
     /**
      * Ausbildungswunsch Anfragen
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request                $request
      * @return mixed|\Illuminate\Http\RedirectResponse
      */
     public function request(Request $request)
@@ -509,10 +533,11 @@ class TrainingController extends Controller
 
         if (empty($qualification_id) || empty($date) || empty($time)) {
             Alert::addAlert(__('general.fehler'), 'danger');
+
             return redirect()->back();
         }
 
-        $model = new TrainingRequest();
+        $model = new TrainingRequest;
         $model->setUserId(Auth::user()->getId());
         $model->setQualificationId($qualification_id);
         $model->setDate(Carbon::parse($date));
@@ -525,8 +550,9 @@ class TrainingController extends Controller
 
         if (!is_null($model_exists)) {
             Alert::addAlert(__('general.bereits_angefragt'), 'success');
+
             return redirect()->back();
-        };
+        }
 
         if ($model->save()) {
             Alert::addAlert(__('general.erfolgreich_gespeichert'), 'success');

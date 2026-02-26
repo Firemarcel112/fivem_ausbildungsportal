@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Arr;
-use DB;
 use App\Facades\Alert;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserStoreRequest;
@@ -13,9 +11,11 @@ use App\Models\Qualifications\Qualification;
 use App\Models\User;
 use App\Models\User\Account;
 use App\Models\User\Fraction as UserFraction;
-use Illuminate\Support\Carbon;
+use Arr;
+use DB;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -23,10 +23,10 @@ use Spatie\Permission\Models\Role;
 
 class UserManagementController extends Controller
 {
-
     /**
      * Userausgabe
-     * @param Request $request
+     *
+     * @param  Request $request
      * @return mixed
      */
     public function index(Request $request)
@@ -70,13 +70,13 @@ class UserManagementController extends Controller
 
         switch ($sort_by) {
             case 'last_name':
-                $data = $data->sortBy(fn($user) => $user->account->getLastName());
+                $data = $data->sortBy(fn ($user) => $user->account->getLastName());
                 break;
             case 'created_at':
                 $data = $data->sortByDesc('created_at');
                 break;
             default:
-                $data = $data->sortBy(fn($user) => $user->account->getFirstName());
+                $data = $data->sortBy(fn ($user) => $user->account->getFirstName());
         }
 
         $genders = [
@@ -116,13 +116,15 @@ class UserManagementController extends Controller
 
     /**
      * Benutzer bearbeiten
-     * @param \App\Models\User $user
+     *
+     * @param  \App\Models\User                                                  $user
      * @return \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
      */
     public function edit(User $user)
     {
         if ($user->isSuperadmin() && !Auth::user()->isSuperadmin()) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+
             return redirect()->back();
         }
         if (!Auth::user()->canAny([
@@ -131,6 +133,7 @@ class UserManagementController extends Controller
             'usermanagement.edit.permissions',
         ])) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+
             return redirect()->route('usermanagement.index');
         }
         $user->load('account.fractions');
@@ -200,8 +203,8 @@ class UserManagementController extends Controller
     /**
      * Aktualisiert einen Benutzer
      *
-     * @param Request $request
-     * @param \App\Models\User $user
+     * @param  Request                           $request
+     * @param  \App\Models\User                  $user
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, User $user)
@@ -216,6 +219,7 @@ class UserManagementController extends Controller
             'usermanagement.edit.permissions',
         ])) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+
             return redirect()->back();
         }
 
@@ -236,32 +240,33 @@ class UserManagementController extends Controller
     /**
      * Neuen Benutzer anlegen
      *
-     * @param \App\Http\Requests\UserStoreRequest $request
+     * @param  \App\Http\Requests\UserStoreRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(UserStoreRequest $request)
     {
         if (!Auth::user()->can('usermanagement.store')) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+
             return redirect()->back();
         }
         $new_password = Str::random(12);
 
         DB::beginTransaction();
-        $user = new User();
+        $user = new User;
         $user->setName($request->input('username'));
         $user->setPassword($new_password);
         $user->setEmail(substr(strtolower($request->input('first_name')), 0, 1) . '.' . trim(strtolower(str_replace(' ', '_', $request->last_name))) . '@example.com');
         $user->save();
 
-        $account = new Account();
+        $account = new Account;
         $account->setUserId($user->getQueueableId());
         $account->setFirstName($request->input('first_name'));
         $account->setLastName($request->input('last_name'));
         $account->setDateOfBirth(Carbon::create($request->input('date_of_birth')));
         $account->save();
 
-        $fraction_model = new UserFraction();
+        $fraction_model = new UserFraction;
         $fraction_model->setUserId($user->getQueueableId());
         $fraction_model->setFractionId($request->input('default_fraction'));
         $fraction_model->setDefault(1);
@@ -270,13 +275,15 @@ class UserManagementController extends Controller
         DB::commit();
         Alert::addAlert(__('general.neues_passwort', ['password' => $new_password]), 'warning');
         Alert::addAlert(__('general.erfolgreich_gespeichert'), 'success');
+
         return redirect()->back();
     }
 
     /**
      * Aktualisiert die Accountdaten
-     * @param Request $request
-     * @param \App\Models\User $user
+     *
+     * @param  Request          $request
+     * @param  \App\Models\User $user
      * @return mixed
      */
     public function updateAccountData(Request $request, User $user)
@@ -288,7 +295,7 @@ class UserManagementController extends Controller
             'fractions' => Arr::flatten($request->input('fraction_ids', [])),
             'date_of_birth' => Carbon::create($request->input('date_of_birth')),
             'birth_location' => $request->input('birth_location'),
-            'gender' => $request->input('gender')
+            'gender' => $request->input('gender'),
         ];
         $user_data['fractions'][] = $request->input('default_fraction', null);
         $account = $user->account;
@@ -303,7 +310,7 @@ class UserManagementController extends Controller
         foreach ($user_data['fractions'] as $fraction_id) {
             $fraction_model = UserFraction::firstOrCreate([
                 'user_id' => $account->getId(),
-                'fraction_id' => (int)$fraction_id,
+                'fraction_id' => (int) $fraction_id,
             ]);
             $fraction_model->setDefault($fraction_id == $user_data['default_fraction'] ? 1 : 0);
             $fraction_model->save();
@@ -320,6 +327,7 @@ class UserManagementController extends Controller
                     session()->put('name', $account->getFullName());
                 }
                 Alert::addAlert(__('general.erfolgreich_gespeichert'), 'success');
+
                 return redirect()->back();
             }
         }
@@ -327,8 +335,9 @@ class UserManagementController extends Controller
 
     /**
      * Aktualisiert die Userdaten
-     * @param Request $request
-     * @param \App\Models\User $user
+     *
+     * @param  Request          $request
+     * @param  \App\Models\User $user
      * @return mixed
      */
     public function updateUserData(Request $request, User $user)
@@ -348,6 +357,7 @@ class UserManagementController extends Controller
             if ($user->save()) {
 
                 Alert::addAlert(__('general.erfolgreich_gespeichert'), 'success');
+
                 return redirect()->back();
             }
         }
@@ -355,8 +365,9 @@ class UserManagementController extends Controller
 
     /**
      * Aktualisiert die Permission und Roles
-     * @param Request $request
-     * @param \App\Models\User $user
+     *
+     * @param  Request          $request
+     * @param  \App\Models\User $user
      * @return mixed
      */
     public function updatePermissions(Request $request, User $user)
@@ -400,7 +411,7 @@ class UserManagementController extends Controller
     /**
      * Löscht einen Benutzer
      *
-     * @param \App\Models\User $user
+     * @param  \App\Models\User                  $user
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(User $user)
@@ -408,12 +419,13 @@ class UserManagementController extends Controller
         $this->checkPermission('usermanagement.delete');
         if ($user->isSuperadmin() || Auth::user()->getId() == $user->getId()) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+
             return redirect()->back();
         }
-        $user->account->directQualifications->each(function ($qualification) use ($user) {
+        $user->account->directQualifications->each(function ($qualification) {
             $qualification->delete();
         });
-        $user->account->trainings->each(function ($participant) use ($user) {
+        $user->account->trainings->each(function ($participant) {
             $participant->delete();
         });
 
@@ -424,6 +436,7 @@ class UserManagementController extends Controller
         $user->delete();
 
         Alert::addAlert(__('general.erfolgreich_geloescht'), 'success');
+
         return redirect()->back();
     }
 }

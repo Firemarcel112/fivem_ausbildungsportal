@@ -2,26 +2,27 @@
 
 namespace App\Services;
 
-use Exception;
-use RuntimeException;
-use Str;
 use App\DTO\ParticipantDTO;
 use App\DTO\TrainerDTO;
+use Exception;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
+use RuntimeException;
 use Spatie\LaravelPdf\Facades\Pdf;
+use Str;
 
 class DocumentService
 {
-
     /**
      * Erstellt ein Zertifikat
-     * @param ParticipantDTO $participant
-     * @param TrainerDTO $trainer
-     * @param string $qualification_name
-     * @param string $training_date
-     * @throws RuntimeException
+     *
+     * @param  ParticipantDTO $participant
+     * @param  TrainerDTO     $trainer
+     * @param  string         $qualification_name
+     * @param  string         $training_date
      * @return string
+     *
+     * @throws RuntimeException
      */
     public function createCertificate(
         ParticipantDTO $participant,
@@ -75,7 +76,7 @@ class DocumentService
 
     public function signPdf(string $pdf_path)
     {
-        $pdf_service = new PdfService();
+        $pdf_service = new PdfService;
         $pdf_service->sign($pdf_path);
     }
 }

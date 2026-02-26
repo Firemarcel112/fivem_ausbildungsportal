@@ -3,16 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Facades\Alert;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Auth;
 
 abstract class Controller extends BaseController
 {
-
     /**
      * Prüft die Permission und leitet den Benutzer zurück
-     * @param mixed $permission
-     * @return bool|\Illuminate\Http\RedirectResponse
+     *
+     * @param  mixed                 $permission
+     * @return bool|RedirectResponse
      */
     public function checkPermission(string|array $permissions)
     {
@@ -33,6 +34,7 @@ abstract class Controller extends BaseController
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
             abort(403);
         }
+
         return true;
     }
 }

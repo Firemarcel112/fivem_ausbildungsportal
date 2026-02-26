@@ -11,15 +11,17 @@ class ProfileController extends Controller
     /**
      * Anzeige eines Profils
      *
-     * @param User $user
+     * @param  User  $user
      * @return mixed
      */
     public function show(User $user)
     {
         if (!Auth::user()->hasPermissionTo('usermanagement.index') && Auth::user()->id !== $user->id) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+
             return redirect()->back();
         }
+
         return view('user.profile', compact('user'));
     }
 }

@@ -33,6 +33,7 @@ class Dropdown extends Component
                 $can_see = false;
             }
         }
+
         return $can_see ? view('components.navigation.dropdown') : '';
     }
 
@@ -62,6 +63,7 @@ class Dropdown extends Component
         if (isset($item['permission'])) {
             return auth()?->user()?->can($item['permission']) ?? false;
         }
+
         return true;
     }
 }

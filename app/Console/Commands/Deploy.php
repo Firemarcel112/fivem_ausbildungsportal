@@ -9,6 +9,7 @@ use Symfony\Component\Process\Process;
 class Deploy extends Command
 {
     protected $signature = 'app:deploy';
+
     protected $description = 'Automatisiertes Deployment';
 
     public function handle()
@@ -42,6 +43,7 @@ class Deploy extends Command
             $this->call('queue:restart');
             $this->info("\n📁 Keine Änderungen vorhanden. Deployment beendet.");
             $bar->finish();
+
             return true;
         }
 
@@ -73,7 +75,7 @@ class Deploy extends Command
                 $this->runProcess([$php_binary, 'composer', 'install', '--no-interaction', '--prefer-dist', '--optimize-autoloader']);
             }
         } else {
-            $this->info("📦 Composer unverändert → übersprungen");
+            $this->info('📦 Composer unverändert → übersprungen');
         }
 
         $bar->advance();
@@ -86,7 +88,7 @@ class Deploy extends Command
             $this->info("\n🗄 Migrationen geändert → führe migrate aus...");
             $this->call('migrate');
         } else {
-            $this->info("🗄 Keine neuen Migrationen → übersprungen");
+            $this->info('🗄 Keine neuen Migrationen → übersprungen');
         }
 
         $bar->advance();
@@ -101,7 +103,7 @@ class Deploy extends Command
                 '--class' => ProductionSeeder::class,
             ]);
         } else {
-            $this->info("🌱 Seeder unverändert → übersprungen");
+            $this->info('🌱 Seeder unverändert → übersprungen');
         }
 
         $bar->advance();
@@ -118,6 +120,7 @@ class Deploy extends Command
         $bar->finish();
 
         $this->info("\n\n✅ Deployment erfolgreich abgeschlossen!");
+
         return true;
     }
 
@@ -137,8 +140,8 @@ class Deploy extends Command
     /**
      * Gibt die änderungen an den Dateien zurück
      *
-     * @param array $changed_files
-     * @param array $paths
+     * @param  array $changed_files
+     * @param  array $paths
      * @return bool
      */
     public function anyChanged(array $changed_files, array $paths): bool
@@ -150,13 +153,14 @@ class Deploy extends Command
                 }
             }
         }
+
         return false;
     }
 
     /**
      * Lässt einen Prozess via CLI laufen
      *
-     * @param array $command
+     * @param  array $command
      * @return void
      */
     public function runProcess(array $command)
@@ -171,7 +175,7 @@ class Deploy extends Command
     /**
      * Lässt einen Prozess via CLI laufen und gibt den output zurück
      *
-     * @param array $command
+     * @param  array  $command
      * @return string
      */
     public function runGetOutput(array $command): string

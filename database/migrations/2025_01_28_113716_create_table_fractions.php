@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('fractions', function (Blueprint $table) {
             $table->id('fraction_id');
-            $table->string('name',);
+            $table->string('name');
             $table->string('short_name', 10);
             $table->string('discord_webhook')
                 ->nullable();

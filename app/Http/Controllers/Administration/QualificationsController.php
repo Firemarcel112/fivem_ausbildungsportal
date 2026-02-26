@@ -22,7 +22,7 @@ class QualificationsController extends Controller
         $this->checkPermission('administration.qualifications.edit');
         $qualifications = Qualification::with([
             'trainings',
-            'userQualifications'
+            'userQualifications',
         ])
             ->isOrderByDefault()
             ->get();
@@ -33,27 +33,28 @@ class QualificationsController extends Controller
     /**
      * Legt eine neue Qualifikation an
      *
-     * @param \App\Http\Requests\Administration\Qualifications\CreateRequest $request
+     * @param  \App\Http\Requests\Administration\Qualifications\CreateRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(CreateRequest $request)
     {
         $this->checkPermission('administration.qualifications.edit');
-        $qualification = new Qualification();
+        $qualification = new Qualification;
         $qualification->setName($request->input('name'));
         $qualification->setRank($request->input('rank', 0));
         $qualification->setGenerateCertificate($request->input('generate_certificate', 1));
         $qualification->save();
 
         Alert::addAlert(__('general.erfolgreich_angelegt'), 'success');
+
         return redirect()->back();
     }
 
     /**
      * Seite zum bearbeiten einer Qualifikation
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Qualifications\Qualification $qualification
+     * @param  \Illuminate\Http\Request                 $request
+     * @param  \App\Models\Qualifications\Qualification $qualification
      * @return \Illuminate\Contracts\View\View
      */
     public function edit(Request $request, Qualification $qualification)
@@ -66,8 +67,8 @@ class QualificationsController extends Controller
     /**
      * Update einer Fraktion
      *
-     * @param \App\Http\Requests\Administration\Qualifications\CreateRequest $request
-     * @param \App\Models\Qualifications\Qualification $qualification
+     * @param  \App\Http\Requests\Administration\Qualifications\CreateRequest $request
+     * @param  \App\Models\Qualifications\Qualification                       $qualification
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(CreateRequest $request, Qualification $qualification)
@@ -80,13 +81,14 @@ class QualificationsController extends Controller
         $qualification->save();
 
         Alert::addAlert(__('general.erfolgreich_aktualisiert'), 'success');
+
         return redirect()->route('administration.qualifications.index');
     }
 
     /**
      * Löscht eine Qualifikation
      *
-     * @param \App\Models\Qualifications\Qualification $qualification
+     * @param  \App\Models\Qualifications\Qualification $qualification
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Qualification $qualification)
@@ -101,8 +103,9 @@ class QualificationsController extends Controller
 
         if ($exists_trainings || $exists_user_with_qualification) {
             Alert::addAlert(__('texte.administration.qualifikation_nicht_loeschbar', [
-                'name' => $qualification->getName()
+                'name' => $qualification->getName(),
             ]), 'danger');
+
             return redirect()->back();
         }
 
@@ -113,13 +116,14 @@ class QualificationsController extends Controller
         $qualification->delete();
 
         Alert::addAlert(__('general.erfolgreich_geloescht'), 'success');
+
         return redirect()->back();
     }
 
     /**
      * Blendet eine Qualifikation ein/aus
      *
-     * @param Qualification $qualification
+     * @param  Qualification                     $qualification
      * @return \Illuminate\Http\RedirectResponse
      */
     public function toggleHide(Qualification $qualification)
@@ -130,6 +134,7 @@ class QualificationsController extends Controller
         $qualification->save();
 
         Alert::addAlert(__('general.erfolgreich_aktualisiert'), 'success');
+
         return redirect()->back();
     }
 }

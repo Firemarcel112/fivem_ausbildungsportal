@@ -8,14 +8,17 @@ use App\Models\User\Account;
 class TrainerDTO
 {
     public string $salutation;
+
     public string $first_name;
+
     public string $last_name;
 
     /**
      * TrainerDTO constructor.
+     *
      * @param string $salutation Anrede
      * @param string $first_name Vorname
-     * @param string $last_name Nachname
+     * @param string $last_name  Nachname
      */
     public function __construct(
         string $salutation,
@@ -34,7 +37,8 @@ class TrainerDTO
 
     /**
      * Erstellt eine TrainerDTO aus einem User Modell.
-     * @param User $trainer
+     *
+     * @param  User       $trainer
      * @return TrainerDTO
      */
     public static function fromModel(Account|User $trainer)
@@ -42,6 +46,7 @@ class TrainerDTO
         if ($trainer instanceof User) {
             $trainer = $trainer->account;
         }
+
         return new self(
             $trainer->getSalutation(),
             $trainer->getFirstName(),

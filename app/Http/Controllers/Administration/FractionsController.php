@@ -20,13 +20,14 @@ class FractionsController extends Controller
     {
         $this->checkPermission('administration.fractions.edit');
         $fractions = Fraction::get();
+
         return view('administration.fractions.index', compact('fractions'));
     }
 
     /**
      * Legt eine neue Fraktion an
      *
-     * @param \App\Http\Requests\Administration\Fractions\CreateRequest $request
+     * @param  \App\Http\Requests\Administration\Fractions\CreateRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(CreateRequest $request)
@@ -40,14 +41,15 @@ class FractionsController extends Controller
         ]);
 
         Alert::addAlert(__('general.erfolgreich_angelegt'), 'success');
+
         return redirect()->back();
     }
 
     /**
      * Seite zum bearbeiten einer Fraktion
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Fractions\Fraction $fraction
+     * @param  \Illuminate\Http\Request        $request
+     * @param  \App\Models\Fractions\Fraction  $fraction
      * @return \Illuminate\Contracts\View\View
      */
     public function edit(Request $request, Fraction $fraction)
@@ -60,8 +62,8 @@ class FractionsController extends Controller
     /**
      * Update einer Fraktion
      *
-     * @param \App\Http\Requests\Administration\Fractions\CreateRequest $request
-     * @param \App\Models\Fractions\Fraction $fraction
+     * @param  \App\Http\Requests\Administration\Fractions\CreateRequest $request
+     * @param  \App\Models\Fractions\Fraction                            $fraction
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(CreateRequest $request, Fraction $fraction)
@@ -77,13 +79,14 @@ class FractionsController extends Controller
         ]);
 
         Alert::addAlert(__('general.erfolgreich_aktualisiert'), 'success');
+
         return redirect()->route('administration.fractions.index');
     }
 
     /**
      * Löscht eine Fraktion
      *
-     * @param \App\Models\Fractions\Fraction $fraction
+     * @param  \App\Models\Fractions\Fraction    $fraction
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Fraction $fraction)
@@ -94,14 +97,16 @@ class FractionsController extends Controller
 
         if ($user_with_fraction_exists) {
             Alert::addAlert(__('texte.administration.fraktion_nicht_loeschbar', [
-                'name' => $fraction->name
+                'name' => $fraction->name,
             ]), 'danger');
+
             return redirect()->back();
         }
 
         $fraction->delete();
 
         Alert::addAlert(__('general.erfolgreich_geloescht'), 'success');
+
         return redirect()->back();
     }
 }

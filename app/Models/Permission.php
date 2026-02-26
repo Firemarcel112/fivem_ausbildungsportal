@@ -18,6 +18,7 @@ use Spatie\Permission\Models\Permission as SpatiePermission;
  * @property-read int|null $roles_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
  * @property-read int|null $users_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission permission($permissions, $without = false)
@@ -31,34 +32,35 @@ use Spatie\Permission\Models\Permission as SpatiePermission;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission withoutRole($roles, $guard = null)
+ *
  * @mixin \Eloquent
  */
 class Permission extends SpatiePermission
 {
-
     protected $table = 'permissions';
+
     protected $primaryKey = 'id';
 
-    #########################
+    # ########################
     # CUSTOM FUNCTIONS
-    #########################
+    # ########################
 
     public function getTranslatedName()
     {
         return __('permissions.' . $this->name);
     }
 
-    #########################
+    # ########################
     # SCOPES
-    #########################
+    # ########################
 
-    #########################
+    # ########################
     # RELATIONS
-    #########################
+    # ########################
 
-    #########################
+    # ########################
     # GET & SET
-    #########################
+    # ########################
 
     /**
      * Get the id attribute.
@@ -73,7 +75,7 @@ class Permission extends SpatiePermission
     /**
      * Set the id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setId(int $value)
@@ -94,7 +96,7 @@ class Permission extends SpatiePermission
     /**
      * Set the name attribute.
      *
-     * @param string $value
+     * @param  string $value
      * @return void
      */
     public function setName(string $value)
@@ -115,7 +117,7 @@ class Permission extends SpatiePermission
     /**
      * Set the guard_name attribute.
      *
-     * @param string $value
+     * @param  string $value
      * @return void
      */
     public function setGuardName(string $value)
@@ -136,7 +138,7 @@ class Permission extends SpatiePermission
     /**
      * Set the created_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setCreated(?Carbon $value)
@@ -157,7 +159,7 @@ class Permission extends SpatiePermission
     /**
      * Set the updated_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setUpdated(?Carbon $value)
@@ -178,7 +180,7 @@ class Permission extends SpatiePermission
     /**
      * Set the categorie_id attribute.
      *
-     * @param ?int $value
+     * @param  ?int $value
      * @return void
      */
     public function setCategorieId(?int $value)

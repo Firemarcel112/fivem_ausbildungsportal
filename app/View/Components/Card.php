@@ -9,6 +9,7 @@ use Illuminate\View\Component;
 class Card extends Component
 {
     public string $size;
+
     public array $classes;
 
     /**

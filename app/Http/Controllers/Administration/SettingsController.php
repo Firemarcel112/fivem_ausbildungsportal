@@ -9,11 +9,10 @@ use Illuminate\Http\Request;
 
 class SettingsController extends Controller
 {
-
     /**
      * Anzeige der Einstellungen
      *
-     * @param Request $request
+     * @param  Request $request
      * @return string
      */
     public function index(Request $request)
@@ -28,8 +27,8 @@ class SettingsController extends Controller
     /**
      * Aktualisiert einen Eintrag
      *
-     * @param Request $request
-     * @param Setting $setting
+     * @param  Request                           $request
+     * @param  Setting                           $setting
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, Setting $setting)
@@ -44,6 +43,7 @@ class SettingsController extends Controller
         $setting->save();
 
         Alert::addAlert(__('general.erfolgreich_aktualisiert'), 'success');
+
         return redirect()->back();
     }
 }

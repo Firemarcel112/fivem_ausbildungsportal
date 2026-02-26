@@ -37,7 +37,7 @@ enum Gender: string
      */
     public static function forSelect(): array
     {
-        return collect(self::cases())->map(fn($gender) => [
+        return collect(self::cases())->map(fn ($gender) => [
             'name' => $gender->label(),
             'value' => $gender->value,
         ])->toArray();

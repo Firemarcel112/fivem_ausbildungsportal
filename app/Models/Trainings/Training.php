@@ -4,12 +4,12 @@ namespace App\Models\Trainings;
 
 use App\Models\BaseModel;
 use App\Models\Qualifications\Qualification;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @property int $training_id
@@ -34,6 +34,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Trainings\Requirement> $requirements
  * @property-read int|null $requirements_count
  * @property-read User|null $trainer
+ *
  * @method static Builder<static>|Training isAvailable()
  * @method static Builder<static>|Training isCompletedBuilder(int $available = 1)
  * @method static Builder<static>|Training newModelQuery()
@@ -54,19 +55,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static Builder<static>|Training whereTrainerId($value)
  * @method static Builder<static>|Training whereTrainingId($value)
  * @method static Builder<static>|Training whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Training extends BaseModel
 {
     protected $table = 'trainings';
+
     protected $primaryKey = 'training_id';
 
-    #########################
+    # ########################
     # CUSTOM FUNCTIONS
-    #########################
+    # ########################
 
     /**
      * Gibt den Namen des Ausbilders zurück
+     *
      * @return mixed
      */
     public function getTrainerName()
@@ -74,6 +78,7 @@ class Training extends BaseModel
         if ($this->trainer->isTrainer() || $this->isCompleted()) {
             return $this->trainer->getFullName();
         }
+
         return __('general.unbekannt');
     }
 
@@ -87,7 +92,7 @@ class Training extends BaseModel
         $date = $this->getDate()->format('d.m.Y');
         $time = $this->getTime()->format('H:i');
 
-        return  __('general.datum_uhrzeit_readable', [
+        return __('general.datum_uhrzeit_readable', [
             'date' => $date,
             'time' => $time,
         ]);
@@ -97,7 +102,7 @@ class Training extends BaseModel
      * Gibt den Namen der Ausbildung zurück
      *
      * @param $with_link (Gibt den Namen inklusive ID und Anzeigen Link zurück)
-     * @param $with_id (Gibt den Namen mit ID zurück)
+     * @param $with_id   (Gibt den Namen mit ID zurück)
      */
     public function getName(bool $with_link = false, bool $with_id = false)
     {
@@ -123,6 +128,7 @@ class Training extends BaseModel
     public function getCountParticipants()
     {
         $this->load('participants');
+
         return $this->participants->count();
     }
 
@@ -136,11 +142,12 @@ class Training extends BaseModel
         $time = $this->getTime()->format('H:i:00');
         $date = $this->getDate()->format('y-m-d');
 
-        return Carbon::parse($date . ' '  . $time);
+        return Carbon::parse($date . ' ' . $time);
     }
 
     /**
      * Gibt minimale und Maximale Teilnehmer aus
+     *
      * @return string
      */
     public function getOutputCountAllowedParticipants()
@@ -167,7 +174,7 @@ class Training extends BaseModel
     /**
      * Prüft ob man sich noch anmelden kann
      *
-     * @param bool $only_time (Berücksichtigt nur die Zeit ohne Teilnehmeranzahl)
+     * @param  bool $only_time (Berücksichtigt nur die Zeit ohne Teilnehmeranzahl)
      * @return bool
      */
     public function canRegister(bool $only_time = false)
@@ -192,11 +199,13 @@ class Training extends BaseModel
         if ($only_time) {
             return $can_register_time;
         }
+
         return $can_register_time && $can_register_paricipant;
     }
 
     /**
      * Gibt an ob der Benutzer bereits zur Ausbildung angemeldet ist
+     *
      * @return bool
      */
     public function isRegistered(): bool
@@ -206,6 +215,7 @@ class Training extends BaseModel
         if (!empty($registered)) {
             return true;
         }
+
         return false;
     }
 
@@ -240,16 +250,18 @@ class Training extends BaseModel
 
             return $trainer_name . ' - ' . __('general.ausbilder_nicht_mehr_aktiv');
         }
+
         return null;
     }
 
-    #########################
+    # ########################
     # SCOPES
-    #########################
+    # ########################
 
     /**
      * Scope für Verfügbare Ausbildungen
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $query
      * @return Builder
      */
     public function scopeIsAvailable(Builder $query)
@@ -266,8 +278,8 @@ class Training extends BaseModel
     /**
      * Scope für Abgeschlossene Ausbildung
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $available
+     * @param  \Illuminate\Database\Eloquent\Builder $query
+     * @param  int                                   $available
      * @return Builder
      */
     public function scopeIsCompletedBuilder(Builder $query, int $available = 1)
@@ -277,7 +289,8 @@ class Training extends BaseModel
 
     /**
      * Scope für Standardsortierung
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $query
      * @return Builder
      */
     public function scopeOrderByDefault(Builder $query, string $direction = 'asc')
@@ -286,9 +299,9 @@ class Training extends BaseModel
             ->orderBy('time', $direction);
     }
 
-    #########################
+    # ########################
     # RELATIONS
-    #########################
+    # ########################
 
     public function trainer(): HasOne
     {
@@ -326,9 +339,9 @@ class Training extends BaseModel
         )->orderByDefault();
     }
 
-    #########################
+    # ########################
     # GET & SET
-    #########################
+    # ########################
 
     /**
      * Get the training_id attribute.
@@ -343,7 +356,7 @@ class Training extends BaseModel
     /**
      * Set the training_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setId(int $value)
@@ -364,7 +377,7 @@ class Training extends BaseModel
     /**
      * Set the training_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setTrainingId(int $value)
@@ -385,7 +398,7 @@ class Training extends BaseModel
     /**
      * Set the trainer_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setTrainerId(int $value)
@@ -406,7 +419,7 @@ class Training extends BaseModel
     /**
      * Set the qualification_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setQualificationId(int $value)
@@ -427,7 +440,7 @@ class Training extends BaseModel
     /**
      * Set the fraktion_id attribute.
      *
-     * @param ?int $value
+     * @param  ?int $value
      * @return void
      */
     public function setFraktionId(?int $value)
@@ -448,7 +461,7 @@ class Training extends BaseModel
     /**
      * Set the meeting_point attribute.
      *
-     * @param ?string $value
+     * @param  ?string $value
      * @return void
      */
     public function setMeetingPoint(?string $value)
@@ -469,7 +482,7 @@ class Training extends BaseModel
     /**
      * Set the additional_information attribute.
      *
-     * @param ?string $value
+     * @param  ?string $value
      * @return void
      */
     public function setAdditionalInformation(?string $value)
@@ -490,7 +503,7 @@ class Training extends BaseModel
     /**
      * Set the date attribute.
      *
-     * @param Carbon $value
+     * @param  Carbon $value
      * @return void
      */
     public function setDate(Carbon $value)
@@ -511,7 +524,7 @@ class Training extends BaseModel
     /**
      * Set the time attribute.
      *
-     * @param Carbon $value
+     * @param  Carbon $value
      * @return void
      */
     public function setTime(Carbon $value)
@@ -532,7 +545,7 @@ class Training extends BaseModel
     /**
      * Set the max_participants attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setMaxParticipants(int $value)
@@ -553,7 +566,7 @@ class Training extends BaseModel
     /**
      * Set the min_participants attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setMinParticipants(int $value)
@@ -574,7 +587,7 @@ class Training extends BaseModel
     /**
      * Set the completed attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setCompleted(int $value)
@@ -595,7 +608,7 @@ class Training extends BaseModel
     /**
      * Set the canceled attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setCanceled(int $value)
@@ -616,7 +629,7 @@ class Training extends BaseModel
     /**
      * Set the created_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setCreated(?Carbon $value)
@@ -637,7 +650,7 @@ class Training extends BaseModel
     /**
      * Set the updated_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setUpdated(?Carbon $value)

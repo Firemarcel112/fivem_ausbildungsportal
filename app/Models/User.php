@@ -3,22 +3,21 @@
 namespace App\Models;
 
 use App\Enums\Role as RoleEnum;
-use App\Models\Trainings\TrainingBan;
-use App\Models\Training\TrainingBanReason;
 use App\Models\Trainings\Participant;
+use App\Models\Trainings\TrainingBan;
 use App\Models\User\Account;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 use OwenIt\Auditing\Auditable as AuditingAuditable;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Database\Eloquent\Builder;
 
 /**
  * @property int $id
@@ -40,6 +39,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property-read int|null $permissions_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Role> $roles
  * @property-read int|null $roles_count
+ *
  * @method static Builder<static>|User newModelQuery()
  * @method static Builder<static>|User newQuery()
  * @method static Builder<static>|User permission($permissions, $without = false)
@@ -56,12 +56,13 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder<static>|User withIsTrainer()
  * @method static Builder<static>|User withoutPermission($permissions)
  * @method static Builder<static>|User withoutRole($roles, $guard = null)
+ *
  * @mixin \Eloquent
  */
 class User extends Authenticatable implements Auditable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, AuditingAuditable, HasRoles {
+    use AuditingAuditable, HasFactory, HasRoles, Notifiable {
         hasPermissionTo as spatieHasPermissionTo;
         hasRole as spatieHasRole;
     }
@@ -93,14 +94,14 @@ class User extends Authenticatable implements Auditable
         ];
     }
 
-    #########################
+    # ########################
     # CUSTOM FUNCTIONS
-    #########################
+    # ########################
 
     /**
      * Sucht den Benutzer nach Benutzernamen
      *
-     * @param string $username
+     * @param  string    $username
      * @return User|null
      */
     public static function findByUsername(string $username)
@@ -118,6 +119,7 @@ class User extends Authenticatable implements Auditable
 
     /**
      * Gibt die Ausgaberolle des Benutzers zurück
+     *
      * @return string
      */
     public function getOutputRole()
@@ -139,14 +141,15 @@ class User extends Authenticatable implements Auditable
                 return "<span class='fw-bold text-{$color}'>" . __('roles.' . strtolower($role->name)) . '</span>';
             }
         }
+
         return "<span class='fw-bold text-green'>" . __('roles.user') . '</span>';
     }
 
     /**
      * Prüft die Permission
      *
-     * @param mixed $permission
-     * @param mixed $guardName
+     * @param  mixed $permission
+     * @param  mixed $guardName
      * @return bool
      */
     public function hasPermissionTo($permission, $guardName = null, bool $check_superadmin = true): bool
@@ -160,9 +163,10 @@ class User extends Authenticatable implements Auditable
 
     /**
      * Prüft ob die Rolle vorhanden ist
-     * @param mixed $roles
-     * @param mixed $guard
-     * @param mixed $check_superadmin
+     *
+     * @param  mixed $roles
+     * @param  mixed $guard
+     * @param  mixed $check_superadmin
      * @return bool
      */
     public function hasRole($roles, ?string $guard = null, bool $check_superadmin = true): bool
@@ -177,8 +181,8 @@ class User extends Authenticatable implements Auditable
     /**
      * Syncronisiert die Permissions und schreibt dafür Audit einträge => typ (Attach, Detach)
      *
-     * @param array $grant_permission_ids
-     * @param array $revoke_permission_ids
+     * @param  array $grant_permission_ids
+     * @param  array $revoke_permission_ids
      * @return void
      */
     public function syncPermissions(array $grant_permission_ids = [], array $revoke_permission_ids = [])
@@ -187,17 +191,16 @@ class User extends Authenticatable implements Auditable
             foreach ($revoke_permission_ids as $permission_id) {
                 $has_permission = $this->hasPermissionTo($permission_id, null, false);
                 if ($has_permission) {
-                    $this->auditDetach('permissions', $permission_id,  true);
+                    $this->auditDetach('permissions', $permission_id, true);
                 }
             }
             unset($revoke_permission_ids);
-
 
             foreach ($grant_permission_ids as $permission_id) {
                 $has_permission = $this->hasPermissionTo($permission_id, null, false);
                 if (!$has_permission) {
                     $this->auditAttach('permissions', $permission_id, [
-                        'permission_id' => $permission_id
+                        'permission_id' => $permission_id,
                     ]);
                 }
             }
@@ -208,8 +211,8 @@ class User extends Authenticatable implements Auditable
     /**
      * Syncronisiert die Rollen und schreibt dafür Audit einträge => typ (Attach, Detach)
      *
-     * @param array $grant_role_ids
-     * @param array $revoke_role_ids
+     * @param  array $grant_role_ids
+     * @param  array $revoke_role_ids
      * @return void
      */
     public function syncRoles(array $grant_role_ids = [], array $revoke_role_ids = [])
@@ -218,17 +221,16 @@ class User extends Authenticatable implements Auditable
             foreach ($revoke_role_ids as $role_id) {
                 $has_role = $this->hasRole($role_id, null, false);
                 if ($has_role) {
-                    $this->auditDetach('roles', $role_id,  true);
+                    $this->auditDetach('roles', $role_id, true);
                 }
             }
             unset($revoke_role_ids);
-
 
             foreach ($grant_role_ids as $role_id) {
                 $has_role = $this->hasRole($role_id, null, false);
                 if (!$has_role) {
                     $this->auditAttach('roles', $role_id, [
-                        'role_id' => $role_id
+                        'role_id' => $role_id,
                     ]);
                 }
             }
@@ -238,9 +240,10 @@ class User extends Authenticatable implements Auditable
 
     /**
      * Verteilt eine Ausbildungssperre
-     * @param mixed $date_from
-     * @param mixed $date_to
-     * @param int $reason_id
+     *
+     * @param  mixed $date_from
+     * @param  mixed $date_to
+     * @param  int   $reason_id
      * @return bool
      */
     public function banForTrainings(
@@ -254,7 +257,7 @@ class User extends Authenticatable implements Auditable
         }
         $date_from = $date_from ?? date('Y-m-d');
         $date_to = $date_to ?? now()->addDays(7);
-        $model = new TrainingBan();
+        $model = new TrainingBan;
         $model->setUserId($this->getId());
         $model->setIssuerId(Auth::user()->getId());
         $model->setReason($reason);
@@ -311,6 +314,7 @@ class User extends Authenticatable implements Auditable
         if (!empty($this->discord) && !empty(config('services.discord.client_id'))) {
             return $this?->discord?->getUsername() ?? $this->getFullName();
         }
+
         return $this->getFullName();
     }
 
@@ -332,6 +336,7 @@ class User extends Authenticatable implements Auditable
         } elseif (in_array($this->getId(), $allowed_ids)) {
             return true;
         }
+
         return false;
     }
 
@@ -355,9 +360,9 @@ class User extends Authenticatable implements Auditable
         return $this->hasPermissionTo('is_trainer', null, false);
     }
 
-    #########################
+    # ########################
     # SCOPES
-    #########################
+    # ########################
 
     /**
      * Scope für Benutzer der Ausbilder ist
@@ -377,9 +382,9 @@ class User extends Authenticatable implements Auditable
             });
     }
 
-    #########################
+    # ########################
     # RELATIONS
-    #########################
+    # ########################
 
     /**
      * Gibt die RP Daten zurück
@@ -407,10 +412,9 @@ class User extends Authenticatable implements Auditable
             ->orderBy('date_to', 'DESC');
     }
 
-    #########################
+    # ########################
     # GET & SET
-    #########################
-
+    # ########################
 
     /**
      * Get the id attribute.
@@ -425,7 +429,7 @@ class User extends Authenticatable implements Auditable
     /**
      * Set the id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setId(int $value)
@@ -446,7 +450,7 @@ class User extends Authenticatable implements Auditable
     /**
      * Set the name attribute.
      *
-     * @param string $value
+     * @param  string $value
      * @return void
      */
     public function setName(string $value)
@@ -467,7 +471,7 @@ class User extends Authenticatable implements Auditable
     /**
      * Set the email attribute.
      *
-     * @param ?string $value
+     * @param  ?string $value
      * @return void
      */
     public function setEmail(?string $value)
@@ -488,7 +492,7 @@ class User extends Authenticatable implements Auditable
     /**
      * Set the email_verified_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setEmailVerifiedAt(?Carbon $value)
@@ -509,7 +513,7 @@ class User extends Authenticatable implements Auditable
     /**
      * Set the password attribute.
      *
-     * @param string $value
+     * @param  string $value
      * @return void
      */
     public function setPassword(string $value)
@@ -530,7 +534,7 @@ class User extends Authenticatable implements Auditable
     /**
      * Set the created_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setCreated(?Carbon $value)
@@ -551,7 +555,7 @@ class User extends Authenticatable implements Auditable
     /**
      * Set the updated_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setUpdated(?Carbon $value)

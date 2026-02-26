@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Exception;
 use App\DTO\ParticipantDTO;
 use App\DTO\TrainerDTO;
 use App\Enums\Gender;
@@ -20,7 +19,6 @@ use Illuminate\Support\Facades\Auth;
 
 class DocumentsController extends Controller
 {
-
     use AuthorizesRequests;
 
     public DocumentService $document_service;
@@ -33,8 +31,8 @@ class DocumentsController extends Controller
     /**
      * Zeigt die Seite an
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Contracts\View\View
+     * @param  Request $request
+     * @return \View
      */
     public function index(Request $request)
     {
@@ -81,11 +79,11 @@ class DocumentsController extends Controller
     /**
      * Speichert ein Zertifikat
      *
-     * @param \Illuminate\Http\Request $request
-     * @throws \Exception
+     * @param  Request                           $request
      * @return \Illuminate\Http\RedirectResponse
+     *
+     * @throws \Exception
      */
-
     public function store(Request $request)
     {
         $this->checkPermission('documents.create');
@@ -133,8 +131,8 @@ class DocumentsController extends Controller
     /**
      * Zeigt ein Dokument an
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Document $document
+     * @param  \Illuminate\Http\Request                             $request
+     * @param  \App\Models\Document                                 $document
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function show(Request $request, Document $document)
@@ -144,14 +142,15 @@ class DocumentsController extends Controller
         if (Auth::user()->isSuperadmin() && !$request->has('download')) {
             return response()->file($document->url);
         }
+
         return response()->download($document->url);
     }
 
     /**
      * Zeigt die Bearbeiten Seite vom Dokument an
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Document $document
+     * @param  \Illuminate\Http\Request        $request
+     * @param  \App\Models\Document            $document
      * @return \Illuminate\Contracts\View\View
      */
     public function edit(Request $request, Document $document)
@@ -171,8 +170,8 @@ class DocumentsController extends Controller
     /**
      * Aktualisiert ein Dokument
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Document $document
+     * @param  \Illuminate\Http\Request          $request
+     * @param  \App\Models\Document              $document
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, Document $document)
@@ -200,13 +199,14 @@ class DocumentsController extends Controller
         }
         $document->save();
         Alert::addAlert(__('general.erfolgreich_aktualisiert'), 'success');
+
         return redirect()->back();
     }
 
     /**
      * Löscht ein Dokument
      *
-     * @param \App\Models\Document $document
+     * @param  \App\Models\Document              $document
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Document $document)

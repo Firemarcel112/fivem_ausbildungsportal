@@ -4,7 +4,6 @@ namespace App\Models\Trainings;
 
 use App\Models\BaseModel;
 use App\Models\Qualifications\Qualification;
-use App\Models\Qualifikation;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,6 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property-read int|null $audits_count
  * @property-read Qualification|null $qualification
  * @property-read User|null $user
+ *
  * @method static Builder<static>|Request newModelQuery()
  * @method static Builder<static>|Request newQuery()
  * @method static Builder<static>|Request query()
@@ -31,28 +31,30 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder<static>|Request whereTrainingRequestId($value)
  * @method static Builder<static>|Request whereUpdatedAt($value)
  * @method static Builder<static>|Request whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class Request extends BaseModel
 {
     protected $table = 'training_requests';
+
     protected $primaryKey = 'training_request_id';
 
     protected $guarded = [
         'training_request_id',
     ];
 
-    #########################
+    # ########################
     # CUSTOM FUNCTIONS
-    #########################
+    # ########################
 
-    #########################
+    # ########################
     # SCOPES
-    #########################
+    # ########################
 
-    #########################
+    # ########################
     # RELATIONS
-    #########################
+    # ########################
 
     public function user()
     {
@@ -72,9 +74,9 @@ class Request extends BaseModel
         );
     }
 
-    #########################
+    # ########################
     # GET & SET
-    #########################
+    # ########################
     /**
      * Get the training_request_id attribute.
      *
@@ -88,7 +90,7 @@ class Request extends BaseModel
     /**
      * Set the training_request_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setId(int $value)
@@ -109,7 +111,7 @@ class Request extends BaseModel
     /**
      * Set the training_request_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setTrainingRequestId(int $value)
@@ -130,7 +132,7 @@ class Request extends BaseModel
     /**
      * Set the user_id attribute.
      *
-     * @param ?int $value
+     * @param  ?int $value
      * @return void
      */
     public function setUserId(?int $value)
@@ -151,7 +153,7 @@ class Request extends BaseModel
     /**
      * Set the qualification_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setQualificationId(int $value)
@@ -172,7 +174,7 @@ class Request extends BaseModel
     /**
      * Set the date attribute.
      *
-     * @param Carbon $value
+     * @param  Carbon $value
      * @return void
      */
     public function setDate(Carbon $value)
@@ -193,7 +195,7 @@ class Request extends BaseModel
     /**
      * Set the time attribute.
      *
-     * @param Carbon $value
+     * @param  Carbon $value
      * @return void
      */
     public function setTime(Carbon $value)
@@ -214,7 +216,7 @@ class Request extends BaseModel
     /**
      * Set the created_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setCreated(?Carbon $value)
@@ -235,7 +237,7 @@ class Request extends BaseModel
     /**
      * Set the updated_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setUpdated(?Carbon $value)

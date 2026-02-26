@@ -4,7 +4,6 @@ namespace App\Models\Qualifications;
 
 use App\Events\QualificationAction;
 use App\Models\BaseModel;
-use App\Models\Qualifications\Requirement;
 use App\Models\Trainings\Training;
 use App\Models\User\Qualification as UserQualification;
 use Carbon\Carbon;
@@ -27,6 +26,7 @@ use Illuminate\Support\Facades\Cache;
  * @property-read int|null $trainings_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, UserQualification> $userQualifications
  * @property-read int|null $user_qualifications_count
+ *
  * @method static Builder<static>|Qualification isOrderByDefault()
  * @method static Builder<static>|Qualification isVisible(bool $value = true)
  * @method static Builder<static>|Qualification newModelQuery()
@@ -39,11 +39,13 @@ use Illuminate\Support\Facades\Cache;
  * @method static Builder<static>|Qualification whereQualificationId($value)
  * @method static Builder<static>|Qualification whereRank($value)
  * @method static Builder<static>|Qualification whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Qualification extends BaseModel
 {
     protected $table = 'qualifications';
+
     protected $primaryKey = 'qualification_id';
 
     protected $dispatchesEvents = [
@@ -52,15 +54,14 @@ class Qualification extends BaseModel
         'deleted' => QualificationAction::class,
     ];
 
-
-    #########################
+    # ########################
     # CUSTOM FUNCTIONS
-    #########################
+    # ########################
 
     /**
      * Gibt alle sichtbaren Qualifikationen zurück, sortiert nach Standardsortierung
      *
-     * @param $with_hidden Wenn true, werden auch ausgeblendete Qualifikationen zurückgegeben
+     * @param                                                                                                                                                                          $with_hidden Wenn true, werden auch ausgeblendete Qualifikationen zurückgegeben
      * @return mixed|\Illuminate\Database\Eloquent\Collection<int, Qualification>|\Illuminate\Database\Eloquent\Collection<int, TModel>|\Illuminate\Support\Collection<int, \stdClass>
      */
     public static function getAllQualifications($with_hidden = false)
@@ -71,6 +72,7 @@ class Qualification extends BaseModel
                     ->get();
             });
         }
+
         return Cache::rememberForever('qualifications.all', function () {
             return self::isVisible()
                 ->isOrderByDefault()
@@ -78,13 +80,14 @@ class Qualification extends BaseModel
         });
     }
 
-    #########################
+    # ########################
     # SCOPES
-    #########################
+    # ########################
 
     /**
      * Scope für Standardsortierung
-     * @param Builder $query
+     *
+     * @param  Builder $query
      * @return Builder
      */
     public function scopeIsOrderByDefault(Builder $query)
@@ -96,8 +99,9 @@ class Qualification extends BaseModel
 
     /**
      * Scope für sichtbare oder ausgeblendete Qualifikationen
-     * @param Builder $query
-     * @param bool $value
+     *
+     * @param  Builder $query
+     * @param  bool    $value
      * @return Builder
      */
     public function scopeIsVisible(Builder $query, bool $value = true)
@@ -105,9 +109,9 @@ class Qualification extends BaseModel
         return $query->where('hide', !$value);
     }
 
-    #########################
+    # ########################
     # RELATIONS
-    ########################
+    # #######################
 
     public function requirements()
     {
@@ -137,9 +141,9 @@ class Qualification extends BaseModel
         );
     }
 
-    #########################
+    # ########################
     # GET & SET
-    #########################
+    # ########################
 
     /**
      * Get the qualification_id attribute.
@@ -154,7 +158,7 @@ class Qualification extends BaseModel
     /**
      * Set the qualification_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setId(int $value)
@@ -175,7 +179,7 @@ class Qualification extends BaseModel
     /**
      * Set the qualification_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setQualificationId(int $value)
@@ -196,7 +200,7 @@ class Qualification extends BaseModel
     /**
      * Set the name attribute.
      *
-     * @param string $value
+     * @param  string $value
      * @return void
      */
     public function setName(string $value)
@@ -217,7 +221,7 @@ class Qualification extends BaseModel
     /**
      * Set the rank attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setRank(int $value)
@@ -238,7 +242,7 @@ class Qualification extends BaseModel
     /**
      * Set the created_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setCreated(?Carbon $value)
@@ -259,7 +263,7 @@ class Qualification extends BaseModel
     /**
      * Set the updated_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setUpdated(?Carbon $value)
@@ -280,7 +284,7 @@ class Qualification extends BaseModel
     /**
      * Set the generate_certificate attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setGenerateCertificate(int $value)
@@ -301,7 +305,7 @@ class Qualification extends BaseModel
     /**
      * Set the hide attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setHide(int $value)

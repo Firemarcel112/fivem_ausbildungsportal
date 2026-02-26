@@ -145,7 +145,7 @@ return [
         4 => 'Do.',
         5 => 'Fr.',
         6 => 'Sa.',
-        7 => 'So.'
+        7 => 'So.',
     ],
     'titel' => 'Titel',
     'teilnehmer_entfernen' => 'Teilnehmer entfernen',

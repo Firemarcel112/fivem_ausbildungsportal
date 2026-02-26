@@ -2,13 +2,11 @@
 
 namespace App\Models;
 
-use Str;
-use App\Models\BaseModel;
 use App\Models\User\Account;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
-
+use Str;
 
 /**
  * @property int $document_id
@@ -23,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
  * @property-read \App\Models\DocumentLink|null $documentAssign
  * @property-read Account|null $linkedAccount
  * @property-read mixed $type
+ *
  * @method static Builder<static>|Document filteredList(bool $can_edit = false, array $allowed_types = [], array $filters = [])
  * @method static Builder<static>|Document isSearch(?string $search)
  * @method static Builder<static>|Document joinDocumentAssign()
@@ -36,11 +35,13 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
  * @method static Builder<static>|Document whereTitle($value)
  * @method static Builder<static>|Document whereUpdatedAt($value)
  * @method static Builder<static>|Document whereUrl($value)
+ *
  * @mixin \Eloquent
  */
 class Document extends BaseModel
 {
     protected $table = 'documents';
+
     protected $primaryKey = 'document_id';
 
     public $casts = [
@@ -50,15 +51,16 @@ class Document extends BaseModel
 
     public $guarded = ['document_id'];
 
-    #########################
+    # ########################
     # CUSTOM FUNCTIONS
-    #########################
+    # ########################
 
     /**
      * Erstellt ein Dokumenteneintrag in der Datenbank
-     * @param string $title
-     * @param string $url
-     * @param mixed $description
+     *
+     * @param  string   $title
+     * @param  string   $url
+     * @param  mixed    $description
      * @return Document
      */
     public static function createDocument(
@@ -87,14 +89,15 @@ class Document extends BaseModel
         return $document;
     }
 
-    #########################
+    # ########################
     # SCOPES
-    #########################
+    # ########################
 
     /**
      * Scope für Suche
-     * @param Builder $query
-     * @param string $search
+     *
+     * @param  Builder $query
+     * @param  string  $search
      * @return Builder
      */
     public function scopeIsSearch(Builder $query, ?string $search)
@@ -102,6 +105,7 @@ class Document extends BaseModel
         if (empty($search)) {
             return $query;
         }
+
         return $query->where(function ($query) use ($search) {
             $query->where('title', 'LIKE', "%{$search}%")
                 ->orWhere('description', 'LIKE', "%{$search}%");
@@ -111,7 +115,7 @@ class Document extends BaseModel
     /**
      * Scope für Join mit DocumentAssign
      *
-     * @param Builder $query
+     * @param  Builder $query
      * @return Builder
      */
     public function scopeJoinDocumentAssign(Builder $query): Builder
@@ -128,8 +132,8 @@ class Document extends BaseModel
     /**
      * Scope für Order nach Zugewiesenem Benutzer
      *
-     * @param Builder $query
-     * @param string $direction
+     * @param  Builder $query
+     * @param  string  $direction
      * @return Builder
      */
     public function scopeOrderByAssigned(Builder $query, string $direction = 'asc'): Builder
@@ -155,9 +159,9 @@ class Document extends BaseModel
      * Scope für Filterung der Dokumenten Liste
      *
      * @param Builder $query
-     * @param bool $can_edit
-     * @param array $allowed_types
-     * @param array $filters
+     * @param bool    $can_edit
+     * @param array   $allowed_types
+     * @param array   $filters
      */
     public function scopeFilteredList(Builder $query, bool $can_edit = false, array $allowed_types = [], array $filters = [])
     {
@@ -182,14 +186,14 @@ class Document extends BaseModel
 
             ->when(
                 $sortBy == 'assigned',
-                fn($q) => $q->orderByAssigned(),
-                fn($q) => $q->orderBy($sortBy, 'desc')
+                fn ($q) => $q->orderByAssigned(),
+                fn ($q) => $q->orderBy($sortBy, 'desc')
             );
     }
 
-    #########################
+    # ########################
     # RELATIONS
-    #########################
+    # ########################
 
     public function documentAssign()
     {
@@ -202,6 +206,7 @@ class Document extends BaseModel
 
     /**
      * Relation zu einem verlinkten Account über die Dokumentenverknüpfung
+     *
      * @return HasOneThrough<Account, DocumentLink, Document>
      */
     public function linkedAccount(): HasOneThrough
@@ -217,9 +222,9 @@ class Document extends BaseModel
             ->where('link_type', 'ACCOUNT');
     }
 
-    #########################
+    # ########################
     # Accessors & Mutators
-    #########################
+    # ########################
 
     public function type(): Attribute
     {
@@ -240,6 +245,7 @@ class Document extends BaseModel
                         'url' => route('profile.show', $this->linkedAccount->user),
                     ];
                 }
+
                 return [
                     'name' => __('general.nicht_zugeordnet'),
                     'url' => null,

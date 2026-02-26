@@ -2,13 +2,13 @@
 
 namespace App\View\Components\Trainings\Modal;
 
-use Closure;
-use Illuminate\Contracts\View\View;
-use Illuminate\View\Component;
 use App\Models\Qualifications\Qualification;
 use App\Models\User;
 use Cache;
+use Closure;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\View\Component;
 
 class Create extends Component
 {

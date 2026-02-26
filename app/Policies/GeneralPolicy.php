@@ -17,7 +17,7 @@ class GeneralPolicy
     /**
      * Prüft ob der Eingeloggte User Ausbilder ist
      *
-     * @param \App\Models\User $user
+     * @param  \App\Models\User $user
      * @return bool
      */
     public function isTrainer(User $user)

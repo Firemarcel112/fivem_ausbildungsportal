@@ -2,14 +2,13 @@
 
 namespace Database\Seeders\Production;
 
-use Artisan;
 use App\Models\Permission;
 use App\Models\PermissionCategorie;
+use Artisan;
 use Illuminate\Database\Seeder;
 
 class AddPermissions extends Seeder
 {
-
     public array $permissions = [
         'Ausbilder' => [
             'permissions' => [
@@ -73,7 +72,7 @@ class AddPermissions extends Seeder
                 'documents.create',
             ],
             'rank' => 40,
-        ]
+        ],
     ];
 
     /**
@@ -92,7 +91,7 @@ class AddPermissions extends Seeder
             foreach ($categorie['permissions'] as $permission_name) {
                 $permission = Permission::firstOrNew(
                     [
-                        'name' => $permission_name
+                        'name' => $permission_name,
                     ]
                 );
                 $permission->setCategorieId($model->getId());

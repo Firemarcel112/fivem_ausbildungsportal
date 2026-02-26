@@ -41,6 +41,7 @@ class UserStoreRequest extends FormRequest
         if (!Auth::user()?->can('usermanagement.store')) {
             $rules['password'] = ['required', 'string', 'min:8'];
         }
+
         return $rules;
     }
 }

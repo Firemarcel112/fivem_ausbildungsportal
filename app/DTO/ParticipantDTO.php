@@ -7,19 +7,23 @@ use Illuminate\Support\Carbon;
 
 class ParticipantDTO
 {
-
     public string $salutation;
+
     public string $first_name;
+
     public string $last_name;
+
     public Carbon $birth_date;
+
     public ?string $birth_location;
 
     /**
      * ParticipantDTO constructor.
-     * @param string $salutation Anrede
-     * @param string $first_name Vorname
-     * @param string $last_name Nachname
-     * @param Carbon $birth_date Geburtsdatum
+     *
+     * @param string $salutation     Anrede
+     * @param string $first_name     Vorname
+     * @param string $last_name      Nachname
+     * @param Carbon $birth_date     Geburtsdatum
      * @param string $birth_location Geburtsort
      */
     public function __construct(
@@ -47,7 +51,6 @@ class ParticipantDTO
     }
 
     /**
-     *
      * Gibt das Geburtsdatum im Format "d.m.Y" zurück.
      *
      * @return string
@@ -59,7 +62,8 @@ class ParticipantDTO
 
     /**
      * Erstellt dass DTO anhand eines Participant Models
-     * @param Account $participant
+     *
+     * @param  Account        $participant
      * @return ParticipantDTO
      */
     public static function fromModel(Account $participant): self
