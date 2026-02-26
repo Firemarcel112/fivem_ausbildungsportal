@@ -4,12 +4,12 @@ namespace App\Traits;
 
 trait ClockworkTrait
 {
-
     /**
      * Startet ein Clockwork Event
-     * @param string $event
-     * @param mixed $name
-     * @param string $color
+     *
+     * @param  string $event
+     * @param  mixed  $name
+     * @param  string $color
      * @return void
      */
     public function beginClockwork(string $event, ?string $name = null, string $color = 'red')
@@ -24,7 +24,8 @@ trait ClockworkTrait
 
     /**
      * Beendet ein Clockwork Event
-     * @param string $event
+     *
+     * @param  string $event
      * @return void
      */
     public function endClockwork(string $event)

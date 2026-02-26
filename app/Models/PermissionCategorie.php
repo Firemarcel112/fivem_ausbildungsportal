@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\BaseModel;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -16,6 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property-read int|null $audits_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $permissions
  * @property-read int|null $permissions_count
+ *
  * @method static Builder<static>|PermissionCategorie newModelQuery()
  * @method static Builder<static>|PermissionCategorie newQuery()
  * @method static Builder<static>|PermissionCategorie orderByDefault()
@@ -25,27 +25,29 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder<static>|PermissionCategorie wherePermissionCategorieId($value)
  * @method static Builder<static>|PermissionCategorie whereRank($value)
  * @method static Builder<static>|PermissionCategorie whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class PermissionCategorie extends BaseModel
 {
     protected $table = 'permission_categories';
+
     protected $primaryKey = 'permission_categorie_id';
 
     protected $guarded = ['permission_categorie_id'];
 
-    #########################
+    # ########################
     # CUSTOM FUNCTIONS
-    #########################
+    # ########################
 
-    #########################
+    # ########################
     # SCOPES
-    #########################
+    # ########################
 
     /**
      * Scope für Standardsortierung
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder $query
      * @return Builder
      */
     public function scopeOrderByDefault(Builder $query)
@@ -53,9 +55,9 @@ class PermissionCategorie extends BaseModel
         return $query->orderBy('rank', 'asc');
     }
 
-    #########################
+    # ########################
     # RELATIONS
-    #########################
+    # ########################
 
     public function permissions()
     {
@@ -66,9 +68,9 @@ class PermissionCategorie extends BaseModel
         );
     }
 
-    #########################
+    # ########################
     # GET & SET
-    #########################
+    # ########################
 
     /**
      * Get the permission_categorie_id attribute.
@@ -83,7 +85,7 @@ class PermissionCategorie extends BaseModel
     /**
      * Set the permission_categorie_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setId(int $value)
@@ -104,7 +106,7 @@ class PermissionCategorie extends BaseModel
     /**
      * Set the permission_categorie_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setPermissionCategorieId(int $value)
@@ -125,7 +127,7 @@ class PermissionCategorie extends BaseModel
     /**
      * Set the name attribute.
      *
-     * @param string $value
+     * @param  string $value
      * @return void
      */
     public function setName(string $value)
@@ -146,7 +148,7 @@ class PermissionCategorie extends BaseModel
     /**
      * Set the rank attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setRank(int $value)
@@ -167,7 +169,7 @@ class PermissionCategorie extends BaseModel
     /**
      * Set the created_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setCreated(?Carbon $value)
@@ -188,7 +190,7 @@ class PermissionCategorie extends BaseModel
     /**
      * Set the updated_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setUpdated(?Carbon $value)

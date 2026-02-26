@@ -6,10 +6,8 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Policies\GeneralPolicy;
 use App\Services\AlertService;
-use App\Services\DocumentService;
 use App\Traits\ClockworkTrait;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -24,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton('alert', function ($app) {
-            return new AlertService();
+            return new AlertService;
         });
     }
 
@@ -52,6 +50,7 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Lädt die Settings in Config dateien
+     *
      * @return void
      */
     public function loadSettings()

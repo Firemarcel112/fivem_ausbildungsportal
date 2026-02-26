@@ -9,10 +9,12 @@ use Illuminate\View\Component;
 
 class Item extends Component
 {
-
     public string $url;
+
     public ?string $route_name = null;
+
     public ?string $icon;
+
     private array $route_names;
 
     /**
@@ -38,7 +40,6 @@ class Item extends Component
         return view('components.navigation.item');
     }
 
-
     /**
      * Prüft ob dir Route Aktiv ist,
      * Funktioniert nur bei Routen von Laravel
@@ -50,6 +51,7 @@ class Item extends Component
         if (in_array($this->route_name, $this->route_names)) {
             return (request()?->route()?->getName() ?? null) == $this->route_name;
         }
+
         return false;
     }
 }

@@ -2,24 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use Exception;
 use App\Facades\Alert;
 use App\Models\DocumentLink;
 use App\Models\Qualifications\Qualification;
 use App\Models\User;
 use App\Models\User\Qualification as UserQualification;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class QualificationsController extends Controller
 {
-
     /**
      * Weißt dem User eine Qualifikation zu
      *
      * @param Request $request
-     * @param User $user
+     * @param User    $user
      */
     public function assign(Request $request, User $user)
     {
@@ -34,15 +32,14 @@ class QualificationsController extends Controller
         $user_qualification->setCreated(Carbon::create($request->date));
         $user_qualification->save();
 
-
-        return redirect()->to(route('usermanagement.index') . "?search=" . $user->getFullName());
+        return redirect()->to(route('usermanagement.index') . '?search=' . $user->getFullName());
     }
 
     /**
      * Entfernt die Qualifikation und die Dokumentzuordnung
      *
-     * @param Request $request
-     * @param User $user
+     * @param  Request                           $request
+     * @param  User                              $user
      * @return \Illuminate\Http\RedirectResponse
      */
     public function remove(Request $request, User $user)
@@ -63,11 +60,13 @@ class QualificationsController extends Controller
                 $user_qualification?->delete();
             } catch (Exception $e) {
                 Alert::addAlert('Qualifikation konnte nicht entfernt werden', 'danger');
+
                 return redirect()->back();
             }
         }
 
         Alert::addAlert('Qualifikation entfernt', 'success');
-        return redirect()->to(route('usermanagement.index') . "?search=" . $user->getFullName());
+
+        return redirect()->to(route('usermanagement.index') . '?search=' . $user->getFullName());
     }
 }

@@ -3,9 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Setting;
-use Illuminate\Queue\Jobs\Job;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Queue;
 
 class SettingsObserver
 {

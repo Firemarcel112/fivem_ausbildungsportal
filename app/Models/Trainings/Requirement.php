@@ -15,6 +15,7 @@ use App\Models\Qualifications\Requirement as QualificationRequirement;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \App\Models\Fractions\Fraction|null $fraction
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Requirement newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Requirement newQuery()
  * @method static Builder<static>|Requirement orderByDefault()
@@ -26,6 +27,7 @@ use App\Models\Qualifications\Requirement as QualificationRequirement;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Requirement whereRank($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Requirement whereRequirementId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Requirement whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Requirement extends QualificationRequirement {}

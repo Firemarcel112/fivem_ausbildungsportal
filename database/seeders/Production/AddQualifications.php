@@ -4,12 +4,11 @@ namespace Database\Seeders\Production;
 
 use App\Models\Fractions\Fraction;
 use App\Models\Qualifications\Qualification;
-use Illuminate\Database\Seeder;
 use App\Models\Trainings\Requirement;
+use Illuminate\Database\Seeder;
 
 class AddQualifications extends Seeder
 {
-
     public array $qualifications = [
         [
             'name' => 'Rettungshelfer',
@@ -56,8 +55,8 @@ class AddQualifications extends Seeder
                     'name' => 'Mindestens 3 Wochen als Rettungssanitäter im Rettungsdienst tätig',
                     'rank' => 20,
                     'fraction' => 'RD',
-                ]
-            ]
+                ],
+            ],
         ],
         [
             'name' => 'Notfallsanitäter',
@@ -72,8 +71,8 @@ class AddQualifications extends Seeder
                     'name' => 'Mindestens 4 Wochen als Rettungsassistent im Rettungsdienst tätig',
                     'rank' => 20,
                     'fraction' => 'RD',
-                ]
-            ]
+                ],
+            ],
         ],
         [
             'name' => 'Funklehrgang',
@@ -83,13 +82,14 @@ class AddQualifications extends Seeder
                     'name' => 'Mitglied Rettungsdienst',
                     'rank' => 10,
                     'fraction' => 'RD',
-                ]
-            ]
-        ]
+                ],
+            ],
+        ],
     ];
 
     /**
      * Seed the application's database.
+     *
      * @todo Fehler in der Erstellung
      */
     public function run(): void

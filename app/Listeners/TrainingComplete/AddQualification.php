@@ -2,13 +2,13 @@
 
 namespace App\Listeners\TrainingComplete;
 
-use Exception;
 use App\DTO\ParticipantDTO;
 use App\DTO\TrainerDTO;
 use App\Events\TrainingComplete;
 use App\Models\Document;
 use App\Models\User\Qualification as UserQualification;
 use App\Services\DocumentService;
+use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 

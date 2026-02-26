@@ -21,6 +21,7 @@ class RolesController extends Controller
 
         $roles = Role::with(['permissions', 'users'])
             ->get();
+
         return view('admin.roles.index', compact('roles'));
     }
 
@@ -40,6 +41,7 @@ class RolesController extends Controller
         $permission_names = $role->permissions
             ->pluck('name')
             ->toArray();
+
         return view('admin.roles.edit', compact(
             'role',
             'permission_categories',
@@ -64,13 +66,14 @@ class RolesController extends Controller
             }
         }
         Alert::addAlert(__('general.berechtigungen_geaendert'), 'success');
+
         return redirect()->back();
     }
 
     /**
      * Rolle Speichern
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request          $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
@@ -84,6 +87,7 @@ class RolesController extends Controller
         Role::create(['name' => $request->name]);
 
         Alert::addAlert(__('general.rolle_erstellt'), 'success');
+
         return redirect()->back();
     }
 }

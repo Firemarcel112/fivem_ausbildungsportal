@@ -14,17 +14,17 @@ use Laravel\Socialite\Facades\Socialite;
 
 class UserController extends Controller
 {
-
     /**
      * Zeigt den Benutzer an
      *
-     * @param \App\Models\User $user
+     * @param  \App\Models\User                                                  $user
      * @return \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
      */
     public function show(User $user)
     {
         if (Auth::user()->getId() != $user->getId()) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+
             return redirect()->back();
         }
         $genders = [
@@ -54,6 +54,7 @@ class UserController extends Controller
     {
         if (Auth::user()->getId() != $user->getId()) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+
             return redirect()->back();
         }
         $user->load('account');
@@ -97,7 +98,7 @@ class UserController extends Controller
         $remove_fractions = array_diff($current_fractions, [$default_fraction_id]);
         $fraction_model = UserFraction::firstOrCreate([
             'user_id' => $account->getId(),
-            'fraction_id' => (int)$default_fraction_id,
+            'fraction_id' => (int) $default_fraction_id,
         ]);
         $fraction_model->setDefault(1);
         $fraction_model->save();
@@ -127,6 +128,7 @@ class UserController extends Controller
     public function linkDiscordAccount()
     {
         session(['discord_type' => 'LINK']);
+
         return Socialite::driver('discord')
             ->scopes(explode(',', config('services.discord.scopes')))
             ->redirect();

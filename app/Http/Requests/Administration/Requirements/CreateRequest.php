@@ -25,17 +25,17 @@ class CreateRequest extends FormRequest
             'name' => [
                 'required',
                 'string',
-                'max:255'
+                'max:255',
             ],
             'fraction_id' => [
                 'required',
                 'integer',
-                'exists:fractions,fraction_id'
+                'exists:fractions,fraction_id',
             ],
             'rank' => [
                 'nullable',
                 'integer',
-            ]
+            ],
         ];
     }
 }

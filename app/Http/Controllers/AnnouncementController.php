@@ -29,6 +29,7 @@ class AnnouncementController extends Controller
         }
         if (empty($request->get('text'))) {
             Alert::addAlert('Fehler beim versenden der Ankündigung: Kein Text gesetzt', 'error');
+
             return redirect()->back();
         }
         $embed = $this->buildEmbed(
@@ -46,6 +47,7 @@ class AnnouncementController extends Controller
             $this->sendToDiscord($webhook_url, $embed);
         }
         Alert::addAlert('Ankündigung gesendet', 'success');
+
         return redirect()->back();
     }
 }

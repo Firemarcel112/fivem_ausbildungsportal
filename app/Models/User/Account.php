@@ -10,10 +10,10 @@ use App\Models\Trainings\Participant;
 use App\Models\User;
 use App\Models\User\Fraction as UserFraction;
 use App\Models\User\Qualification as UserQualification;
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $user_account_id
@@ -38,6 +38,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Participant> $trainings
  * @property-read int|null $trainings_count
  * @property-read User|null $user
+ *
  * @method static Builder<static>|Account isSearch(string $search)
  * @method static Builder<static>|Account newModelQuery()
  * @method static Builder<static>|Account newQuery()
@@ -51,16 +52,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static Builder<static>|Account whereUpdatedAt($value)
  * @method static Builder<static>|Account whereUserAccountId($value)
  * @method static Builder<static>|Account whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class Account extends BaseModel
 {
     protected $table = 'user_accounts';
+
     protected $primaryKey = 'user_account_id';
 
-    #########################
+    # ########################
     # CUSTOM FUNCTIONS
-    #########################
+    # ########################
 
     /**
      * Gibt den vollen Namen zurück
@@ -88,15 +91,15 @@ class Account extends BaseModel
         };
     }
 
-    #########################
+    # ########################
     # SCOPES
-    #########################
+    # ########################
 
     /**
      * Scope für Suche
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $search
+     * @param  \Illuminate\Database\Eloquent\Builder $query
+     * @param  string                                $search
      * @return Builder
      */
     public function scopeIsSearch(Builder $query, string $search)
@@ -108,9 +111,9 @@ class Account extends BaseModel
         });
     }
 
-    #########################
+    # ########################
     # RELATIONS
-    #########################
+    # ########################
 
     public function user()
     {
@@ -125,7 +128,6 @@ class Account extends BaseModel
             'user_id'
         );
     }
-
 
     public function fractions(): BelongsToMany
     {
@@ -167,9 +169,9 @@ class Account extends BaseModel
             ->where('link_type', 'ACCOUNT');
     }
 
-    #########################
+    # ########################
     # GET & SET
-    #########################
+    # ########################
 
     /**
      * Gibt die Standard Fraktion zurück
@@ -199,7 +201,7 @@ class Account extends BaseModel
     /**
      * Set the user_account_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setId(int $value)
@@ -220,7 +222,7 @@ class Account extends BaseModel
     /**
      * Set the user_account_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setUserAccountId(int $value)
@@ -241,7 +243,7 @@ class Account extends BaseModel
     /**
      * Set the user_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setUserId(int $value)
@@ -262,7 +264,7 @@ class Account extends BaseModel
     /**
      * Set the first_name attribute.
      *
-     * @param string $value
+     * @param  string $value
      * @return void
      */
     public function setFirstName(string $value)
@@ -283,7 +285,7 @@ class Account extends BaseModel
     /**
      * Set the last_name attribute.
      *
-     * @param string $value
+     * @param  string $value
      * @return void
      */
     public function setLastName(string $value)
@@ -304,7 +306,7 @@ class Account extends BaseModel
     /**
      * Set the date_of_birth attribute.
      *
-     * @param Carbon $value
+     * @param  Carbon $value
      * @return void
      */
     public function setDateOfBirth(Carbon $value)
@@ -325,7 +327,7 @@ class Account extends BaseModel
     /**
      * Set the created_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setCreated(?Carbon $value)
@@ -346,14 +348,13 @@ class Account extends BaseModel
     /**
      * Set the updated_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setUpdated(?Carbon $value)
     {
         $this->updated_at = $value;
     }
-
 
     /**
      * Get the gender attribute.
@@ -368,7 +369,7 @@ class Account extends BaseModel
     /**
      * Set the gender attribute.
      *
-     * @param mixed $value
+     * @param  mixed $value
      * @return void
      */
     public function setGender(mixed $value)
@@ -389,7 +390,7 @@ class Account extends BaseModel
     /**
      * Set the birth_location attribute.
      *
-     * @param ?string $value
+     * @param  ?string $value
      * @return void
      */
     public function setBirthLocation(?string $value)

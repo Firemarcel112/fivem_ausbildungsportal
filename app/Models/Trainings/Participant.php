@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \App\Models\Trainings\Training|null $training
+ *
  * @method static Builder<static>|Participant isTrainingId(int $training_id)
  * @method static Builder<static>|Participant isUserId(int $user_id)
  * @method static Builder<static>|Participant newModelQuery()
@@ -35,18 +36,20 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder<static>|Participant whereTrainingParticipantId($value)
  * @method static Builder<static>|Participant whereUpdatedAt($value)
  * @method static Builder<static>|Participant whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class Participant extends BaseModel
 {
     protected $table = 'training_participants';
+
     protected $primaryKey = 'training_participant_id';
 
     protected $guarded = ['training_participant_id'];
 
-    #########################
+    # ########################
     # CUSTOM FUNCTIONS
-    #########################
+    # ########################
 
     /**
      * Gibt den vollen Namen zurück
@@ -63,7 +66,8 @@ class Participant extends BaseModel
 
     /**
      * Abmeldung vom Teilnehmer
-     * @param string $notice
+     *
+     * @param  string $notice
      * @return void
      */
     public function signOut()
@@ -73,7 +77,8 @@ class Participant extends BaseModel
 
     /**
      * Abmeldung vom Teilnehmer
-     * @param string $notice
+     *
+     * @param  string $notice
      * @return void
      */
     public function signOutAdmin(string $notice)
@@ -99,15 +104,15 @@ class Participant extends BaseModel
         return '<span class="badge bg-red text-white">Abwesend</span>';
     }
 
-    #########################
+    # ########################
     # SCOPES
-    #########################
+    # ########################
 
     /**
      * Scope für Ausbildungs ID
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $training_id
+     * @param  \Illuminate\Database\Eloquent\Builder $query
+     * @param  int                                   $training_id
      * @return Builder
      */
     public function scopeisTrainingId(Builder $query, int $training_id)
@@ -118,8 +123,8 @@ class Participant extends BaseModel
     /**
      * Scope für User ID
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $user_id
+     * @param  \Illuminate\Database\Eloquent\Builder $query
+     * @param  int                                   $user_id
      * @return Builder
      */
     public function scopeIsUserId(Builder $query, int $user_id)
@@ -127,9 +132,9 @@ class Participant extends BaseModel
         return $query->where('user_id', $user_id);
     }
 
-    #########################
+    # ########################
     # RELATIONS
-    #########################
+    # ########################
 
     public function account()
     {
@@ -149,9 +154,9 @@ class Participant extends BaseModel
         );
     }
 
-    #########################
+    # ########################
     # GET & SET
-    #########################
+    # ########################
 
     /**
      * Get the training_participant_id attribute.
@@ -166,7 +171,7 @@ class Participant extends BaseModel
     /**
      * Set the training_participant_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setId(int $value)
@@ -187,7 +192,7 @@ class Participant extends BaseModel
     /**
      * Set the training_participant_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setTrainingParticipantId(int $value)
@@ -208,7 +213,7 @@ class Participant extends BaseModel
     /**
      * Set the training_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setTrainingId(int $value)
@@ -229,7 +234,7 @@ class Participant extends BaseModel
     /**
      * Set the user_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setUserId(int $value)
@@ -250,7 +255,7 @@ class Participant extends BaseModel
     /**
      * Set the present attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setPresent(int $value)
@@ -271,7 +276,7 @@ class Participant extends BaseModel
     /**
      * Set the logged_out attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setLoggedOut(int $value)
@@ -292,7 +297,7 @@ class Participant extends BaseModel
     /**
      * Set the passed attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setPassed(int $value)
@@ -313,7 +318,7 @@ class Participant extends BaseModel
     /**
      * Set the notices attribute.
      *
-     * @param ?string $value
+     * @param  ?string $value
      * @return void
      */
     public function setNotices(?string $value)
@@ -334,7 +339,7 @@ class Participant extends BaseModel
     /**
      * Set the created_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setCreated(?Carbon $value)
@@ -355,7 +360,7 @@ class Participant extends BaseModel
     /**
      * Set the updated_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setUpdated(?Carbon $value)

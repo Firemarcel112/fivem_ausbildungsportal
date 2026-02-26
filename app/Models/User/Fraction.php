@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
+ *
  * @method static Builder<static>|Fraction newModelQuery()
  * @method static Builder<static>|Fraction newQuery()
  * @method static Builder<static>|Fraction query()
@@ -24,30 +25,32 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder<static>|Fraction whereUpdatedAt($value)
  * @method static Builder<static>|Fraction whereUserFractionId($value)
  * @method static Builder<static>|Fraction whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class Fraction extends BaseModel
 {
     protected $table = 'user_fractions';
+
     protected $primaryKey = 'user_fraction_id';
 
     protected $guarded = ['user_fraction_id'];
 
-    #########################
+    # ########################
     # CUSTOM FUNCTIONS
-    #########################
+    # ########################
 
-    #########################
+    # ########################
     # SCOPES
-    #########################
+    # ########################
 
-    #########################
+    # ########################
     # RELATIONS
-    #########################
+    # ########################
 
-    #########################
+    # ########################
     # GET & SET
-    #########################
+    # ########################
 
     /**
      * Get the user_fraction_id attribute.
@@ -62,7 +65,7 @@ class Fraction extends BaseModel
     /**
      * Set the user_fraction_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setId(int $value)
@@ -83,7 +86,7 @@ class Fraction extends BaseModel
     /**
      * Set the user_fraction_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setUserFractionId(int $value)
@@ -104,7 +107,7 @@ class Fraction extends BaseModel
     /**
      * Set the user_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setUserId(int $value)
@@ -125,7 +128,7 @@ class Fraction extends BaseModel
     /**
      * Set the fraction_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setFractionId(int $value)
@@ -146,7 +149,7 @@ class Fraction extends BaseModel
     /**
      * Set the default attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setDefault(int $value)
@@ -167,7 +170,7 @@ class Fraction extends BaseModel
     /**
      * Set the created_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setCreated(?Carbon $value)
@@ -188,7 +191,7 @@ class Fraction extends BaseModel
     /**
      * Set the updated_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setUpdated(?Carbon $value)

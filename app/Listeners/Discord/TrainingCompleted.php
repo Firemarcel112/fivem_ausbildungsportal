@@ -67,9 +67,9 @@ class TrainingCompleted implements ShouldQueue
                 );
                 $this->sendToDiscord($webhook_url, $embed);
             }
+
             return;
         }
-
 
         $participants_data = $event->context['participants_data'] ?? collect();
         $participants = $event->context['participants'] ?? collect();
@@ -83,7 +83,7 @@ class TrainingCompleted implements ShouldQueue
             'nicht_bestanden',
             'abgemeldet',
             'abwesend',
-            'Notizen'
+            'Notizen',
         ];
         $results['Angemeldet'] = collect();
         $results['Anwesend'] = collect();
@@ -97,6 +97,7 @@ class TrainingCompleted implements ShouldQueue
             }
             $results[$case] = $participants_data->filter(function ($participant, $id) use ($request, $case) {
                 $case = strtolower($case);
+
                 return in_array($id, array_keys($request[$case] ?? []));
             });
         }
@@ -133,6 +134,7 @@ class TrainingCompleted implements ShouldQueue
         })
             ->map(function ($participant, $id) use ($request) {
                 $participant['notice'] = $request['notices'][$id] ?? null;
+
                 return $participant;
             });
         /** @var Participant $participant */

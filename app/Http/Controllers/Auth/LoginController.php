@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Enums\Role;
 use App\Facades\Alert;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
@@ -20,13 +19,16 @@ class LoginController extends Controller
     {
         if (Auth::check()) {
             Alert::addAlert(__('general.bereits_eingeloggt'), 'Info');
+
             return redirect()->route('home');
         }
+
         return view('auth.login');
     }
 
     /**
      * Einloggen
+     *
      * @param LoginRequest
      * @return mixed|\Illuminate\Http\RedirectResponse
      */
@@ -37,6 +39,7 @@ class LoginController extends Controller
 
         if (!$user) {
             Alert::addAlert(__('general.benutzername_oder_passwort_falsch'), 'error');
+
             return redirect()->back();
         }
 
@@ -47,6 +50,7 @@ class LoginController extends Controller
             ]);
         } else {
             Alert::addAlert(__('general.benutzername_oder_passwort_falsch'), 'error');
+
             return redirect()->back();
         }
 
@@ -65,6 +69,7 @@ class LoginController extends Controller
     public function loginDiscord()
     {
         session(['discord_type' => 'AUTH']);
+
         return Socialite::driver('discord')
             ->scopes(explode(',', config('services.discord.scopes')))
             ->redirect();
@@ -72,12 +77,14 @@ class LoginController extends Controller
 
     /**
      * Loggt den Benutzer aus
+     *
      * @return mixed|\Illuminate\Http\RedirectResponse
      */
     public function logout()
     {
         Alert::addAlert(__('general.erfolgreich_ausgeloggt'), 'success');
         Auth::logout();
+
         return redirect()->route('home');
     }
 }

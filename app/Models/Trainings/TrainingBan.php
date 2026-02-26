@@ -2,11 +2,10 @@
 
 namespace App\Models\Trainings;
 
-use DateTime;
 use App\Models\BaseModel;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * @property int $training_ban_id
@@ -21,6 +20,7 @@ use Carbon\Carbon;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read User|null $issuer
+ *
  * @method static Builder<static>|TrainingBan isValid()
  * @method static Builder<static>|TrainingBan newModelQuery()
  * @method static Builder<static>|TrainingBan newQuery()
@@ -34,19 +34,22 @@ use Carbon\Carbon;
  * @method static Builder<static>|TrainingBan whereTrainingBanId($value)
  * @method static Builder<static>|TrainingBan whereUpdatedAt($value)
  * @method static Builder<static>|TrainingBan whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class TrainingBan extends BaseModel
 {
     protected $table = 'training_bans';
+
     protected $primaryKey = 'training_ban_id';
 
-    #########################
+    # ########################
     # CUSTOM FUNCTIONS
-    #########################
+    # ########################
 
     /**
      * Gibt den Namen des Ausstellers zurück
+     *
      * @return string
      */
     public function getIssuerName()
@@ -54,13 +57,14 @@ class TrainingBan extends BaseModel
         return $this->issuer->account->getFullName();
     }
 
-    #########################
+    # ########################
     # SCOPES
-    #########################
+    # ########################
 
     /**
      * Scope für Gültigkeit
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder   $query
      * @return Builder<TrainingBan>|Builder<\Eloquent>
      */
     public function scopeIsValid(Builder $query)
@@ -69,9 +73,9 @@ class TrainingBan extends BaseModel
             ->where('date_to', '>=', date('Y-m-d'));
     }
 
-    #########################
+    # ########################
     # RELATIONS
-    #########################
+    # ########################
 
     public function issuer()
     {
@@ -83,9 +87,9 @@ class TrainingBan extends BaseModel
             ->with('account');
     }
 
-    #########################
+    # ########################
     # GET & SET
-    #########################
+    # ########################
 
     /**
      * Get the training_ban_id attribute.
@@ -100,7 +104,7 @@ class TrainingBan extends BaseModel
     /**
      * Set the training_ban_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setId(int $value)
@@ -121,7 +125,7 @@ class TrainingBan extends BaseModel
     /**
      * Set the training_ban_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setTrainingBanId(int $value)
@@ -142,7 +146,7 @@ class TrainingBan extends BaseModel
     /**
      * Set the user_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setUserId(int $value)
@@ -163,7 +167,7 @@ class TrainingBan extends BaseModel
     /**
      * Set the date_from attribute.
      *
-     * @param Carbon $value
+     * @param  Carbon $value
      * @return void
      */
     public function setDateFrom(Carbon $value)
@@ -184,7 +188,7 @@ class TrainingBan extends BaseModel
     /**
      * Set the date_to attribute.
      *
-     * @param Carbon $value
+     * @param  Carbon $value
      * @return void
      */
     public function setDateTo(Carbon $value)
@@ -205,7 +209,7 @@ class TrainingBan extends BaseModel
     /**
      * Set the reason attribute.
      *
-     * @param string $value
+     * @param  string $value
      * @return void
      */
     public function setReason(string $value)
@@ -226,7 +230,7 @@ class TrainingBan extends BaseModel
     /**
      * Set the issuer_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setIssuerId(int $value)
@@ -247,7 +251,7 @@ class TrainingBan extends BaseModel
     /**
      * Set the internal_note attribute.
      *
-     * @param ?string $value
+     * @param  ?string $value
      * @return void
      */
     public function setInternalNote(?string $value)
@@ -268,7 +272,7 @@ class TrainingBan extends BaseModel
     /**
      * Set the created_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setCreated(?Carbon $value)
@@ -289,7 +293,7 @@ class TrainingBan extends BaseModel
     /**
      * Set the updated_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setUpdated(?Carbon $value)

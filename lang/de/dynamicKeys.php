@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'training' => array(
+    'training' => [
         'trainer_id' => 'Ausbilder',
         'date' => 'Datum',
         'time' => 'Uhrzeit',
@@ -9,6 +9,6 @@ return [
         'max_participants' => 'Maximale Teilnehmer',
         'meeting_point' => 'Treffpunkt',
         'additional_informations' => 'Zusatz Information',
-    ),
+    ],
 
 ];

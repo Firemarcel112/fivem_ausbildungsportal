@@ -9,6 +9,7 @@ use Illuminate\View\Component;
 class Alert extends Component
 {
     public string $type;
+
     /**
      * Create a new component instance.
      */
@@ -27,6 +28,7 @@ class Alert extends Component
 
     /**
      * Gibt die  Klasse für dass Alert zurück
+     *
      * @return string
      */
     public function getClass()
@@ -49,11 +51,13 @@ class Alert extends Component
                 $alert_class = 'alert-info';
                 break;
         }
+
         return $alert_class;
     }
 
     /**
      * Gibt dass richtige Icon zurück
+     *
      * @return string
      */
     public function getIcon()
@@ -75,6 +79,7 @@ class Alert extends Component
                 $icon = 'info-circle';
                 break;
         }
+
         return $icon;
     }
 }

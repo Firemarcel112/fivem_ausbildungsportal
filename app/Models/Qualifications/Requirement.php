@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read Fraction|null $fraction
+ *
  * @method static Builder<static>|Requirement newModelQuery()
  * @method static Builder<static>|Requirement newQuery()
  * @method static Builder<static>|Requirement orderByDefault()
@@ -29,27 +30,29 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder<static>|Requirement whereRank($value)
  * @method static Builder<static>|Requirement whereRequirementId($value)
  * @method static Builder<static>|Requirement whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Requirement extends BaseModel
 {
     protected $table = 'requirements';
+
     protected $primaryKey = 'requirement_id';
 
     protected $guarded = ['requirement_id'];
 
-    #########################
+    # ########################
     # CUSTOM FUNCTIONS
-    #########################
+    # ########################
 
-    #########################
+    # ########################
     # SCOPES
-    #########################
+    # ########################
 
     /**
      * Legt die Standardsortierung fest
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder $query
      * @return Builder
      */
     public function scopeOrderByDefault(Builder $query)
@@ -57,9 +60,9 @@ class Requirement extends BaseModel
         return $query->orderBy('rank');
     }
 
-    #########################
+    # ########################
     # RELATIONS
-    #########################
+    # ########################
 
     public function fraction()
     {
@@ -70,9 +73,9 @@ class Requirement extends BaseModel
         );
     }
 
-    #########################
+    # ########################
     # GET & SET
-    #########################
+    # ########################
 
     /**
      * Get the requirement_id attribute.
@@ -87,7 +90,7 @@ class Requirement extends BaseModel
     /**
      * Set the requirement_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setId(int $value)
@@ -108,7 +111,7 @@ class Requirement extends BaseModel
     /**
      * Set the requirement_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setRequirementId(int $value)
@@ -129,7 +132,7 @@ class Requirement extends BaseModel
     /**
      * Set the qualification_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setQualificationId(int $value)
@@ -150,7 +153,7 @@ class Requirement extends BaseModel
     /**
      * Set the fraction_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setFractionId(int $value)
@@ -171,7 +174,7 @@ class Requirement extends BaseModel
     /**
      * Set the name attribute.
      *
-     * @param string $value
+     * @param  string $value
      * @return void
      */
     public function setName(string $value)
@@ -192,7 +195,7 @@ class Requirement extends BaseModel
     /**
      * Set the rank attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setRank(int $value)
@@ -213,7 +216,7 @@ class Requirement extends BaseModel
     /**
      * Set the created_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setCreated(?Carbon $value)
@@ -234,7 +237,7 @@ class Requirement extends BaseModel
     /**
      * Set the updated_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setUpdated(?Carbon $value)

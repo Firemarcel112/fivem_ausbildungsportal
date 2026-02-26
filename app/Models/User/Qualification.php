@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
+ *
  * @method static Builder<static>|Qualification isQualificationId(int $qualification_id)
  * @method static Builder<static>|Qualification newModelQuery()
  * @method static Builder<static>|Qualification newQuery()
@@ -27,40 +28,43 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder<static>|Qualification whereUpdatedAt($value)
  * @method static Builder<static>|Qualification whereUserId($value)
  * @method static Builder<static>|Qualification whereUserQualificationId($value)
+ *
  * @mixin \Eloquent
  */
 class Qualification extends BaseModel
 {
     protected $table = 'user_qualifications';
+
     protected $primaryKey = 'user_qualification_id';
 
     protected $guarded = ['user_qualification_id'];
 
-    #########################
+    # ########################
     # CUSTOM FUNCTIONS
-    #########################
+    # ########################
 
-    #########################
+    # ########################
     # SCOPES
-    #########################
+    # ########################
 
     /**
      * Scope für Qualifikation-ID
+     *
      * @param Builder $query
-     * @param int $qualification_id
+     * @param int     $qualification_id
      */
     public function scopeIsQualificationId(Builder $query, int $qualification_id)
     {
         return $query->where('qualification_id', $qualification_id);
     }
 
-    #########################
+    # ########################
     # RELATIONS
-    #########################
+    # ########################
 
-    #########################
+    # ########################
     # GET & SET
-    #########################
+    # ########################
 
     /**
      * Get the user_qualification_id attribute.
@@ -75,7 +79,7 @@ class Qualification extends BaseModel
     /**
      * Set the user_qualification_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setId(int $value)
@@ -96,7 +100,7 @@ class Qualification extends BaseModel
     /**
      * Set the user_qualification_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setUserQualificationId(int $value)
@@ -117,7 +121,7 @@ class Qualification extends BaseModel
     /**
      * Set the user_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setUserId(int $value)
@@ -138,7 +142,7 @@ class Qualification extends BaseModel
     /**
      * Set the qualification_id attribute.
      *
-     * @param int $value
+     * @param  int  $value
      * @return void
      */
     public function setQualificationId(int $value)
@@ -159,7 +163,7 @@ class Qualification extends BaseModel
     /**
      * Set the training_id attribute.
      *
-     * @param ?int $value
+     * @param  ?int $value
      * @return void
      */
     public function setTrainingId(?int $value)
@@ -180,7 +184,7 @@ class Qualification extends BaseModel
     /**
      * Set the date_obtained attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setDateObtained(?Carbon $value)
@@ -201,7 +205,7 @@ class Qualification extends BaseModel
     /**
      * Set the created_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setCreated(?Carbon $value)
@@ -222,7 +226,7 @@ class Qualification extends BaseModel
     /**
      * Set the updated_at attribute.
      *
-     * @param ?Carbon $value
+     * @param  ?Carbon $value
      * @return void
      */
     public function setUpdated(?Carbon $value)

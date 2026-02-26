@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Fractions\Fraction;
 use App\Models\Qualifications\Qualification;
 use App\Models\Trainings\Training;

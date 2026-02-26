@@ -71,7 +71,6 @@ Route::middleware(['auth', 'alerts'])
                     ->name('show');
             });
 
-
         Route::prefix('benutzer')
             ->name('user.')
             ->controller(\App\Http\Controllers\Auth\UserController::class)

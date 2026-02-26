@@ -3,13 +3,14 @@
 namespace App\Services;
 
 use Exception;
-use Storage;
 use Illuminate\Support\Facades\Process;
+use Storage;
 
 class PdfService
 {
     /**
      * Pfad zur P12 Datei
+     *
      * @var string
      */
     protected string $p12_path;
@@ -23,6 +24,7 @@ class PdfService
 
     /**
      * Pfad zur JSignPdf Datei
+     *
      * @var string
      */
     protected string $jar_path;
@@ -37,7 +39,7 @@ class PdfService
     /**
      * Signiert eine PDF-Datei mit jSignPdf.
      *
-     * @param string $pdf_path Pfad zur bestehenden PDF-Datei
+     * @param  string      $pdf_path Pfad zur bestehenden PDF-Datei
      * @return bool|string
      */
     public function sign(string $pdf_path)
@@ -89,6 +91,7 @@ class PdfService
             $tmp_signed_file = $tmp_signed_file . '_signed.pdf';
             rename($tmp_signed_file, $pdf_path);
             $this->clearTempFiles($pdf_path);
+
             return $pdf_path;
         }
 
@@ -100,13 +103,13 @@ class PdfService
             unlink($pdf_path);
         }
 
-        throw new Exception("Fehler beim Signieren: " . $result->errorOutput());
+        throw new Exception('Fehler beim Signieren: ' . $result->errorOutput());
     }
 
     /**
      * Löscht die Temporären PDF Dateien
      *
-     * @param mixed $original_file_path
+     * @param  mixed $original_file_path
      * @return void
      */
     public function clearTempFiles($original_file_path)

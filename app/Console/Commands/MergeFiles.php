@@ -9,14 +9,15 @@ class MergeFiles extends Command
 {
     // Der Name, mit dem du den Befehl aufrufst
     protected $signature = 'code:merge';
+
     protected $description = 'Fügt alle Controller, Models und Commands in jeweils eine Datei zusammen';
 
     public function handle()
     {
         $map = [
             'Controllers.txt' => app_path('Http/Controllers'),
-            'Models.txt'      => app_path('Models'),
-            'Commands.txt'    => app_path('Console/Commands'),
+            'Models.txt' => app_path('Models'),
+            'Commands.txt' => app_path('Console/Commands'),
             'Services.txt' => app_path('Services'),
             'Events.txt' => app_path('Events'),
             'Listeners.txt' => app_path('Listeners'),
@@ -30,6 +31,7 @@ class MergeFiles extends Command
         foreach ($map as $output_name => $source_dir) {
             if (!File::exists($source_dir)) {
                 $this->warn("Verzeichnis nicht gefunden: $source_dir");
+
                 continue;
             }
 
@@ -46,7 +48,7 @@ class MergeFiles extends Command
                 // Entferne das öffnende <?php Tag aus den Quelldateien
                 $content = str_replace(['<?php', '<?'], '', $content);
 
-                $combined_content .= "/** Datei: " . $file->getRelativePathname() . " **/\n";
+                $combined_content .= '/** Datei: ' . $file->getRelativePathname() . " **/\n";
                 $combined_content .= trim($content) . "\n\n";
             }
 

@@ -25,25 +25,25 @@ class CreateRequest extends FormRequest
             'name' => [
                 'required',
                 'string',
-                'max:255'
+                'max:255',
             ],
             'short_name' => [
                 'required',
                 'string',
-                'max:5'
+                'max:5',
             ],
             'discord_webhook' => [
                 'nullable',
                 'string',
-                'max:255'
+                'max:255',
             ],
             'discord_webhook_completed' => [
                 'nullable',
                 'string',
-                'max:255'
+                'max:255',
             ],
             'master' => [
-                'boolean'
+                'boolean',
             ],
         ];
     }

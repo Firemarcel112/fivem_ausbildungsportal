@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Trainings\Request as TrainingRequest;
-use Illuminate\Http\Request;
 
 class TrainingRequestController extends Controller
 {
-
     /**
      * Display a listing of the resource.
      *

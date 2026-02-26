@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\Builder;
 class {{ class }} extends BaseModel
 {
 	protected $table = '';
+
 	protected $primaryKey = '';
+
     protected $guarded = ['*'];
 
 	#########################

@@ -3,17 +3,15 @@
 namespace Database\Seeders;
 
 use App\Models\Setting;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class AddDefaultSettings extends Seeder
 {
-
     public array $settings = [
         [
             'key' => 'default_meeting_point',
             'value' => null,
-            'description' => 'Standard Treffpunkt für Ausbildungen'
+            'description' => 'Standard Treffpunkt für Ausbildungen',
         ],
         [
             'key' => 'enroll_deadline',
@@ -39,7 +37,7 @@ class AddDefaultSettings extends Seeder
             'key' => 'training_creation_time_limit',
             'value' => 1440,
             'description' => 'Zeit in Minuten bevor die Ausbildung beginnt, bis zu der diese erstellt werden darf',
-        ]
+        ],
     ];
 
     /**
