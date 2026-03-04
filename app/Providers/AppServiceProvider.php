@@ -52,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $this->app->singleton(UserWithQualificationsService::class, function () {
-            $qualifications = \App\Models\Qualifications\Qualification::getAllQualifications()
+            $qualifications = \App\Models\Qualifications\Qualification::getAllQualifications(true)
                 ->pluck('name')
                 ->toArray();
 

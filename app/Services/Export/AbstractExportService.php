@@ -2,15 +2,30 @@
 
 namespace App\Services\Export;
 
-use App\Interface\ExportInterface;
+use App\Interfaces\ExportInterface;
 use Spatie\SimpleExcel\SimpleExcelWriter;
 
 abstract class AbstractExportService implements ExportInterface
 {
+    /**
+     * Anzahl der Zeilen, nach denen der Buffer geleert wird. Dies verhindert Memory-Leaks bei großen Datenmengen.
+     *
+     * @var int
+     */
+    protected int $chunk_size = 1000;
+
+    /**
+     * Exportiert die Daten in Excel
+     *
+     * @param  iterable $data
+     * @param  string   $filename
+     * @param  string   $file_type
+     * @return void
+     */
     public function export(iterable $data, string $filename, string $file_type = 'xlsx'): void
     {
 
-        $writer = SimpleExcelWriter::streamDownload($filename . '.' . $file_type)
+        $writer = $this->initializeWriter($filename, $file_type)
             ->addHeader($this->setHeaders());
 
         $buffer_count = 0;
@@ -21,11 +36,21 @@ abstract class AbstractExportService implements ExportInterface
 
             $buffer_count++;
 
-            if ($buffer_count >= 1000) {
+            if (++$buffer_count % $this->chunk_size === 0) {
                 flush();
-                $buffer_count = 0;
             }
         }
+    }
+
+    /**
+     * Initialisiert den Writer
+     *
+     * @param string $filename  Name der Datei ohne Endung
+     * @param string $file_type Endung der Datei (z.B. xlsx, csv)
+     */
+    protected function initializeWriter(string $filename, string $file_type): SimpleExcelWriter
+    {
+        return SimpleExcelWriter::streamDownload("{$filename}.{$file_type}");
     }
 
     abstract protected function setHeaders(): array;

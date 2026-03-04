@@ -15,12 +15,14 @@ class UserWithQualificationsService extends AbstractExportService
 
     protected function setHeaders(): array
     {
-        return [
-            'id' => 'ID',
-            'name' => __('general.name'),
-            'fraction' => __('general.fraktion'),
-            ...$this->qualifications,
-        ];
+        return array_merge(
+            [
+                'id' => 'ID',
+                'name' => __('general.name'),
+                'fraction' => __('general.fraktion'),
+            ],
+            $this->qualifications
+        );
     }
 
     /**
@@ -36,10 +38,7 @@ class UserWithQualificationsService extends AbstractExportService
             'name' => $item->name,
             'fraction' => $item->fraction_name,
         ];
-        foreach ($item->qualifications as $key => $value) {
-            $row[$key] = $value;
-        }
 
-        return $row;
+        return array_merge($row, $item->qualifications);
     }
 }
