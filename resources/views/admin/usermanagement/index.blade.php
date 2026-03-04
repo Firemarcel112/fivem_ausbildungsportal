@@ -52,8 +52,16 @@
                             <option @selected(old('sort_by', 'first_name') == 'created_at') value="created_at">{{ __('general.erstellt_am') }}</option>
                         </x-forms.select>
                     </div>
-                    <div class="col-12 text-end">
-                        <x-forms.button>{{ __('general.suchen') }}</x-forms.button>
+                    <div class="col-12 d-flex justify-content-end align-items-center gap-3" x-data="{ is_export: false, loading: false }">
+
+                        <x-forms.checkbox :label-classes="['mb-0']" name="export" value="1" x-model="is_export">
+                            {{ __('general.exportieren') }}
+                        </x-forms.checkbox>
+
+                        <div>
+                            <x-forms.button x-bind:disabled="loading" x-on:click="if(is_export) { $event.target.form.submit(); loading = true; setTimeout(() => loading = false, 3000); }" x-text="is_export ? '{{ __('general.herunterladen') }}' : '{{ __('general.suchen') }}'">
+                            </x-forms.button>
+                        </div>
                     </div>
                 </div>
             </form>

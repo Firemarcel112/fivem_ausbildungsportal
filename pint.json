@@ -12,6 +12,9 @@
             "tags": ["param", "return", "throws", "type", "var"]
         },
         "no_superfluous_phpdoc_tags": false,
-        "single_line_comment_style": false
+        "single_line_comment_style": false,
+        "function_declaration": {
+            "closure_fn_spacing": "none"
+        }
     }
 }

@@ -6,10 +6,10 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Policies\GeneralPolicy;
 use App\Services\AlertService;
+use App\Services\Export\UserWithQualificationsService;
 use App\Traits\ClockworkTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -50,6 +50,14 @@ class AppServiceProvider extends ServiceProvider
         if (!empty((Auth::user()?->getKey() ?? 0) == 1) || config('app.superadmin_ip') == request()->ip()) {
             config(['app.debug' => true]);
         }
+
+        $this->app->singleton(UserWithQualificationsService::class, function () {
+            $qualifications = \App\Models\Qualifications\Qualification::getAllQualifications()
+                ->pluck('name')
+                ->toArray();
+
+            return new UserWithQualificationsService($qualifications);
+        });
 
         $this->loadSettings();
     }
