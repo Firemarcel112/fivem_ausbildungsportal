@@ -18,16 +18,25 @@ class Checkbox extends Component
 
     public bool $with_hidden_value;
 
+    public array $label_classes;
+
     /**
      * Create a new component instance.
      */
-    public function __construct(string $name, int $value = 0, $with_hidden_value = false, array $classes = [], array $input_classes = [])
-    {
+    public function __construct(
+        string $name,
+        int $value = 0,
+        $with_hidden_value = false,
+        array $classes = [],
+        array $input_classes = [],
+        array $labelClasses = [],
+    ) {
         $this->name = $name;
         $this->value = $value ?? old($name, default: 0);
         $this->classes = $classes;
         $this->input_classes = $input_classes;
         $this->with_hidden_value = $with_hidden_value;
+        $this->label_classes = $labelClasses;
     }
 
     /**
@@ -35,6 +44,8 @@ class Checkbox extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.forms.checkbox');
+        return view('components.forms.checkbox', [
+            'label_classes' => $this->label_classes,
+        ]);
     }
 }

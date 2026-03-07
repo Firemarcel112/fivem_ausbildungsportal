@@ -69,7 +69,7 @@ class Fraction extends BaseModel
     public function fullName(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->name . ' (' . $this->short_name . ')'
+            get: fn() => $this->name . ' (' . $this->short_name . ')'
         );
     }
 }

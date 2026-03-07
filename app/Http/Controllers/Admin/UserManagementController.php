@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\DTO\Export\UserWithQualificationsDTO;
 use App\Facades\Alert;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserStoreRequest;
@@ -11,6 +12,7 @@ use App\Models\Qualifications\Qualification;
 use App\Models\User;
 use App\Models\User\Account;
 use App\Models\User\Fraction as UserFraction;
+use App\Services\Export\UserWithQualificationsService;
 use Arr;
 use DB;
 use Illuminate\Http\Request;
@@ -23,6 +25,14 @@ use Spatie\Permission\Models\Role;
 
 class UserManagementController extends Controller
 {
+    public UserWithQualificationsService $export_service;
+
+    public function __construct(
+        UserWithQualificationsService $export_service
+    ) {
+        $this->export_service = $export_service;
+    }
+
     /**
      * Userausgabe
      *
@@ -70,13 +80,19 @@ class UserManagementController extends Controller
 
         switch ($sort_by) {
             case 'last_name':
-                $data = $data->sortBy(fn ($user) => $user->account->getLastName());
+                $data = $data->sortBy(fn($user) => $user->account->getLastName());
                 break;
             case 'created_at':
                 $data = $data->sortByDesc('created_at');
                 break;
             default:
-                $data = $data->sortBy(fn ($user) => $user->account->getFirstName());
+                $data = $data->sortBy(fn($user) => $user->account->getFirstName());
+        }
+
+        if ($request->has('export')) {
+            $this->export($request, $data, $qualifications->pluck('name')->toArray());
+
+            return;
         }
 
         $genders = [
@@ -438,5 +454,23 @@ class UserManagementController extends Controller
         Alert::addAlert(__('general.erfolgreich_geloescht'), 'success');
 
         return redirect()->back();
+    }
+
+    /**
+     * Exportiert die Benutzer mit ihren Qualifikationen
+     *
+     * @param  Request $request
+     * @return void
+     */
+    public function export(Request $request, $data = null, $qualifications = null)
+    {
+        $data = $data->map(function (User $user) use ($qualifications) {
+            return UserWithQualificationsDTO::fromModel($user->account, $qualifications);
+        });
+
+        $this->export_service->export(
+            $data,
+            'users-with-qualifications-' . now()->format('Y-m-d')
+        );
     }
 }

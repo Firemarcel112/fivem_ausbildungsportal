@@ -26,6 +26,7 @@ class MergeFiles extends Command
             'Enums.txt' => app_path('Enums'),
             'DTO.txt' => app_path('DTO'),
             'Traits.txt' => app_path('Traits'),
+            'Interfaces.txt' => app_path('Interfaces'),
         ];
 
         foreach ($map as $output_name => $source_dir) {

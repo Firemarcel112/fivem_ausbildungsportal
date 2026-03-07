@@ -102,6 +102,8 @@ Route::middleware(['auth', 'alerts'])
                 Route::post('destroy/{user}', 'destroy')
                     ->name('destroy')
                     ->where('user', '[0-9]+');
+                Route::get('export', 'export')
+                    ->name('export');
             });
         Route::prefix('ausbildungen')
             ->name('trainings.')

@@ -186,8 +186,8 @@ class Document extends BaseModel
 
             ->when(
                 $sortBy == 'assigned',
-                fn ($q) => $q->orderByAssigned(),
-                fn ($q) => $q->orderBy($sortBy, 'desc')
+                fn($q) => $q->orderByAssigned(),
+                fn($q) => $q->orderBy($sortBy, 'desc')
             );
     }
 
