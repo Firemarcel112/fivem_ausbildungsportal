@@ -19,6 +19,7 @@
         "socialiteproviders/discord": "^4.2",
         "spatie/laravel-pdf": "^1.8",
         "spatie/laravel-permission": "^6.15",
+        "spatie/simple-excel": "^3.9",
         "stevebauman/purify": "^6.3"
     },
     "require-dev": {
