@@ -119,7 +119,7 @@ class DocumentsController extends Controller
             'Zertifikat: ' . $qualification->getName(),
             $document_url,
             null,
-            $user?->getUserId() ?? null,
+            $user?->getKey() ?? null,
             'ACCOUNT',
         );
 
