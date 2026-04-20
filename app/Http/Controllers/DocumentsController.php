@@ -7,7 +7,7 @@ use App\Actions\UpdateDocumentAction;
 use App\DTO\DocumentViewData;
 use App\DTO\ParticipantDTO;
 use App\DTO\SimpleListItem;
-use App\DTO\TrainerDTO;
+use App\DTO\SimpleUserViewData;
 use App\Enums\Gender;
 use App\Facades\Alert;
 use App\Http\Requests\StoreDocumentRequest;
@@ -118,7 +118,7 @@ class DocumentsController extends Controller
         $training_date = $request->date('training_date')->format('d.m.Y');
         $qualification = Qualification::findOrFail($request->validated('qualification_id'));
 
-        $trainer_dto = TrainerDTO::fromModel($trainer);
+        $trainer_dto = SimpleUserViewData::fromModel($trainer);
 
         CreateCertificate::dispatch(
             $participant_dto,

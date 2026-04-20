@@ -25,7 +25,7 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        $user = $this->route('user');
+        $updated_user = $this->route('user');
 
         $fraction = new Fraction;
         $user = new User;
@@ -72,7 +72,7 @@ class UpdateUserRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                Rule::unique($user->getTable(), 'name')->ignore($user),
+                Rule::unique($user->getTable(), 'name')->ignore($updated_user),
             ],
         ];
     }

@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Actions\StoreDocumentAction;
+use App\DTO\ParticipantDTO;
 use App\DTO\SimpleUserViewData;
 use App\DTO\TrainingParticipantViewData;
 use App\Models\Qualification;
@@ -20,7 +21,7 @@ class CreateCertificate implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public TrainingParticipantViewData $participant,
+        public TrainingParticipantViewData|ParticipantDTO $participant,
         public SimpleUserViewData $trainer,
         public Qualification $qualification,
         public string $training_date,

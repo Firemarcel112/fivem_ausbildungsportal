@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DTO\ParticipantDTO;
 use App\DTO\SimpleUserViewData;
 use App\DTO\TrainingParticipantViewData;
 use Exception;
@@ -16,7 +17,7 @@ class DocumentService
     /**
      * Erstellt ein Zertifikat
      *
-     * @param  TrainingParticipantViewData $participant
+     * @param  TrainingParticipantViewData|ParticipantDTO $participant
      * @param  SimpleUserViewData          $trainer
      * @param  string                      $qualification_name
      * @param  string                      $training_date
@@ -25,7 +26,7 @@ class DocumentService
      * @throws RuntimeException
      */
     public function createCertificate(
-        TrainingParticipantViewData $participant,
+        TrainingParticipantViewData|ParticipantDTO $participant,
         SimpleUserViewData $trainer,
         string $qualification_name,
         string $training_date,

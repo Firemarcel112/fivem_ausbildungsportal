@@ -17,11 +17,13 @@ class ParticipantDTO
 
     public string $last_name;
 
-    public Carbon $birth_date;
+    public Carbon $date_of_birth;
 
     public ?string $birth_location;
 
     public ?string $notices;
+
+    public string $full_name = '';
 
     /**
      * ParticipantDTO constructor.
@@ -29,43 +31,24 @@ class ParticipantDTO
      * @param string $salutation     Anrede
      * @param string $first_name     Vorname
      * @param string $last_name      Nachname
-     * @param Carbon $birth_date     Geburtsdatum
+     * @param Carbon $date_of_birth     Geburtsdatum
      * @param string $birth_location Geburtsort
      */
     public function __construct(
         string $salutation,
         string $first_name,
         string $last_name,
-        Carbon $birth_date,
+        Carbon $date_of_birth,
         ?string $birth_location,
         ?string $notices = null,
     ) {
         $this->salutation = $salutation;
         $this->first_name = $first_name;
         $this->last_name = $last_name;
-        $this->birth_date = $birth_date;
+        $this->date_of_birth = $date_of_birth;
         $this->birth_location = $birth_location;
         $this->notices = $notices;
-    }
-
-    /**
-     * Gibt den vollständigen Namen des Teilnehmers zurück.
-     *
-     * @return string
-     */
-    public function getFullName(): string
-    {
-        return $this->first_name . ' ' . $this->last_name;
-    }
-
-    /**
-     * Gibt das Geburtsdatum im Format "d.m.Y" zurück.
-     *
-     * @return string
-     */
-    public function getBirthDate(string $format = 'd.m.Y'): string
-    {
-        return $this->birth_date->format($format);
+        $this->full_name = $this->first_name . ' ' . $this->last_name;
     }
 
     /**

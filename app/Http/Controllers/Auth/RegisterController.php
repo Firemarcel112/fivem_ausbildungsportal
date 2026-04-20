@@ -48,26 +48,26 @@ class RegisterController extends Controller
         $fractions = array_unique($fractions);
         DB::beginTransaction();
         $user = new User;
-        $user->setName($request->input('username'));
-        $user->setPassword($request->input('password'));
+        $user->name = $request->input('username');
+        $user->password = $request->input('password');
         if ($user->save()) {
             $alert_success = true;
         }
 
         $account = new Account;
-        $account->setUserId($user->getQueueableId());
-        $account->setFirstName($request->input('first_name'));
-        $account->setLastName($request->input('last_name'));
-        $account->setGender($request->input('gender'));
-        $account->setBirthLocation($request->input('birth_location'));
-        $account->setDateOfBirth(Carbon::create($request->input('date_of_birth')));
+        $account->user_id = $user->getQueueableId();
+        $account->first_name = $request->input('first_name');
+        $account->last_name = $request->input('last_name');
+        $account->gender = $request->input('gender');
+        $account->birth_location = $request->input('birth_location');
+        $account->date_of_birth = $request->input('date_of_birth');
         $account->save();
 
         foreach ($fractions as $fraction_id) {
             $fraction_model = new UserFraction;
-            $fraction_model->setUserId($account->getQueueableId());
-            $fraction_model->setFractionId($fraction_id);
-            $fraction_model->setDefault($fraction_id == $request->input('default_fraction') ? 1 : 0);
+            $fraction_model->user_id = $account->getQueueableId();
+            $fraction_model->fraction_id = $fraction_id;
+            $fraction_model->default = $fraction_id == $request->input('default_fraction') ? 1 : 0;
             $fraction_model->save();
         }
 

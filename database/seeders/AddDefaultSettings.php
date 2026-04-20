@@ -15,7 +15,7 @@ class AddDefaultSettings extends Seeder
     public array $settings = [
         [
             'key' => 'default_meeting_point',
-            'value' => null,
+            'value' => '',
             'description' => 'Standard Treffpunkt für Ausbildungen',
         ],
         [
