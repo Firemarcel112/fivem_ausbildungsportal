@@ -118,7 +118,7 @@ class DocumentsController extends Controller
         $training_date = $request->date('training_date')->format('d.m.Y');
         $qualification = Qualification::findOrFail($request->validated('qualification_id'));
 
-        $trainer_dto = SimpleUserViewData::fromModel($trainer);
+        $trainer_dto = SimpleUserViewData::fromModel($trainer->user);
 
         CreateCertificate::dispatch(
             $participant_dto,
