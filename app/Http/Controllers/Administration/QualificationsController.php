@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Administration;
 use App\Facades\Alert;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Administration\Qualifications\CreateRequest;
-use App\Models\Qualifications\Qualification;
-use App\Models\Trainings\Training;
+use App\Models\Qualification;
+use App\Models\Training;
 use App\Models\User\Qualification as UserQualification;
 use Illuminate\Http\Request;
 
@@ -39,11 +39,11 @@ class QualificationsController extends Controller
     public function store(CreateRequest $request)
     {
         $this->checkPermission('administration.qualifications.edit');
-        $qualification = new Qualification;
-        $qualification->setName($request->input('name'));
-        $qualification->setRank($request->input('rank', 0));
-        $qualification->setGenerateCertificate($request->input('generate_certificate', 1));
-        $qualification->save();
+        $qualification = Qualification::create([
+            'name' => $request->input('name'),
+            'rank' => $request->input('rank', 0),
+            'generate_certificate' => $request->input('generate_certificate', 1),
+        ]);
 
         Alert::addAlert(__('general.erfolgreich_angelegt'), 'success');
 
@@ -53,8 +53,8 @@ class QualificationsController extends Controller
     /**
      * Seite zum bearbeiten einer Qualifikation
      *
-     * @param  \Illuminate\Http\Request                 $request
-     * @param  \App\Models\Qualifications\Qualification $qualification
+     * @param  \Illuminate\Http\Request        $request
+     * @param  \App\Models\Qualification       $qualification
      * @return \Illuminate\Contracts\View\View
      */
     public function edit(Request $request, Qualification $qualification)
@@ -68,17 +68,18 @@ class QualificationsController extends Controller
      * Update einer Fraktion
      *
      * @param  \App\Http\Requests\Administration\Qualifications\CreateRequest $request
-     * @param  \App\Models\Qualifications\Qualification                       $qualification
+     * @param  \App\Models\Qualification                                      $qualification
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(CreateRequest $request, Qualification $qualification)
     {
         $this->checkPermission('administration.qualifications.edit');
 
-        $qualification->setName($request->input('name'));
-        $qualification->setRank($request->input('rank', 0));
-        $qualification->setGenerateCertificate($request->input('generate_certificate', 1));
-        $qualification->save();
+        $qualification->update([
+            'name' => $request->input('name'),
+            'rank' => $request->input('rank', 0),
+            'generate_certificate' => $request->input('generate_certificate', 1),
+        ]);
 
         Alert::addAlert(__('general.erfolgreich_aktualisiert'), 'success');
 
@@ -88,7 +89,7 @@ class QualificationsController extends Controller
     /**
      * Löscht eine Qualifikation
      *
-     * @param  \App\Models\Qualifications\Qualification $qualification
+     * @param  \App\Models\Qualification         $qualification
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Qualification $qualification)
@@ -96,14 +97,14 @@ class QualificationsController extends Controller
         $this->checkPermission('administration.qualifications.delete');
         $qualification->load('requirements');
 
-        $exists_trainings = Training::where('qualification_id', $qualification->getId())
+        $exists_trainings = Training::where('qualification_id', $qualification->getKey())
             ->exists();
-        $exists_user_with_qualification = UserQualification::isQualificationId($qualification->getId())
+        $exists_user_with_qualification = UserQualification::isQualificationId($qualification->getKey())
             ->exists();
 
         if ($exists_trainings || $exists_user_with_qualification) {
             Alert::addAlert(__('texte.administration.qualifikation_nicht_loeschbar', [
-                'name' => $qualification->getName(),
+                'name' => $qualification->name,
             ]), 'danger');
 
             return redirect()->back();
@@ -129,9 +130,9 @@ class QualificationsController extends Controller
     public function toggleHide(Qualification $qualification)
     {
         $this->checkPermission('administration.qualifications.edit');
-
-        $qualification->setHide(!$qualification->getHide());
-        $qualification->save();
+        $qualification->update([
+            'hide' => !$qualification->hide,
+        ]);
 
         Alert::addAlert(__('general.erfolgreich_aktualisiert'), 'success');
 

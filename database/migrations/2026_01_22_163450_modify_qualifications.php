@@ -15,7 +15,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('hide')
                 ->default(0)
                 ->after('rank')
-                ->description('Qualifikation wird in der Ausbidlungsliste angezeigt');
+                ->comment('Qualifikation wird in der Ausbidlungsliste angezeigt');
         });
     }
 

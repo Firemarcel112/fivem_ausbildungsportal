@@ -31,9 +31,4 @@ class BaseModel extends Model implements Auditable
     {
         return Purify::clean($string);
     }
-
-    public static function getTableName(): string
-    {
-        return (new static)->getTable();
-    }
 }

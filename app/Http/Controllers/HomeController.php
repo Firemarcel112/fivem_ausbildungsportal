@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Fractions\Fraction;
-use App\Models\Qualifications\Qualification;
-use App\Models\Trainings\Training;
+use App\DTO\TrainingGroupDTO;
+use App\DTO\TrainingViewData;
+use App\Models\Training;
+use App\Policies\GeneralPolicy;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 
 class HomeController extends Controller
@@ -14,31 +16,18 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $is_trainer = Gate::check('is_trainer');
+        $is_trainer = Gate::check('isTrainer', GeneralPolicy::class);
 
-        $trainings = Training::with([
-            'trainer.account',
-            'qualification',
-            'participants.account',
-            'requirements',
-        ])
-            ->when(!$is_trainer, function ($query) {
-                $query->isAvailable();
-            })
-            ->isCompletedBuilder(0)
-            ->orderByDefault()
-            ->get()
-            ->groupBy('date');
-
-        $fractions = Fraction::get();
-
-        $qualifications = Qualification::isOrderByDefault()
-            ->get();
+        $trainings = Training::getUpcomingTrainings($is_trainer ? false : true)
+            ->map(fn(Training $training): TrainingViewData => TrainingViewData::fromModel($training, config('settings.enroll_deadline')))
+            ->groupBy('date')
+            ->map(fn(Collection $items): TrainingGroupDTO => new TrainingGroupDTO(
+                $items->first()->day_of_week . ' ' . $items->first()->date_output,
+                $items,
+            ));
 
         return view('home', [
             'trainings' => $trainings,
-            'fractions' => $fractions,
-            'qualifications' => $qualifications,
         ]);
     }
 }

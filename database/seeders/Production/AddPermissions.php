@@ -9,6 +9,11 @@ use Illuminate\Database\Seeder;
 
 class AddPermissions extends Seeder
 {
+    /**
+     * Permissions mit Namen die erstellt werden sollen
+     *
+     * @var array<string, array{permissions: string[], rank: int|null}>
+     */
     public array $permissions = [
         'Ausbilder' => [
             'permissions' => [
@@ -85,7 +90,7 @@ class AddPermissions extends Seeder
             $model = PermissionCategorie::firstOrNew([
                 'name' => $name,
             ]);
-            $model->setRank($categorie['rank'] ?? 0);
+            $model->rank = $categorie['rank'] ?? 0;
             $model->save();
 
             foreach ($categorie['permissions'] as $permission_name) {
@@ -94,7 +99,7 @@ class AddPermissions extends Seeder
                         'name' => $permission_name,
                     ]
                 );
-                $permission->setCategorieId($model->getId());
+                $permission->categorie_id = $model->getKey();
                 $permission->save();
             }
         }

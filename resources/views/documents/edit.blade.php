@@ -1,3 +1,10 @@
+@use('Illuminate\Support\Collection')
+@use('App\DTO\SimpleListItem')
+@use('App\DTO\DocumentViewData')
+@php
+    /** @var DocumentViewData $document **/
+    /** @var Collection<int, SimpleListItem> $accounts **/
+@endphp
 @extends('layouts.app')
 
 @section('content')
@@ -22,15 +29,16 @@
                 {{ __('general.bearbeiten') }}
             </x-slot:header>
             <x-slot:body>
-                <form action="{{ route('documents.update', $document) }}" class="space-y" method="POST">
+                <form action="{{ route('documents.update', $document->id) }}" class="space-y" method="POST">
                     @csrf
                     <x-forms.input :default="$document->title" name="title" required>
                         {{ __('general.name') }}
                     </x-forms.input>
 
-                    <x-forms.select :label="__('general.zugeordnet_zu')" name="assign">
-                        @foreach ($users as $user)
-                            <option @selected(!empty($document->documentAssign) && $document->documentAssign->link_id == $user->getKey()) value="{{ $user->getKey() }}">{{ $user->getSalutation() }} {{ $user->getFullName() }} ({{ $user->getId() }})</option>
+                    <x-forms.select :label="__('general.zugeordnet_zu')" name="assign_info">
+                        <option @selected(empty($document->assign_to_id)) value="">{{ __('general.nicht_zugeordnet') }}</option>
+                        @foreach ($accounts as $account)
+                            <option @selected($account->extra['selected']) value="{{ $account->id }}">{{ $account->label }} {{ $account->description }}</option>
                         @endforeach
                     </x-forms.select>
 

@@ -30,6 +30,10 @@ use Spatie\Permission\Models\Role as ModelsRole;
  */
 class Role extends ModelsRole
 {
+    protected $with = [
+        'permissions',
+    ];
+
     # ########################
     # CUSTOM FUNCTIONS
     # ########################
@@ -43,11 +47,6 @@ class Role extends ModelsRole
     # ########################
 
     # ########################
-    # GET & SET
+    # ACCESSORS & MUTATORS
     # ########################
-
-    public function getName()
-    {
-        return $this->name;
-    }
 }

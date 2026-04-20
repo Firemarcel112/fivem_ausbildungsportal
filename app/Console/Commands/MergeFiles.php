@@ -27,6 +27,7 @@ class MergeFiles extends Command
             'DTO.txt' => app_path('DTO'),
             'Traits.txt' => app_path('Traits'),
             'Interfaces.txt' => app_path('Interfaces'),
+            'Actions.txt' => app_path('Actions'),
         ];
 
         foreach ($map as $output_name => $source_dir) {
@@ -37,7 +38,7 @@ class MergeFiles extends Command
             }
 
             $files = File::allFiles($source_dir);
-            $combined_content = "<?php\n\n/** Sammeldatei: $output_name **/\n\n";
+            $combined_content = "/** Sammeldatei: $output_name **/\n\n";
             File::makeDirectory(base_path('utils'), 0755, true, true);
             foreach ($files as $file) {
                 // Verhindert, dass der Command sich selbst oder die Sammeldatei einliest

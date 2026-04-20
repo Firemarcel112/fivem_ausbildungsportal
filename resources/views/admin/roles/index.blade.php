@@ -37,11 +37,11 @@
                     <tbody>
                         @foreach ($roles as $role)
                             <tr>
-                                <td>{{ $role->getName() }}</td>
+                                <td>{{ $role->name }}</td>
                                 <td>
                                     <ul>
                                         @foreach ($role->permissions as $permission)
-                                            <li>{{ $permission->getTranslatedName() }}</li>
+                                            <li>{{ $permission->translated_name }}</li>
                                         @endforeach
                                     </ul>
                                 </td>
@@ -50,7 +50,7 @@
                                         @foreach ($role->users as $user)
                                             <li>
                                                 <a href="{{ route('usermanagement.edit', $user) }}">
-                                                    {{ $user->getFullName() }}
+                                                    {{ $user->account->full_name }}
                                                 </a>
                                             </li>
                                         @endforeach

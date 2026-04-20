@@ -32,7 +32,7 @@ class AlertService
     /**
      * Gibt alle gespeicherten Alerts zurück.
      *
-     * @return array
+     * @return array<mixed>
      */
     public function getAlerts()
     {
@@ -62,5 +62,15 @@ class AlertService
         });
 
         Session::put('alerts', $alerts);
+    }
+
+    public function success(string $message, bool $static = false): void
+    {
+        $this->addAlert($message, 'success', $static);
+    }
+
+    public function error(string $message, bool $static = false): void
+    {
+        $this->addAlert($message, 'danger', $static);
     }
 }

@@ -22,6 +22,8 @@ class Select extends Component
 
     public ?string $title;
 
+    public array $class;
+
     /**
      * Create a new component instance.
      */
@@ -30,6 +32,7 @@ class Select extends Component
         string $label,
         mixed $value = null,
         array $classes = [],
+        mixed $class = null,
         bool $required = false,
         bool $multiple = false,
         ?string $title = null,
@@ -39,6 +42,16 @@ class Select extends Component
         $this->classes = $classes;
         $this->label = $label;
         $this->required = $required;
+        if (empty($class)) {
+            $class = [];
+        }
+
+        if (is_string($class)) {
+            $this->class = explode(' ', $class);
+        }
+
+        $this->class = $class;
+
         if ($multiple) {
             $this->name .= '[]';
         }

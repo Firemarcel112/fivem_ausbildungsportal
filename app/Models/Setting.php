@@ -49,7 +49,7 @@ class Setting extends BaseModel
      */
     public static function getValue(string $key, ?string $default = null): ?string
     {
-        $setting = self::isKey($key)?->first()?->value;
+        $setting = self::isKey($key)->first()?->value;
 
         return $setting ?? $default;
     }

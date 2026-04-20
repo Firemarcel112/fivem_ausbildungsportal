@@ -3,17 +3,17 @@
 namespace App\Models\Trainings;
 
 use App\Models\BaseModel;
-use App\Models\Qualifications\Qualification;
+use App\Models\Qualification;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property int $training_request_id
  * @property int|null $user_id
  * @property int $qualification_id
- * @property string $date
- * @property string $time
+ * @property \Illuminate\Support\Carbon $date
+ * @property \Illuminate\Support\Carbon $time
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property-read Qualification|null $qualification
  * @property-read User|null $user
  *
+ * @method static Builder<static>|Request isDateInFuture()
  * @method static Builder<static>|Request newModelQuery()
  * @method static Builder<static>|Request newQuery()
  * @method static Builder<static>|Request query()
@@ -40,8 +41,11 @@ class Request extends BaseModel
 
     protected $primaryKey = 'training_request_id';
 
-    protected $guarded = [
-        'training_request_id',
+    protected $guarded = ['training_request_id'];
+
+    protected $casts = [
+        'date' => 'datetime',
+        'time' => 'datetime',
     ];
 
     # ########################
@@ -52,11 +56,22 @@ class Request extends BaseModel
     # SCOPES
     # ########################
 
+    /**
+     * Scope für Datum in der Zukunft
+     *
+     * @param  Builder<Request> $query
+     * @return Builder<Request>
+     */
+    public function scopeIsDateInFuture(Builder $query)
+    {
+        return $query->where('date', '>=', now()->tomorrow()->format('Y-m-d'));
+    }
+
     # ########################
     # RELATIONS
     # ########################
 
-    public function user()
+    public function user(): HasOne
     {
         return $this->hasOne(
             User::class,
@@ -65,7 +80,7 @@ class Request extends BaseModel
         );
     }
 
-    public function qualification()
+    public function qualification(): HasOne
     {
         return $this->hasOne(
             Qualification::class,
@@ -75,173 +90,6 @@ class Request extends BaseModel
     }
 
     # ########################
-    # GET & SET
+    # ACCESSORS & MUTATORS
     # ########################
-    /**
-     * Get the training_request_id attribute.
-     *
-     * @return int
-     */
-    public function getId(): int
-    {
-        return $this->training_request_id;
-    }
-
-    /**
-     * Set the training_request_id attribute.
-     *
-     * @param  int  $value
-     * @return void
-     */
-    public function setId(int $value)
-    {
-        $this->training_request_id = $value;
-    }
-
-    /**
-     * Get the training_request_id attribute.
-     *
-     * @return int
-     */
-    public function getTrainingRequestId(): int
-    {
-        return $this->training_request_id;
-    }
-
-    /**
-     * Set the training_request_id attribute.
-     *
-     * @param  int  $value
-     * @return void
-     */
-    public function setTrainingRequestId(int $value)
-    {
-        $this->training_request_id = $value;
-    }
-
-    /**
-     * Get the user_id attribute.
-     *
-     * @return ?int
-     */
-    public function getUserId(): ?int
-    {
-        return $this->user_id;
-    }
-
-    /**
-     * Set the user_id attribute.
-     *
-     * @param  ?int $value
-     * @return void
-     */
-    public function setUserId(?int $value)
-    {
-        $this->user_id = $value;
-    }
-
-    /**
-     * Get the qualification_id attribute.
-     *
-     * @return int
-     */
-    public function getQualificationId(): int
-    {
-        return $this->qualification_id;
-    }
-
-    /**
-     * Set the qualification_id attribute.
-     *
-     * @param  int  $value
-     * @return void
-     */
-    public function setQualificationId(int $value)
-    {
-        $this->qualification_id = $value;
-    }
-
-    /**
-     * Get the date attribute.
-     *
-     * @return Carbon
-     */
-    public function getDate(): Carbon
-    {
-        return Carbon::parse($this->date);
-    }
-
-    /**
-     * Set the date attribute.
-     *
-     * @param  Carbon $value
-     * @return void
-     */
-    public function setDate(Carbon $value)
-    {
-        $this->date = $value;
-    }
-
-    /**
-     * Get the time attribute.
-     *
-     * @return Carbon
-     */
-    public function getTime(): Carbon
-    {
-        return Carbon::parse($this->time);
-    }
-
-    /**
-     * Set the time attribute.
-     *
-     * @param  Carbon $value
-     * @return void
-     */
-    public function setTime(Carbon $value)
-    {
-        $this->time = $value;
-    }
-
-    /**
-     * Get the created_at attribute.
-     *
-     * @return ?Carbon
-     */
-    public function getCreated(): ?Carbon
-    {
-        return is_null($this->created_at) ? null : Carbon::parse($this->created_at);
-    }
-
-    /**
-     * Set the created_at attribute.
-     *
-     * @param  ?Carbon $value
-     * @return void
-     */
-    public function setCreated(?Carbon $value)
-    {
-        $this->created_at = $value;
-    }
-
-    /**
-     * Get the updated_at attribute.
-     *
-     * @return ?Carbon
-     */
-    public function getUpdated(): ?Carbon
-    {
-        return is_null($this->updated_at) ? null : Carbon::parse($this->updated_at);
-    }
-
-    /**
-     * Set the updated_at attribute.
-     *
-     * @param  ?Carbon $value
-     * @return void
-     */
-    public function setUpdated(?Carbon $value)
-    {
-        $this->updated_at = $value;
-    }
 }

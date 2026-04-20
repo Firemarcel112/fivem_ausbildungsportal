@@ -1,4 +1,4 @@
-<x-modal body_classes="text-center" form_action="{{ route('administration.qualifications.toggle_hide', [$qualification]) }}" id="qualification-{{ $qualification->getId() }}-hide">
+<x-modal body_classes="text-center" form_action="{{ route('administration.qualifications.toggle_hide', [$qualification]) }}" id="qualification-{{ $qualification->getKey() }}-hide">
 
     <x-slot:title>{{ __('general.ausblenden') }}</x-slot:title>
     <x-slot:body>
@@ -7,7 +7,7 @@
         </div>
         <p class="text-warning">{!! __('general.qualifikation_sicher_ausblenden', [
             'br' => '<br/>',
-            'name' => $qualification->getName(),
+            'name' => $qualification->name,
         ]) !!}</p>
     </x-slot:body>
     <x-slot:footer>

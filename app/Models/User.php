@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use App\Enums\Role as RoleEnum;
 use App\Models\Trainings\Participant;
 use App\Models\Trainings\TrainingBan;
 use App\Models\User\Account;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -30,21 +31,25 @@ use Spatie\Permission\Traits\HasRoles;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Account|null $account
  * @property-read TrainingBan|null $activeTrainingBan
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
+ * @property-read Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \App\Models\DiscordAccount|null $discord
+ * @property-read mixed $full_name
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $permissions
+ * @property-read Collection<int, \App\Models\Permission> $permissions
  * @property-read int|null $permissions_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Role> $roles
+ * @property-read Collection<int, \App\Models\Role> $roles
  * @property-read int|null $roles_count
  *
+ * @method static Builder<static>|User isUserId(int $user_id)
+ * @method static Builder<static>|User joinAccounts()
  * @method static Builder<static>|User newModelQuery()
  * @method static Builder<static>|User newQuery()
  * @method static Builder<static>|User permission($permissions, $without = false)
  * @method static Builder<static>|User query()
  * @method static Builder<static>|User role($roles, $guard = null, $without = false)
+ * @method static Builder<static>|User searchAccount(string $search)
  * @method static Builder<static>|User whereCreatedAt($value)
  * @method static Builder<static>|User whereEmail($value)
  * @method static Builder<static>|User whereEmailVerifiedAt($value)
@@ -61,11 +66,14 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class User extends Authenticatable implements Auditable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use AuditingAuditable, HasFactory, HasRoles, Notifiable {
+    use AuditingAuditable;
+
+    // use HasFactory;
+    use HasRoles {
         hasPermissionTo as spatieHasPermissionTo;
         hasRole as spatieHasRole;
     }
+    use Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -106,67 +114,15 @@ class User extends Authenticatable implements Auditable
      */
     public static function findByUsername(string $username)
     {
-        return self::where('name', $username)->first();
-    }
-
-    /**
-     * Gibt die Rollen des Benutzers zurück
-     */
-    public function getRoles()
-    {
-        return $this->roles->pluck('name')->toArray();
-    }
-
-    /**
-     * Gibt die Ausgaberolle des Benutzers zurück
-     *
-     * @return string
-     */
-    public function getOutputRole()
-    {
-        $roles = $this->getRoles();
-        foreach (RoleEnum::cases() as $role) {
-            switch ($role->name) {
-                case 'ADMIN':
-                    $color = 'red';
-                    break;
-                case 'AUSBILDER':
-                    $color = 'purple';
-                    break;
-                case 'AUSBILDER_EXTERN':
-                    $color = 'pink';
-                    break;
-            }
-            if (in_array($role->value, $roles)) {
-                return "<span class='fw-bold text-{$color}'>" . __('roles.' . strtolower($role->name)) . '</span>';
-            }
-        }
-
-        return "<span class='fw-bold text-green'>" . __('roles.user') . '</span>';
-    }
-
-    /**
-     * Prüft die Permission
-     *
-     * @param  mixed $permission
-     * @param  mixed $guardName
-     * @return bool
-     */
-    public function hasPermissionTo($permission, $guardName = null, bool $check_superadmin = true): bool
-    {
-        if ($this->isSuperadmin() && $check_superadmin) {
-            return true;
-        }
-
-        return $this->spatieHasPermissionTo($permission, $guardName);
+        return self::firstWhere('name', $username);
     }
 
     /**
      * Prüft ob die Rolle vorhanden ist
      *
-     * @param  mixed $roles
-     * @param  mixed $guard
-     * @param  mixed $check_superadmin
+     * @param  mixed   $roles
+     * @param  ?string $guard
+     * @param  bool    $check_superadmin
      * @return bool
      */
     public function hasRole($roles, ?string $guard = null, bool $check_superadmin = true): bool
@@ -189,7 +145,7 @@ class User extends Authenticatable implements Auditable
     {
         if (Auth::user()->hasPermissionTo('usermanagement.edit.permissions')) {
             foreach ($revoke_permission_ids as $permission_id) {
-                $has_permission = $this->hasPermissionTo($permission_id, null, false);
+                $has_permission = $this->hasPermissionTo($permission_id, null);
                 if ($has_permission) {
                     $this->auditDetach('permissions', $permission_id, true);
                 }
@@ -197,7 +153,7 @@ class User extends Authenticatable implements Auditable
             unset($revoke_permission_ids);
 
             foreach ($grant_permission_ids as $permission_id) {
-                $has_permission = $this->hasPermissionTo($permission_id, null, false);
+                $has_permission = $this->hasPermissionTo($permission_id, null);
                 if (!$has_permission) {
                     $this->auditAttach('permissions', $permission_id, [
                         'permission_id' => $permission_id,
@@ -241,9 +197,10 @@ class User extends Authenticatable implements Auditable
     /**
      * Verteilt eine Ausbildungssperre
      *
-     * @param  mixed $date_from
-     * @param  mixed $date_to
-     * @param  int   $reason_id
+     * @param  string $reason
+     * @param  mixed  $date_from
+     * @param  mixed  $date_to
+     * @param  string $notice
      * @return bool
      */
     public function banForTrainings(
@@ -262,7 +219,7 @@ class User extends Authenticatable implements Auditable
         $model->setIssuerId(Auth::user()->getId());
         $model->setReason($reason);
         $model->setDateFrom(Carbon::parse($date_from));
-        $model->setDateTo(Carbon::parse($date_to ?? now()->addDays(7)));
+        $model->setDateTo(Carbon::parse($date_to));
         $model->setInternalNote($notice);
 
         $trainings = Participant::with(['training' => function ($query) use ($date_from, $date_to) {
@@ -281,47 +238,11 @@ class User extends Authenticatable implements Auditable
     }
 
     /**
-     * Gibt den vollen Namen zurück
-     */
-    public function getFullName()
-    {
-        return $this->account->getFullName();
-    }
-
-    /**
-     * Gibt die Anrede zurück
-     *
-     * @return string
-     */
-    public function getSalutation()
-    {
-        $gender = $this->account?->getGender() ?? 'D';
-
-        return match ($gender) {
-            'M' => __('general.herr'),
-            'W' => __('general.frau'),
-            'D' => '',
-        };
-    }
-
-    /**
-     * Gibt den Discord namen oder den Normalen Namen zurück
-     *
-     * @return string
-     */
-    public function getDiscordName(): string
-    {
-        if (!empty($this->discord) && !empty(config('services.discord.client_id'))) {
-            return $this?->discord?->getUsername() ?? $this->getFullName();
-        }
-
-        return $this->getFullName();
-    }
-
-    /**
      * Gibt die Aktiven Ausbilder zurück
+     *
+     * @return Collection<User>
      */
-    public static function getTrainers()
+    public static function getTrainers(): Collection
     {
         return User::with('account')
             ->withIsTrainer()
@@ -333,21 +254,11 @@ class User extends Authenticatable implements Auditable
         $allowed_ids = explode(',', config('app.superadmins'));
         if (config('app.superadmins') == '*' && config('app.env') != 'production') {
             return true;
-        } elseif (in_array($this->getId(), $allowed_ids)) {
+        } elseif (in_array($this->getKey(), $allowed_ids)) {
             return true;
         }
 
         return false;
-    }
-
-    /**
-     * Gibt die Initialien des Benutzers zurück
-     *
-     * @return string
-     */
-    public function getInitials(): string
-    {
-        return strtoupper(substr($this->account->first_name, 0, 1)) . strtoupper(substr($this->account->last_name, 0, 1));
     }
 
     /**
@@ -357,7 +268,7 @@ class User extends Authenticatable implements Auditable
      */
     public function isTrainer(): bool
     {
-        return $this->hasPermissionTo('is_trainer', null, false);
+        return $this->can('is_trainer', [null, 'ignore-superadmin']);
     }
 
     # ########################
@@ -371,26 +282,65 @@ class User extends Authenticatable implements Auditable
      */
     public function scopeWithIsTrainer(Builder $query): Builder
     {
-        return $query
-            ->with(['roles.permissions'])
-            ->where(function (Builder $q) {
-                $q->whereHas('permissions', function ($q2) {
-                    $q2->where('name', 'is_trainer');
-                })->orWhereHas('roles.permissions', function ($q2) {
-                    $q2->where('name', 'is_trainer');
-                });
-            });
+        return $query->permission('is_trainer');
+    }
+
+    /**
+     * Scope für User ID
+     *
+     * @param  Builder<User> $query
+     * @param  int           $user_id
+     * @return Builder<User>
+     */
+    public function scopeIsUserId(Builder $query, int $user_id): Builder
+    {
+        return $query->where($this->getKeyName(), $user_id);
+    }
+
+    /**
+     * @param  Builder<User> $query
+     * @param  string        $search
+     * @return Builder<User>
+     */
+    public function scopeSearchAccount(Builder $query, string $search)
+    {
+        return $query->whereHas('account', function (Builder $q) use ($search) {
+            /** @phpstan-ignore-next-line */
+            /** @var Builder & Account $q */
+            return $q->isSearch($search);
+        });
+    }
+
+    public function scopeJoinAccounts(Builder $query): Builder
+    {
+        $self_table_name = (new self)->getTable();
+
+        $this->joinAccountsOnce($query);
+
+        return $query->select($self_table_name . '.*');
+    }
+
+    public function joinAccountsOnce(Builder $query)
+    {
+        $table_name = (new Account)->getTable();
+        $self_table_name = (new self)->getTable();
+
+        $joins = collect($query->getQuery()->joins);
+
+        if (!$joins->pluck('table')->contains($table_name)) {
+            $query->leftJoin(
+                $table_name,
+                $self_table_name . '.id',
+                '=',
+                $table_name . '.user_id'
+            );
+        }
     }
 
     # ########################
     # RELATIONS
     # ########################
 
-    /**
-     * Gibt die RP Daten zurück
-     *
-     * @return HasOne<Account, User>
-     */
     public function account(): HasOne
     {
         return $this->hasOne(Account::class, 'user_id', 'id');
@@ -413,153 +363,15 @@ class User extends Authenticatable implements Auditable
     }
 
     # ########################
-    # GET & SET
-    # ########################
+    # ACCESSORS & MUTATORS
+    # #########################
 
-    /**
-     * Get the id attribute.
-     *
-     * @return int
-     */
-    public function getId(): int
+    public function fullName(): Attribute
     {
-        return $this->id;
-    }
-
-    /**
-     * Set the id attribute.
-     *
-     * @param  int  $value
-     * @return void
-     */
-    public function setId(int $value)
-    {
-        $this->id = $value;
-    }
-
-    /**
-     * Get the name attribute.
-     *
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Set the name attribute.
-     *
-     * @param  string $value
-     * @return void
-     */
-    public function setName(string $value)
-    {
-        $this->name = $value;
-    }
-
-    /**
-     * Get the email attribute.
-     *
-     * @return ?string
-     */
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    /**
-     * Set the email attribute.
-     *
-     * @param  ?string $value
-     * @return void
-     */
-    public function setEmail(?string $value)
-    {
-        $this->email = $value;
-    }
-
-    /**
-     * Get the email_verified_at attribute.
-     *
-     * @return ?Carbon
-     */
-    public function getEmailVerifiedAt(): ?Carbon
-    {
-        return is_null($this->email_verified_at) ? null : Carbon::parse($this->email_verified_at);
-    }
-
-    /**
-     * Set the email_verified_at attribute.
-     *
-     * @param  ?Carbon $value
-     * @return void
-     */
-    public function setEmailVerifiedAt(?Carbon $value)
-    {
-        $this->email_verified_at = $value;
-    }
-
-    /**
-     * Get the password attribute.
-     *
-     * @return string
-     */
-    public function getPassword(): string
-    {
-        return $this->password;
-    }
-
-    /**
-     * Set the password attribute.
-     *
-     * @param  string $value
-     * @return void
-     */
-    public function setPassword(string $value)
-    {
-        $this->password = $value;
-    }
-
-    /**
-     * Get the created_at attribute.
-     *
-     * @return ?Carbon
-     */
-    public function getCreated(): ?Carbon
-    {
-        return is_null($this->created_at) ? null : Carbon::parse($this->created_at);
-    }
-
-    /**
-     * Set the created_at attribute.
-     *
-     * @param  ?Carbon $value
-     * @return void
-     */
-    public function setCreated(?Carbon $value)
-    {
-        $this->created_at = $value;
-    }
-
-    /**
-     * Get the updated_at attribute.
-     *
-     * @return ?Carbon
-     */
-    public function getUpdated(): ?Carbon
-    {
-        return is_null($this->updated_at) ? null : Carbon::parse($this->updated_at);
-    }
-
-    /**
-     * Set the updated_at attribute.
-     *
-     * @param  ?Carbon $value
-     * @return void
-     */
-    public function setUpdated(?Carbon $value)
-    {
-        $this->updated_at = $value;
+        return Attribute::make(
+            function () {
+                return $this->account?->full_name ?? __('general.unbekannt');
+            },
+        );
     }
 }

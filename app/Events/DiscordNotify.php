@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Enums\Training\Type;
+use App\Models\Training;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -17,7 +18,7 @@ class DiscordNotify
     public function __construct(
         public array $notifications,
         public Type $type,
-        public mixed $model = null,
+        public ?Training $model = null,
         public array $context = [],
     ) {}
 }

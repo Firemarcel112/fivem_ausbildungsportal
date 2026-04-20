@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Facades\Alert;
 use App\Models\DocumentLink;
-use App\Models\Qualifications\Qualification;
+use App\Models\Qualification;
 use App\Models\User;
 use App\Models\User\Qualification as UserQualification;
-use Carbon\Carbon;
 use Exception;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class QualificationsController extends Controller
@@ -19,17 +19,17 @@ class QualificationsController extends Controller
      * @param Request $request
      * @param User    $user
      */
-    public function assign(Request $request, User $user)
+    public function assign(Request $request, User $user): RedirectResponse
     {
         $this->checkPermission('user.qualifications.assign');
 
         $qualification = Qualification::findOrFail($request->qualification_id);
 
         $user_qualification = UserQualification::firstOrNew([
-            'qualification_id' => $request->qualification_id,
+            'qualification_id' => $qualification->getKey(),
             'user_id' => $user->getId(),
         ]);
-        $user_qualification->setCreated(Carbon::create($request->date));
+        $user_qualification->created_at = $request->date;
         $user_qualification->save();
 
         return redirect()->to(route('usermanagement.index') . '?search=' . $user->getFullName());
@@ -51,11 +51,11 @@ class QualificationsController extends Controller
         /** @var Qualification $qualification */
         foreach ($qualifications as $qualification) {
             try {
-                $document = $user->account->certificates->where('title', 'LIKE', 'Zertifikat: ' . $qualification->getName())->first();
+                $document = $user->account->certificates->where('title', 'LIKE', 'Zertifikat: ' . $qualification->name)->first();
                 $document_id = $document->getKey();
                 DocumentLink::firstWhere('document_id', $document_id)?->delete();
 
-                $user_qualification = $user->account->directQualifications->where('qualification_id', $qualification->getId())
+                $user_qualification = $user->account->directQualifications->where('qualification_id', $qualification->getKey())
                     ->first();
                 $user_qualification?->delete();
             } catch (Exception $e) {

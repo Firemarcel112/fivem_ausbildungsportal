@@ -2,6 +2,7 @@
 
 namespace App\DTO\Export;
 
+use App\DTO\SimpleUserViewData;
 use App\Models\User\Account;
 
 class UserWithQualificationsDTO
@@ -45,6 +46,22 @@ class UserWithQualificationsDTO
             $account->getKey(),
             $account->getFullName(),
             $account->getDefaultFraction()->full_name,
+            $user_qualifications
+        );
+    }
+
+    public static function fromSimpleUserViewDataModel(SimpleUserViewData $user, array $qualifications): self
+    {
+        $user_qualifications = [];
+
+        foreach ($qualifications as $qualification) {
+            $user_qualifications[$qualification] = $user->qualifications->contains('label', $qualification);
+        }
+
+        return new self(
+            $user->account_id,
+            $user->full_name,
+            $user->fraction_data['default']['short_name'],
             $user_qualifications
         );
     }

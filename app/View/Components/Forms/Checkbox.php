@@ -32,7 +32,7 @@ class Checkbox extends Component
         array $labelClasses = [],
     ) {
         $this->name = $name;
-        $this->value = $value ?? old($name, default: 0);
+        $this->value = !empty($value) ? $value : (int) old($name, '0');
         $this->classes = $classes;
         $this->input_classes = $input_classes;
         $this->with_hidden_value = $with_hidden_value;

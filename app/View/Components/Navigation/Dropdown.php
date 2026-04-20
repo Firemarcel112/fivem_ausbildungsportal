@@ -4,12 +4,17 @@ namespace App\View\Components\Navigation;
 
 use Closure;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Component;
 
 class Dropdown extends Component
 {
     /**
      * Create a new component instance.
+     *
+     * @param string       $icon
+     * @param string       $text
+     * @param array<mixed> $items
      */
     public function __construct(
         public string $icon,
@@ -25,11 +30,17 @@ class Dropdown extends Component
     public function render(): View|Closure|string
     {
         $can_see = true;
-        $any_permission = collect($this->items)->pluck('permission')->toArray();
+
+        $any_permission = collect($this->items)
+            ->pluck('permission')
+            ->toArray();
+
         $has_no_permission = in_array('', $any_permission, true) || in_array(null, $any_permission, true);
+
         $any_permission = array_filter($any_permission);
+
         if (!empty($any_permission) && !$has_no_permission) {
-            if (!auth()?->user()?->hasAnyPermission($any_permission)) {
+            if (!Auth::user()?->canAny($any_permission)) {
                 $can_see = false;
             }
         }
@@ -37,12 +48,16 @@ class Dropdown extends Component
         return $can_see ? view('components.navigation.dropdown') : '';
     }
 
-    public function isActive()
+    public function isActive(): bool
     {
-        return in_array(request()->route()->getName(), collect($this->items)->pluck('route_name')->toArray());
+        return in_array(request()->route()?->getName(), collect($this->items)->pluck('route_name')->toArray());
     }
 
-    public function getDropdownUrl($item)
+    /**
+     * @param  mixed  $item
+     * @return string
+     */
+    public function getDropdownUrl($item): string
     {
         if (isset($item['route_name'])) {
             return route($item['route_name']);
@@ -53,15 +68,23 @@ class Dropdown extends Component
         }
     }
 
-    public function getDropdownActive($item)
+    /**
+     * @param  mixed $item
+     * @return bool
+     */
+    public function getDropdownActive($item): bool
     {
-        return request()->route()->getName() === ($item['route_name'] ?? false) ? true : false;
+        return request()->route()?->getName() === ($item['route_name'] ?? false) ? true : false;
     }
 
-    public function getItemPermission($item)
+    /**
+     * @param  mixed $item
+     * @return bool
+     */
+    public function getItemPermission($item): bool
     {
         if (isset($item['permission'])) {
-            return auth()?->user()?->can($item['permission']) ?? false;
+            return Auth::user()?->can($item['permission']) ?? false;
         }
 
         return true;

@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Facades\Alert;
+use App\DTO\UserProfileViewData;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ProfileController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Anzeige eines Profils
      *
@@ -16,12 +18,10 @@ class ProfileController extends Controller
      */
     public function show(User $user)
     {
-        if (!Auth::user()->hasPermissionTo('usermanagement.index') && Auth::user()->id !== $user->id) {
-            Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+        $this->authorize('view', $user);
 
-            return redirect()->back();
-        }
+        $profile = UserProfileViewData::fromModel($user);
 
-        return view('user.profile', compact('user'));
+        return view('user.profile', compact('profile'));
     }
 }

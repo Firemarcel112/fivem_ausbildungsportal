@@ -1,15 +1,13 @@
-<x-modal form_action="{{ route('trainings.request') }}" id="training-request">
+@props([
+    'id' => 'training-request',
+])
+<x-modal form_action="{{ route('trainings.request.store') }}" id="{{ $id }}">
     <x-slot:title>{{ __('general.ausbildungswunsch') }}</x-slot:title>
     <x-slot:body>
         <x-alert :static="true">
             {{ __('general.ausbildungswunsch_info_text') }}
         </x-alert>
-        <x-forms.select label="{{ __('general.ausbildung') }}" name="qualification_id" required required>
-            <option disabled selected value="">-- {{ __('general.ausbildung_auswaehlen') }} --</option>
-            @foreach ($qualifications ?? [] as $qualification)
-                <option value="{{ $qualification->getId() }}">{{ $qualification->getName() }}</option>
-            @endforeach
-        </x-forms.select>
+        <x-forms.select.qualifications :label="__('general.ausbildung')" name="qualification_id" required />
 
         <x-forms.input :max="now()->addDays(14)->format('Y-m-d')" :min="now()->addDay()->format('Y-m-d')" name="date" required type="date">
             {{ __('general.datum') }}

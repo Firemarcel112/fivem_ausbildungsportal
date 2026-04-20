@@ -15,10 +15,17 @@ class Item extends Component
 
     public ?string $icon;
 
+    /**
+     * @var array<string>
+     */
     private array $route_names;
 
     /**
      * Create a new component instance.
+     *
+     * @param string       $url
+     * @param array<mixed> $parameters
+     * @param string|null  $icon
      */
     public function __construct(string $url, array $parameters = [], ?string $icon = null)
     {
@@ -46,10 +53,10 @@ class Item extends Component
      *
      * @return bool
      */
-    public function isActive()
+    public function isActive(): bool
     {
         if (in_array($this->route_name, $this->route_names)) {
-            return (request()?->route()?->getName() ?? null) == $this->route_name;
+            return (request()->route()?->getName() ?? null) == $this->route_name;
         }
 
         return false;

@@ -15,7 +15,7 @@ use Str;
  * @property string $url
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read mixed $assign_info
+ * @property int|null $assign_info
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \App\Models\DocumentLink|null $documentAssign
@@ -55,40 +55,6 @@ class Document extends BaseModel
     # CUSTOM FUNCTIONS
     # ########################
 
-    /**
-     * Erstellt ein Dokumenteneintrag in der Datenbank
-     *
-     * @param  string   $title
-     * @param  string   $url
-     * @param  mixed    $description
-     * @return Document
-     */
-    public static function createDocument(
-        string $title,
-        string $url,
-        ?string $description = null,
-        ?int $link_id = null,
-        ?string $link_type = null,
-    ): Document {
-        $document = self::create([
-            'title' => $title,
-            'url' => $url,
-            'description' => $description,
-        ]);
-
-        $document->save();
-
-        if (!is_null($link_id) && !is_null($link_type)) {
-            DocumentLink::create([
-                'document_id' => $document->getKey(),
-                'link_id' => $link_id,
-                'link_type' => $link_type,
-            ]);
-        }
-
-        return $document;
-    }
-
     # ########################
     # SCOPES
     # ########################
@@ -100,7 +66,7 @@ class Document extends BaseModel
      * @param  string  $search
      * @return Builder
      */
-    public function scopeIsSearch(Builder $query, ?string $search)
+    public function scopeIsSearch(Builder $query, ?string $search): Builder
     {
         if (empty($search)) {
             return $query;
@@ -120,13 +86,16 @@ class Document extends BaseModel
      */
     public function scopeJoinDocumentAssign(Builder $query): Builder
     {
+        $document_link_table_name = (new DocumentLink)->getTable();
+        $self_table_name = (new self)->getTable();
+
         return $query->leftJoin(
-            DocumentLink::getTableName(),
-            self::getTableName() . '.' . self::getKeyName(),
+            $document_link_table_name,
+            $self_table_name . '.' . self::getKeyName(),
             '=',
-            DocumentLink::getTableName() . '.document_id',
+            $document_link_table_name . '.document_id',
         )
-            ->select(self::getTableName() . '.*');
+            ->select($self_table_name . '.*');
     }
 
     /**
@@ -170,11 +139,12 @@ class Document extends BaseModel
 
         return $query->with(['documentAssign', 'linkedAccount'])
             ->when($search, function ($q) use ($search) {
+                /** @var \Illuminate\Database\Eloquent\Builder<Document> $q */
                 return $q->isSearch($search);
             })
             ->joinDocumentAssign()
             ->where(function ($q) use ($can_edit, $allowed_types) {
-                $tableName = DocumentLink::getTableName();
+                $tableName = (new DocumentLink)->getTable();
 
                 $q->when($can_edit, function ($sq) use ($tableName) {
                     return $sq->orWhereNull($tableName . '.id');
@@ -204,11 +174,6 @@ class Document extends BaseModel
         );
     }
 
-    /**
-     * Relation zu einem verlinkten Account über die Dokumentenverknüpfung
-     *
-     * @return HasOneThrough<Account, DocumentLink, Document>
-     */
     public function linkedAccount(): HasOneThrough
     {
         return $this->hasOneThrough(
@@ -241,15 +206,34 @@ class Document extends BaseModel
             get: function () {
                 if ($this->linkedAccount) {
                     return [
-                        'name' => $this->linkedAccount->getFullName(),
-                        'url' => route('profile.show', $this->linkedAccount->user),
+                        'id' => $this->linkedAccount->getKey(),
+                        'name' => $this->linkedAccount->full_name,
+                        'url' => route('profile.show', $this->linkedAccount),
                     ];
                 }
 
                 return [
+                    'id' => null,
                     'name' => __('general.nicht_zugeordnet'),
                     'url' => null,
                 ];
+            },
+            set: function (?int $value) {
+                if (empty($value)) {
+                    return $this->documentAssign()->delete();
+                }
+
+                $this->documentAssign()->updateOrCreate(
+                    [
+                        'document_id' => $this->getKey(),
+                    ],
+                    [
+                        'link_id' => $value,
+                        'link_type' => 'ACCOUNT',
+                    ]
+                );
+
+                return [];
             }
         );
     }

@@ -2,9 +2,13 @@
 
 namespace App\Providers;
 
+use App\Events\TrainingCompleted;
+use App\Interfaces\DiscordNotificationInterface;
+use App\Listeners\Discord\SendDiscordEmbed;
+use App\Listeners\GenerateCertificate;
+use App\Listeners\ModifyTrainingParticipantData;
 use App\Models\Setting;
 use App\Models\User;
-use App\Policies\GeneralPolicy;
 use App\Services\AlertService;
 use App\Services\Export\UserWithQualificationsService;
 use App\Traits\ClockworkTrait;
@@ -18,11 +22,30 @@ class AppServiceProvider extends ServiceProvider
 {
     use ClockworkTrait;
 
+    public function registerEvents(): void
+    {
+        Event::listen(
+            listener: SendDiscordEmbed::class,
+            events: DiscordNotificationInterface::class,
+        );
+
+        Event::listen(
+            events: TrainingCompleted::class,
+            listener: ModifyTrainingParticipantData::class
+        );
+
+        Event::listen(
+            events: TrainingCompleted::class,
+            listener: GenerateCertificate::class
+        );
+    }
+
     /**
      * Register any application services.
      */
     public function register(): void
     {
+
         $this->app->singleton('alert', function ($app) {
             return new AlertService;
         });
@@ -33,26 +56,31 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Model::preventLazyLoading(config('app.prevent_lazy_loading', false));
+        $this->registerEvents();
 
-        Event::listen(function (\SocialiteProviders\Manager\SocialiteWasCalled $event) {
-            $event->extendSocialite('discord', \SocialiteProviders\Discord\Provider::class);
+        Gate::before(function (User $user, string $ability, $args) {
+
+            if (in_array('ignore-superadmin', $args)) {
+                return null;
+            }
+
+            if ($user->isSuperadmin()) {
+                return true;
+            }
+
+            return null;
         });
 
-        Gate::define('is_trainer', [GeneralPolicy::class, 'isTrainer']);
+        $this->defineGates();
 
-        if (app()->environment('production')) {
-            Gate::define('viewPulse', function (User $user) {
-                return $user->isSuperadmin() || (config('app.env') == 'local');
-            });
-        }
+        Model::preventLazyLoading(config('app.prevent_lazy_loading', false));
 
         if (!empty((Auth::user()?->getKey() ?? 0) == 1) || config('app.superadmin_ip') == request()->ip()) {
             config(['app.debug' => true]);
         }
 
         $this->app->singleton(UserWithQualificationsService::class, function () {
-            $qualifications = \App\Models\Qualifications\Qualification::getAllQualifications(true)
+            $qualifications = \App\Models\Qualification::getAllQualifications(true)
                 ->pluck('name')
                 ->toArray();
 
@@ -60,6 +88,13 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->loadSettings();
+    }
+
+    public function defineGates(): void
+    {
+        Gate::define('viewPulse', function (User $user) {
+            return $user->isSuperadmin() && app()->isProduction();
+        });
     }
 
     /**

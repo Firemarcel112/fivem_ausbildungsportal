@@ -7,6 +7,11 @@ use Illuminate\Database\Seeder;
 
 class AddDefaultSettings extends Seeder
 {
+    /**
+     * Permissions mit Namen die erstellt werden sollen
+     *
+     * @var array<int, array<string, string|int|null>>
+     */
     public array $settings = [
         [
             'key' => 'default_meeting_point',
@@ -46,13 +51,27 @@ class AddDefaultSettings extends Seeder
     public function run(): void
     {
         foreach ($this->settings as $setting) {
+
+            /**
+             * @var string $key
+             */
+            $key = $setting['key'];
+            /**
+             * @var string|null $value
+             */
+            $value = $setting['value'];
+            /**
+             * @var string $description
+             */
+            $description = $setting['description'];
+
             $model = Setting::firstOrNew([
-                'key' => $setting['key'],
+                'key' => $key,
             ]);
 
             if (!$model->exists) {
-                $model->value = $setting['value'];
-                $model->description = $setting['description'];
+                $model->value = $value;
+                $model->description = $description;
             }
             $model->save();
         }

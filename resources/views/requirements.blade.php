@@ -1,3 +1,9 @@
+@use('Illuminate\Support\Collection')
+@use('App\DTO\QualificationRequirementViewData')
+@php
+    /** @var Collection<string, Collection<string, Collection<int, QualificationRequirementViewData>>> $requirements **/
+@endphp
+
 @extends('layouts.app')
 
 @section('content')
@@ -18,32 +24,33 @@
             <x-alert :static="true" type="info">
                 {{ __('general.voraussetzungen_erfragbar') }}
             </x-alert>
-            @forelse($qualifications as $qualification)
-                @continue(($qualification->requirements?->count() ?? 0) == 0)
+
+            @forelse($requirements as $qualification_name => $items)
                 <x-card :classes="['mb-2']" size="sm">
                     <x-slot:header>
-                        <h2 class="card-title">{{ $qualification->getName() }}</h2>
+                        <h2 class="card-title">{{ $qualification_name }}</h2>
                     </x-slot:header>
                     <x-slot:body>
-                        @foreach ($fractions as $fraction)
-                            @continue(empty($qualification->requirements->firstWhere('fraction_id', $fraction->fraction_id)))
-                            <div class="accordion" id="fractions-accordion-{{ $fraction->getKey() }}-{{ $qualification->getId() }}">
+                        @foreach ($items as $fraction_name => $requirement_items)
+                            @php
+                                $unique_id = $requirement_items->first()->unique_id;
+                            @endphp
+                            <div class="accordion" id="fractions-accordion-{{ $unique_id }}">
                                 <div class="accordion-item">
                                     <div class="accordion-header">
-                                        <button aria-controls="collapse-fractions-{{ $fraction->getKey() }}-{{ $qualification->getId() }}" aria-expanded="false" class="accordion-button collapsed" data-bs-target="#collapse-fractions-{{ $fraction->getKey() }}-{{ $qualification->getId() }}" data-bs-toggle="collapse">
-                                            {{ $fraction->name }}
+                                        <button aria-controls="collapse-fractions-{{ $unique_id }}" aria-expanded="false" class="accordion-button collapsed" data-bs-target="#collapse-fractions-{{ $unique_id }}" data-bs-toggle="collapse">
+                                            {{ $fraction_name }}
                                             <div class="accordion-button-toggle">
                                                 <x-icon name="chevron-down" />
                                             </div>
                                         </button>
 
                                     </div>
-                                    <div class="accordion-collapse collapse" data-bs-parent="#fractions-accordion-{{ $fraction->getKey() }}-{{ $qualification->getId() }}" id="collapse-fractions-{{ $fraction->getKey() }}-{{ $qualification->getId() }}">
+                                    <div class="accordion-collapse collapse" data-bs-parent="#fractions-accordion-{{ $unique_id }}" id="collapse-fractions-{{ $unique_id }}">
                                         <div class="accordion-body">
                                             <ul style="list-style: none; padding-left: 0;">
-                                                @foreach ($qualification->requirements as $requirement)
-                                                    @continue($requirement->getFractionId() != $fraction->fraction_id)
-                                                    <li class="mt-2">{{ $requirement->getName() }}</li>
+                                                @foreach ($requirement_items as $requirement_item)
+                                                    <li class="mt-2">{{ $requirement_item->label }}</li>
                                                 @endforeach
                                             </ul>
                                         </div>

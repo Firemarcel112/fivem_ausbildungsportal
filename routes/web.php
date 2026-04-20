@@ -39,6 +39,8 @@ Route::prefix('ausbilder')
     ->group(function () {
         Route::get('/', 'index')
             ->name('index');
+        Route::get('completed', 'completed')
+            ->name('completed');
     });
 
 Route::prefix('ausbildung')

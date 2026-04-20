@@ -2,10 +2,13 @@
 
 namespace App\Models\Trainings;
 
+use App\Enums\ParticipantStatus;
 use App\Models\BaseModel;
+use App\Models\Training;
 use App\Models\User\Account;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property int $training_participant_id
@@ -20,10 +23,11 @@ use Illuminate\Database\Eloquent\Builder;
  * @property-read Account|null $account
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
- * @property-read \App\Models\Trainings\Training|null $training
+ * @property-read mixed $full_name
+ * @property-read Training|null $training
  *
+ * @method static Builder<static>|Participant isAccountId(int $user_id)
  * @method static Builder<static>|Participant isTrainingId(int $training_id)
- * @method static Builder<static>|Participant isUserId(int $user_id)
  * @method static Builder<static>|Participant newModelQuery()
  * @method static Builder<static>|Participant newQuery()
  * @method static Builder<static>|Participant query()
@@ -47,27 +51,17 @@ class Participant extends BaseModel
 
     protected $guarded = ['training_participant_id'];
 
+    protected $casts = [
+        'created_at' => 'datetime',
+    ];
+
     # ########################
     # CUSTOM FUNCTIONS
     # ########################
 
     /**
-     * Gibt den vollen Namen zurück
-     */
-    public function getFullName()
-    {
-        return $this->account->getFullName();
-    }
-
-    public function getBirthDate()
-    {
-        return $this->account->getDateofBirth()->format('d.m.Y');
-    }
-
-    /**
      * Abmeldung vom Teilnehmer
      *
-     * @param  string $notice
      * @return void
      */
     public function signOut()
@@ -88,20 +82,14 @@ class Participant extends BaseModel
         $this->save();
     }
 
-    /**
-     * Gibt dass Badge zurück
-     */
-    public function getOutputBadge()
+    public function getStatus(): ParticipantStatus
     {
-        if ($this->getPresent() && $this->getPassed()) {
-            return '<span class="badge bg-success text-white">Bestanden</span>';
-        } elseif ($this->getPresent()) {
-            return '<span class="badge bg-warning text-white">Nur Anwesend</span>';
-        } elseif ($this->getLoggedOut()) {
-            return '<span class="badge bg-red text-white">Abgemeldet</span>';
-        }
-
-        return '<span class="badge bg-red text-white">Abwesend</span>';
+        return match (true) {
+            ((bool) $this->present && (bool) $this->passed) || (bool) $this->passed => ParticipantStatus::PASSED,
+            (bool) $this->present => ParticipantStatus::ONLY_PRESENT,
+            (bool) $this->logged_out => ParticipantStatus::LOGGED_OUT,
+            default => ParticipantStatus::ABSENCE,
+        };
     }
 
     # ########################
@@ -121,13 +109,13 @@ class Participant extends BaseModel
     }
 
     /**
-     * Scope für User ID
+     * Scope für AccountID
      *
      * @param  \Illuminate\Database\Eloquent\Builder $query
      * @param  int                                   $user_id
      * @return Builder
      */
-    public function scopeIsUserId(Builder $query, int $user_id)
+    public function scopeIsAccountId(Builder $query, int $user_id)
     {
         return $query->where('user_id', $user_id);
     }
@@ -136,7 +124,7 @@ class Participant extends BaseModel
     # RELATIONS
     # ########################
 
-    public function account()
+    public function account(): HasOne
     {
         return $this->hasOne(
             Account::class,
@@ -145,7 +133,7 @@ class Participant extends BaseModel
         );
     }
 
-    public function training()
+    public function training(): HasOne
     {
         return $this->hasOne(
             Training::class,
@@ -155,216 +143,15 @@ class Participant extends BaseModel
     }
 
     # ########################
-    # GET & SET
+    # ACCESSORS & MUTATORS
     # ########################
 
-    /**
-     * Get the training_participant_id attribute.
-     *
-     * @return int
-     */
-    public function getId(): int
+    public function fullName(): Attribute
     {
-        return $this->training_participant_id;
-    }
-
-    /**
-     * Set the training_participant_id attribute.
-     *
-     * @param  int  $value
-     * @return void
-     */
-    public function setId(int $value)
-    {
-        $this->training_participant_id = $value;
-    }
-
-    /**
-     * Get the training_participant_id attribute.
-     *
-     * @return int
-     */
-    public function getTrainingParticipantId(): int
-    {
-        return $this->training_participant_id;
-    }
-
-    /**
-     * Set the training_participant_id attribute.
-     *
-     * @param  int  $value
-     * @return void
-     */
-    public function setTrainingParticipantId(int $value)
-    {
-        $this->training_participant_id = $value;
-    }
-
-    /**
-     * Get the training_id attribute.
-     *
-     * @return int
-     */
-    public function getTrainingId(): int
-    {
-        return $this->training_id;
-    }
-
-    /**
-     * Set the training_id attribute.
-     *
-     * @param  int  $value
-     * @return void
-     */
-    public function setTrainingId(int $value)
-    {
-        $this->training_id = $value;
-    }
-
-    /**
-     * Get the user_id attribute.
-     *
-     * @return int
-     */
-    public function getUserId(): int
-    {
-        return $this->user_id;
-    }
-
-    /**
-     * Set the user_id attribute.
-     *
-     * @param  int  $value
-     * @return void
-     */
-    public function setUserId(int $value)
-    {
-        $this->user_id = $value;
-    }
-
-    /**
-     * Get the present attribute.
-     *
-     * @return int
-     */
-    public function getPresent(): int
-    {
-        return $this->present;
-    }
-
-    /**
-     * Set the present attribute.
-     *
-     * @param  int  $value
-     * @return void
-     */
-    public function setPresent(int $value)
-    {
-        $this->present = $value;
-    }
-
-    /**
-     * Get the logged_out attribute.
-     *
-     * @return int
-     */
-    public function getLoggedOut(): int
-    {
-        return $this->logged_out;
-    }
-
-    /**
-     * Set the logged_out attribute.
-     *
-     * @param  int  $value
-     * @return void
-     */
-    public function setLoggedOut(int $value)
-    {
-        $this->logged_out = $value;
-    }
-
-    /**
-     * Get the passed attribute.
-     *
-     * @return int
-     */
-    public function getPassed(): int
-    {
-        return $this->passed;
-    }
-
-    /**
-     * Set the passed attribute.
-     *
-     * @param  int  $value
-     * @return void
-     */
-    public function setPassed(int $value)
-    {
-        $this->passed = $value;
-    }
-
-    /**
-     * Get the notices attribute.
-     *
-     * @return ?string
-     */
-    public function getNotices(): ?string
-    {
-        return $this->notices;
-    }
-
-    /**
-     * Set the notices attribute.
-     *
-     * @param  ?string $value
-     * @return void
-     */
-    public function setNotices(?string $value)
-    {
-        $this->notices = $value;
-    }
-
-    /**
-     * Get the created_at attribute.
-     *
-     * @return ?Carbon
-     */
-    public function getCreated(): ?Carbon
-    {
-        return is_null($this->created_at) ? null : Carbon::parse($this->created_at);
-    }
-
-    /**
-     * Set the created_at attribute.
-     *
-     * @param  ?Carbon $value
-     * @return void
-     */
-    public function setCreated(?Carbon $value)
-    {
-        $this->created_at = $value;
-    }
-
-    /**
-     * Get the updated_at attribute.
-     *
-     * @return ?Carbon
-     */
-    public function getUpdated(): ?Carbon
-    {
-        return is_null($this->updated_at) ? null : Carbon::parse($this->updated_at);
-    }
-
-    /**
-     * Set the updated_at attribute.
-     *
-     * @param  ?Carbon $value
-     * @return void
-     */
-    public function setUpdated(?Carbon $value)
-    {
-        $this->updated_at = $value;
+        return Attribute::make(
+            get: function () {
+                return $this->account->full_name;
+            }
+        );
     }
 }

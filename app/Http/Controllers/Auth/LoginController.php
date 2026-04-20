@@ -5,10 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Facades\Alert;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
-use App\Models\User;
+use App\Services\AuthenticationService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Laravel\Socialite\Facades\Socialite;
 
 class LoginController extends Controller
 {
@@ -29,50 +27,17 @@ class LoginController extends Controller
     /**
      * Einloggen
      *
-     * @param LoginRequest
+     * @param  LoginRequest                            $request
      * @return mixed|\Illuminate\Http\RedirectResponse
      */
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request, AuthenticationService $auth_service)
     {
 
-        $user = User::findByUsername($request->input('username'));
-
-        if (!$user) {
+        if (!$auth_service->attemptLogin($request->input('username'), $request->input('password'), $request->has('remember'))) {
             Alert::addAlert(__('general.benutzername_oder_passwort_falsch'), 'error');
-
-            return redirect()->back();
         }
 
-        if (Hash::check($request->input('password'), $user->password) || config('app.env') == 'local') {
-            Auth::login($user, $request->has('remember'));
-            session([
-                'name' => $user->account->getFullName(),
-            ]);
-        } else {
-            Alert::addAlert(__('general.benutzername_oder_passwort_falsch'), 'error');
-
-            return redirect()->back();
-        }
-
-        if ($user->isTrainer()) {
-            return redirect()->intended(route('ausbilder.index'));
-        }
-
-        return redirect()->route('home');
-    }
-
-    /**
-     * Anmeldung via Discord
-     *
-     * @return void
-     */
-    public function loginDiscord()
-    {
-        session(['discord_type' => 'AUTH']);
-
-        return Socialite::driver('discord')
-            ->scopes(explode(',', config('services.discord.scopes')))
-            ->redirect();
+        return redirect()->intended($auth_service->getRedirectRouteForUser(Auth::user()));
     }
 
     /**
@@ -83,6 +48,7 @@ class LoginController extends Controller
     public function logout()
     {
         Alert::addAlert(__('general.erfolgreich_ausgeloggt'), 'success');
+
         Auth::logout();
 
         return redirect()->route('home');

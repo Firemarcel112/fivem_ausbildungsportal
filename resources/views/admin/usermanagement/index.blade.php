@@ -1,3 +1,8 @@
+@use('App\DTO\SimpleUserViewData')
+@use('Illuminate\Pagination\LengthAwarePaginator')
+@php
+    /** @var LengthAwarePaginator<int, SimpleUserViewData> $data */
+@endphp
 @extends('layouts.app')
 
 @section('content')
@@ -72,7 +77,6 @@
                     <thead>
                         <tr>
                             <th>{{ __('general.name') }}</th>
-                            <th>{{ __('general.fraktion') }}</th>
                             <th>{{ __('general.ausbildungen') }}</th>
                             <th>{{ __('general.ausbilder') }}</th>
                             <th>{{ __('general.ausbildungssperre') }}</th>
@@ -82,60 +86,31 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                            /** @var SimpleUserViewData $user */
+                        @endphp
                         @forelse ($data ?? [] as $user)
                             <tr>
                                 <td>
                                     <div class="py-1 d-flex align-items-center">
-                                        <x-avatar :$user size="2"></x-avatar>
+                                        <x-avatar :$user :initials="$user->initials" size="2"></x-avatar>
                                         <div class="flex-fill ms-2">
                                             <div class="font-weight-medium">
-                                                <a class="cursor-pointer" data-bs-title="{{ $user->getDiscordName() }} ({{ $user->getId() }})" data-bs-toggle="tooltip" href="{{ route('profile.show', $user) }}">
-                                                    {{ $user->getSalutation() }} {{ $user->getFullName() }}
+                                                <a class="cursor-pointer" data-bs-title="{{ $user->full_name }} ({{ $user->id }})" data-bs-toggle="tooltip" href="{{ route('profile.show', $user->id) }}">
+                                                    {{ $user->salutation }} {{ $user->full_name }}
                                                 </a>
-                                                @if ($user->discord && !empty(config('services.discord.client_id')))
-                                                    <x-icon :hovertext="__('general.discord_account_verknuepft')" name="discord" />
-                                                @endif
                                                 <div class="text-secondary">
-                                                    {{ $user->account->fractions->firstWhere('pivot.default', 1)->full_name }}
+                                                    {{ $user->fraction_data['default']['short_name'] }}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="accordion-flush" id="fractions-accordion-{{ $user->getId() }}">
+                                    <div class="accordion-flush" id="qualifications-accordion-{{ $user->id }}">
                                         <div class="accordion-item">
                                             <div class="accordion-header">
-                                                <button aria-controls="collapse-fractions-{{ $user->getId() }}" aria-expanded="false" class="accordion-button collapsed" data-bs-target="#collapse-fractions--{{ $user->getId() }}" data-bs-toggle="collapse">
-                                                    {{ __('general.fraktionen_anzeigen') }}
-                                                    <div class="accordion-button-toggle">
-                                                        <x-icon name="chevron-down" />
-                                                    </div>
-                                                </button>
-
-                                            </div>
-                                            <div class="accordion-collapse collapse" data-bs-parent="#fractions-accordion-{{ $user->getId() }}" id="collapse-fractions--{{ $user->getId() }}">
-                                                <div class="accordion-body">
-                                                    <ul style="list-style: none; padding-left: 0;">
-                                                        @foreach ($user->account->fractions as $fraction)
-                                                            <li>
-                                                                {{ $fraction->full_name }}
-                                                                @if ($fraction->default)
-                                                                    {{ __('general.standard') }}
-                                                                @endif
-                                                            </li>
-                                                        @endforeach
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="accordion-flush" id="qualifications-accordion-{{ $user->getId() }}">
-                                        <div class="accordion-item">
-                                            <div class="accordion-header">
-                                                <button aria-controls="collapse-{{ $user->getId() }}" aria-expanded="false" class="accordion-button collapsed" data-bs-target="#collapse-{{ $user->getId() }}" data-bs-toggle="collapse">
+                                                <button aria-controls="collapse-{{ $user->id }}" aria-expanded="false" class="accordion-button collapsed" data-bs-target="#collapse-{{ $user->id }}" data-bs-toggle="collapse">
                                                     {{ __('general.qualifikationen_anzeigen') }}
                                                     <div class="accordion-button-toggle">
                                                         <x-icon name="chevron-down" />
@@ -143,13 +118,13 @@
                                                 </button>
 
                                             </div>
-                                            <div class="accordion-collapse collapse" data-bs-parent="#qualifications-accordion-{{ $user->getId() }}" id="collapse-{{ $user->getId() }}">
+                                            <div class="accordion-collapse collapse" data-bs-parent="#qualifications-accordion-{{ $user->id }}" id="collapse-{{ $user->id }}">
                                                 <div class="accordion-body">
                                                     <ul style="list-style: none; padding-left: 0;">
                                                         @foreach ($qualifications as $qualification)
                                                             @php
                                                                 $url = '';
-                                                                $has_qualification = $user->account->qualifications->firstWhere('qualification_id', $qualification->getId());
+                                                                $has_qualification = $user->qualifications->firstWhere('id', $qualification->getKey());
                                                             @endphp
 
                                                             <li>
@@ -161,15 +136,15 @@
                                                                     </a>
                                                                 @else
                                                                     @php
-                                                                        if (!empty($has_qualification->pivot->training_id)) {
-                                                                            $url = route('ausbildung.show', $has_qualification->pivot->training_id);
+                                                                        if (!empty($has_qualification->extra['training_id'])) {
+                                                                            $url = route('ausbildung.show', $has_qualification->extra['training_id']);
                                                                         }
                                                                     @endphp
-                                                                    <a @if (!empty($url)) href="{{ $url }}" @endif data-bs-title="{{ __('general.seit', ['date' => now()->parse($has_qualification->pivot->created_at)->format('d.m.Y')]) }}" data-bs-toggle="tooltip">
+                                                                    <a @if (!empty($url)) href="{{ $url }}" @endif data-bs-title="{{ __('general.seit', ['date' => $has_qualification->description]) }}" data-bs-toggle="tooltip">
                                                                         <x-icon :classes="['text-success']" name="check" />
                                                                     </a>
                                                                 @endif
-                                                                {{ $qualification->getName() }}
+                                                                {{ $qualification->name }}
                                                             </li>
                                                         @endforeach
                                                     </ul>
@@ -179,33 +154,38 @@
                                     </div>
                                 </td>
                                 <td>
-                                    {{ $user->isTrainer() ? __('general.ja') : __('general.nein') }}
+                                    {{ $user->is_trainer ? __('general.ja') : __('general.nein') }}
                                 </td>
                                 <td class="text-center">
-                                    @if ($user->activeTrainingBan)
-                                        <a data-bs-target="#training-ban-reason-{{ $user->getId() }}" data-bs-toggle="modal">
+                                    @if (!empty($user->training_ban_data))
+                                        <a data-bs-target="#training-ban-reason-{{ $user->id }}" data-bs-toggle="modal">
                                             <x-icon :classes="['text-danger', 'cursor-pointer']" :hovertext="__('general.ausbildungssperre_bis', [
-                                                'date_from' => $user->activeTrainingBan->getDateFrom()->format('d.m.Y'),
-                                                'date_to' => $user->activeTrainingBan->getDateTo()->format('d.m.Y'),
+                                                'date_from' => $user->training_ban_data->extra['date_from'],
+                                                'date_to' => $user->training_ban_data->extra['date_to'],
                                             ])" name="ban" />
                                         </a>
-                                        @include('training.modals.ban_show')
+                                        @include('training.modals.ban_show', [
+                                            'id' => $user->id,
+                                            'full_name' => $user->full_name,
+                                            'issuer_name' => $user->training_ban_data->label,
+                                            'reason' => $user->training_ban_data->description,
+                                        ])
                                     @endif
                                 </td>
                                 <td class="text-end">
-                                    @if (!empty($user->account->qualifications->count()))
+                                    @if (!empty($user->qualifications->count()))
                                         @can('user.qualifications.remove')
-                                            <a class="btn btn-sm btn-primary" data-bs-target="#remove-user-qualification-{{ $user->getId() }}" data-bs-toggle="modal">
+                                            <a class="btn btn-sm btn-primary" data-bs-target="#remove-user-qualification-{{ $user->id }}" data-bs-toggle="modal">
                                                 <x-icon :classes="['text-danger']" :hovertext="__('general.qualifikation_entfernen')" name="circle-minus" />
                                             </a>
                                             @include('training.modals.remove_qualification', [
                                                 'user' => $user,
-                                                'qualifications' => $user->account->qualifications,
+                                                'qualifications' => $user->qualifications,
                                             ])
                                         @endcan
                                     @endif
                                     @can('user.qualifications.assign')
-                                        <a class="btn btn-sm btn-primary" data-bs-target="#add-user-qualification-{{ $user->getId() }}" data-bs-toggle="modal">
+                                        <a class="btn btn-sm btn-primary" data-bs-target="#add-user-qualification-{{ $user->id }}" data-bs-toggle="modal">
                                             <x-icon :classes="['text-success']" :hovertext="__('general.qualifikation_zuweisen')" name="plus" />
                                         </a>
                                         @include('training.modals.add_qualification', [
@@ -213,20 +193,20 @@
                                         ])
                                     @endcan
                                     @can('trainingban.assign')
-                                        @if (empty($user->activeTrainingBan))
-                                            <a class="btn btn-sm btn-primary" data-bs-target="#add-training-ban-{{ $user->getId() }}" data-bs-toggle="modal">
+                                        @if (empty($user->training_ban_data))
+                                            <a class="btn btn-sm btn-primary" data-bs-target="#add-training-ban-{{ $user->id }}" data-bs-toggle="modal">
                                                 <x-icon :classes="['text-danger', 'cursor-pointer']" :hovertext="__('general.ausbildungssperre_verteilen')" name="ban" />
                                             </a>
-                                            @include('training.modals.ban', ['user' => $user])
+                                            @include('training.modals.ban')
                                         @endif
                                     @endcan
                                     @canany(['usermanagement.edit.personal_data', 'usermanagement.edit.account_data', 'usermanagement.edit.permissions'])
-                                        <a class="btn btn-sm btn-primary" href="{{ route('usermanagement.edit', $user) }}">
+                                        <a class="btn btn-sm btn-primary" href="{{ route('usermanagement.edit', $user->id) }}">
                                             <x-icon :classes="['text-white']" :hovertext="__('general.bearbeiten')" name="edit" />
                                         </a>
                                     @endcan
                                     @can('usermanagement.delete')
-                                        <x-modal body_classes="text-center" form_action="{{ route('usermanagement.destroy', [$user]) }}" id="delete-user-{{ $user->getId() }}">
+                                        <x-modal body_classes="text-center" form_action="{{ route('usermanagement.destroy', [$user->id]) }}" id="delete-user-{{ $user->id }}">
 
                                             <x-slot:title>{{ __('general.loeschen') }}</x-slot:title>
                                             <x-slot:body>
@@ -234,7 +214,7 @@
                                                     <x-icon :classes="['text-warning']" name="alert-triangle" width-height="48" />
                                                 </div>
                                                 <p class="text-warning">{!! __('general.benutzer_loeschen_confirm', [
-                                                    'name' => $user->getFullName(),
+                                                    'name' => $user->full_name,
                                                     'br' => '<br/>',
                                                 ]) !!}
                                                 </p>
@@ -244,7 +224,7 @@
                                                 <button class="btn btn-danger" type="submit">{{ __('general.loeschen') }}</button>
                                             </x-slot:footer>
                                         </x-modal>
-                                        <a class="btn btn-sm btn-danger" data-bs-target="#delete-user-{{ $user->getId() }}" data-bs-toggle="modal">
+                                        <a class="btn btn-sm btn-danger" data-bs-target="#delete-user-{{ $user->id }}" data-bs-toggle="modal">
                                             <x-icon :classes="['text-white', 'cursor-pointer']" :hovertext="__('general.loeschen')" name="trash" />
                                         </a>
                                     @endcan

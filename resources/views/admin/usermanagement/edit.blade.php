@@ -8,7 +8,7 @@
                     {{ __('general.benutzerverwaltung') }}
                 </div>
                 <h2 class="page-title">
-                    {{ $user->getSalutation() }} {{ $user->getFullName() }}
+                    {{ $user->account->salutation }} {{ $user->account->full_name }}
                 </h2>
             </div>
             <div class="col-auto ms-auto d-print-none">
@@ -32,31 +32,27 @@
                         @csrf
                         <div class="row">
                             <div class="col-4">
-                                <x-forms.input :default="$account->getFirstName()" name="first_name" required>
+                                <x-forms.input :default="$account->first_name" name="first_name" required>
                                     {{ __('general.vorname') }}
                                 </x-forms.input>
                             </div>
                             <div class="col-4">
-                                <x-forms.input :default="$account->getLastName()" name="last_name" required>
+                                <x-forms.input :default="$account->last_name" name="last_name" required>
                                     {{ __('general.nachname') }}
                                 </x-forms.input>
                             </div>
                             <div class="col-4">
-                                <x-forms.select label="{{ __('general.geschlecht') }}" name="gender" required>
-                                    @foreach ($genders as $gender)
-                                        <option @selected($account->getGender() == $gender['value']) value="{{ $gender['value'] }}">{{ $gender['name'] }}</option>
-                                    @endforeach
-                                </x-forms.select>
+                                <x-forms.select.genders />
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-6">
-                                <x-forms.input :default="$account->getDateOfBirth()->format('Y-m-d')" name="date_of_birth" required type="date">
+                                <x-forms.input :default="$account->date_of_birth->format('Y-m-d')" name="date_of_birth" required type="date">
                                     {{ __('general.geburtsdatum') }}
                                 </x-forms.input>
                             </div>
                             <div class="col-6">
-                                <x-forms.input :default="$account->getBirthLocation()" name="birth_location" required>
+                                <x-forms.input :default="$account->birth_location" name="birth_location" required>
                                     {{ __('general.geburtsort') }}
                                 </x-forms.input>
                             </div>
@@ -102,7 +98,7 @@
                 <div class="accordion-collapse collapse p-4" id="collapse-account-data">
                     <form action="{{ route('usermanagement.update', $user) }}" class="space-y" method="POST">
                         @csrf
-                        <x-forms.input :default="$user->getName()" name="username" required>
+                        <x-forms.input :default="$user->name" name="username" required>
                             {{ __('general.benutzername') }}
                         </x-forms.input>
 
@@ -167,7 +163,7 @@
                                             <td colspan="2">
                                                 <ul>
                                                     @foreach ($role->permissions as $rolePermission)
-                                                        <li>{{ $rolePermission->getTranslatedName() }}</li>
+                                                        <li>{{ $rolePermission->translated_name }}</li>
                                                     @endforeach
                                                 </ul>
                                             </td>
@@ -181,16 +177,16 @@
                                 </tr>
                                 @foreach ($permission_categories as $category)
                                     <tr>
-                                        <td class="text-center text-white bg-info" colspan="2">{{ $category->getName() }}</td>
+                                        <td class="text-center text-white bg-info" colspan="2">{{ $category->name }}</td>
                                     </tr>
                                     @foreach ($category->permissions as $permission)
                                         <tr>
-                                            <td>{{ $permission->getTranslatedName() }}</td>
+                                            <td>{{ $permission->translated_name }}</td>
                                             <td>
                                                 <div class="d-flex">
                                                     <label class="form-check form-switch form-switch-3">
                                                         <input name="permissions[{{ $permission->id }}]" type="hidden" value="0">
-                                                        <input @checked($has_permission_to[$permission->name]) @disabled(!$can_give_permission[$permission->name]) class="form-check-input" name="permissions[{{ $permission->id }}]" type="checkbox" value="1" value="{{ $permission->getTranslatedName() }}">
+                                                        <input @checked($has_permission_to[$permission->name]) @disabled(!$can_give_permission[$permission->name]) class="form-check-input" name="permissions[{{ $permission->id }}]" type="checkbox" value="1" value="{{ $permission->translated_name }}">
                                                     </label>
                                                     @if (!$has_direct_permission_to[$permission->name] && $has_permission_to[$permission->name] && empty($permission_from_role_id[$permission->name]))
                                                         <x-icon :hovertext="__('general.recht_geerbt')" name="info-circle" />

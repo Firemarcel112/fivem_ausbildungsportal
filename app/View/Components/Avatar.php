@@ -2,15 +2,12 @@
 
 namespace App\View\Components;
 
-use App\Models\User;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
 class Avatar extends Component
 {
-    private ?User $user;
-
     public string $size;
 
     public ?string $image;
@@ -20,12 +17,11 @@ class Avatar extends Component
     /**
      * Create a new component instance.
      */
-    public function __construct(?User $user, string $size = 'md', ?string $initials = null)
+    public function __construct(string $size = 'md', string $initials = 'XX')
     {
-        $this->user = $user;
         $this->size = $size;
-        $this->image = $this->user?->discord?->avatar ?? null;
-        $this->initials = $initials ?? $this->user->getInitials();
+        $this->image = null;
+        $this->initials = $initials;
     }
 
     /**

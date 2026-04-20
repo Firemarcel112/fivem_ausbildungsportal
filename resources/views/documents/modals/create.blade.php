@@ -1,3 +1,9 @@
+@use('Illuminate\Support\Collection')
+@use('App\DTO\SimpleListItem')
+@php
+    /** @var Collection<int, SimpleListItem> $accounts **/
+    /** @var Collection<int, SimpleListItem> $trainers **/
+@endphp
 <x-modal form_action="{{ route('documents.store') }}" id="create-new-document">
     <x-slot:title>{{ __('general.zertifikat_erstellen') }}</x-slot:title>
     <x-slot:body>
@@ -7,19 +13,18 @@
             <div class="row">
                 <x-forms.select label="{{ __('general.ausbilder') }}" name="trainer" required x-model="trainer">
                     @foreach ($trainers as $user)
-                        <option @selected(old('trainer', 0) == $user->getId()) value="{{ $user->getId() }}">
-                            {{ $user->getSalutation() }} {{ $user->getFullName() }}
+                        <option @selected(old('trainer', request()->get('trainer')) == $user->id) value="{{ $user->id }}">
+                            {{ $user->label }}
                         </option>
                     @endforeach
                 </x-forms.select>
             </div>
             <div class="row">
                 <x-forms.select label="{{ __('general.teilnehmer') }}" name="participant" x-model="participant">
-                    <option @selected(old('participant', 0) == 0) value="0">{{ __('general.teilnehmer_nicht_vorhanden') }}</option>
-                    @foreach ($users as $user)
-                        <option @selected(old('participant', 0) == $user->getId()) value="{{ $user->getId() }}">
-                            {{ $user->getSalutation() }} {{ $user->getFullName() }} - geb. {{ $user->getDateOfBirth()->format('d.m.Y') }} in {{ $user->getBirthLocation() }}
-
+                    <option selected value="">{{ __('general.teilnehmer_nicht_vorhanden') }}</option>
+                    @foreach ($accounts as $account)
+                        <option @selected(old('participant', request()->get('participant')) == $account->id) value="{{ $account->id }}">
+                            {{ $account->label }} - {{ $account->description }}
                         </option>
                     @endforeach
                 </x-forms.select>
@@ -32,11 +37,7 @@
                     <x-forms.input name="last_name" x-bind:required="participant == 0">{{ __('general.nachname') }}</x-forms.input>
                 </div>
                 <div class="col">
-                    <x-forms.select label="{{ __('general.geschlecht') }}" name="gender" x-bind:required="participant == 0">
-                        @foreach ($genders as $gender)
-                            <option value="{{ $gender['value'] }}">{{ $gender['name'] }}</option>
-                        @endforeach
-                    </x-forms.select>
+                    <x-forms.select.genders />
                 </div>
             </div>
             <div class="row" x-show="participant == 0">
@@ -53,11 +54,7 @@
                     <x-forms.input name="training_date" type="date">{{ __('general.datum_ausbildung') }}</x-forms.input>
                 </div>
                 <div class="col">
-                    <x-forms.select label="{{ __('general.qualifikation') }}" name="qualification" required>
-                        @foreach ($qualifications as $qualification)
-                            <option value="{{ $qualification->getId() }}">{{ $qualification->getName() }}</option>
-                        @endforeach
-                    </x-forms.select>
+                    <x-forms.select.qualifications />
                 </div>
             </div>
         </div>

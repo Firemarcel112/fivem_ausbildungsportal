@@ -12,7 +12,7 @@ class DocumentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can('documents.show.account');
     }
 
     /**
@@ -29,7 +29,7 @@ class DocumentPolicy
         }
 
         $link_type = strtolower($linked_document->link_type);
-        $is_own_file = $user->account->getKey() == $linked_document->link_id;
+        $is_own_file = $user->account?->getKey() == $linked_document->link_id;
         $has_show_permission = $user->can('documents.show.' . $link_type);
 
         return ($link_type == 'account' && ($is_own_file || $has_show_permission)) || $documents_edit_permission;
@@ -40,7 +40,15 @@ class DocumentPolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        return $user->can('documents.create');
+    }
+
+    /**
+     * Determine whether the user can update any model.
+     */
+    public function updateAny(User $user, Document $document): bool
+    {
+        return $user->can('documents.edit');
     }
 
     /**
@@ -48,7 +56,7 @@ class DocumentPolicy
      */
     public function update(User $user, Document $document): bool
     {
-        return true;
+        return $user->can('documents.edit.' . $document->getKey());
     }
 
     /**
@@ -56,7 +64,7 @@ class DocumentPolicy
      */
     public function delete(User $user, Document $document): bool
     {
-        return true;
+        return $user->can('documents.delete');
     }
 
     /**
@@ -64,14 +72,6 @@ class DocumentPolicy
      */
     public function restore(User $user, Document $document): bool
     {
-        return true;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Document $document): bool
-    {
-        return true;
+        return false;
     }
 }

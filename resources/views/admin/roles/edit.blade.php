@@ -8,7 +8,7 @@
                     {{ __('general.rolle') }}
                 </div>
                 <h2 class="page-title">
-                    {{ $role->getName() }}
+                    {{ $role->name }}
                 </h2>
             </div>
             <div class="col-auto ms-auto d-print-none">
@@ -34,14 +34,14 @@
                             </thead>
                             @foreach ($permission_categories as $category)
                                 <tr>
-                                    <td class="text-center text-white bg-info" colspan="2">{{ $category->getName() }}</td>
+                                    <td class="text-center text-white bg-info" colspan="2">{{ $category->name }}</td>
                                 </tr>
                                 @foreach ($category->permissions as $permission)
                                     @php
                                         $has_permission_to = $role->hasPermissionTo($permission);
                                     @endphp
                                     <tr>
-                                        <td>{{ $permission->getTranslatedName() }}</td>
+                                        <td>{{ $permission->translated_name }}</td>
                                         <td>
                                             <div class="d-flex">
                                                 <label class="form-check form-switch form-switch-3">

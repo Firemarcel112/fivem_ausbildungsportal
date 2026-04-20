@@ -1,5 +1,5 @@
 @can('administration.qualifications.delete')
-    <x-modal body_classes="text-center" form_action="{{ route('administration.qualifications.destroy', [$qualification]) }}" id="qualification-{{ $qualification->getId() }}-delete">
+    <x-modal body_classes="text-center" form_action="{{ route('administration.qualifications.destroy', [$qualification]) }}" id="qualification-{{ $qualification->getKey() }}-delete">
 
         <x-slot:title>{{ __('general.loeschen') }}</x-slot:title>
         <x-slot:body>
@@ -8,7 +8,7 @@
             </div>
             <p class="text-warning">{!! __('general.qualifikation_sicher_loeschen', [
                 'br' => '<br/>',
-                'name' => $qualification->getName(),
+                'name' => $qualification->name,
             ]) !!}</p>
         </x-slot:body>
         <x-slot:footer>

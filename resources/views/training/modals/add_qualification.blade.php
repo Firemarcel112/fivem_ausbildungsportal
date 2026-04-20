@@ -1,7 +1,7 @@
-<x-modal form_action="{{ route('qualifications.user.assign', $user) }}" id="add-user-qualification-{{ $user->getId() }}">
+<x-modal form_action="{{ route('qualifications.user.assign', $user->id) }}" id="add-user-qualification-{{ $user->id }}">
     <x-slot:title>
         {{ __('general.qualifikation_zuweisen', [
-            'name' => $user->getFullName(),
+            'name' => $user->full_name,
         ]) }}
     </x-slot:title>
     <x-slot:body>
@@ -11,8 +11,8 @@
 
         <x-forms.select label="{{ __('general.qualifikation') }}" name="qualification_id" required>
             @foreach ($qualifications as $qualification)
-                @continue($user->account->qualifications->firstWhere('qualification_id', $qualification->getId())?->exists)
-                <option value="{{ $qualification->getId() }}">{{ $qualification->getName() }}</option>
+                @continue(!empty($user->qualifications->firstWhere('id', $qualification->getKey())))
+                <option value="{{ $qualification->getKey() }}">{{ $qualification->name }}</option>
             @endforeach
         </x-forms.select>
     </x-slot:body>

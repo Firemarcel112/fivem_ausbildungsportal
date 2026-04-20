@@ -15,7 +15,7 @@
         @include('default.alerts')
         <x-card>
             <x-slot:header>
-                <h2 class="card-title">{{ $requirement->getName() }} / {{ $requirement->fraction->getName() }} / {{ $qualification->getName() }}</h2>
+                <h2 class="card-title">{{ $requirement->name }} / {{ $requirement->fraction->name }} / {{ $qualification->name }}</h2>
             </x-slot:header>
             <x-slot:body>
                 <form action="{{ route('administration.requirements.update', [
@@ -23,13 +23,13 @@
                     'requirement' => $requirement,
                 ]) }}" class="space-y" method="POST">
                     @csrf
-                    <x-forms.input :default="$requirement->getName()" name="name" required>{{ __('general.name') }}</x-forms.input>
+                    <x-forms.input :default="$requirement->name" name="name" required>{{ __('general.name') }}</x-forms.input>
                     <x-forms.select label="{{ __('general.fraktion') }}" name="fraction_id" required>
                         @foreach ($fractions as $fraction)
-                            <option @selected(old('fraction_id', $requirement->fraction->getId()) == $fraction->getId()) value="{{ $fraction->getId() }}">{{ $fraction->getFullName() }}</option>
+                            <option @selected(old('fraction_id', $requirement->fraction->getKey()) == $fraction->getKey()) value="{{ $fraction->getKey() }}">{{ $fraction->full_name }}</option>
                         @endforeach
                     </x-forms.select>
-                    <x-forms.input :default="$requirement->getRank()" name="rank">{{ __('general.rank') }}</x-forms.input>
+                    <x-forms.input :default="$requirement->rank" name="rank">{{ __('general.rank') }}</x-forms.input>
                     <x-forms.button :classes="['mt-2']">{{ __('general.speichern') }}</x-forms.button>
                 </form>
             </x-slot:body>

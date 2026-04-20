@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Fractions\Fraction;
-use App\Models\Qualifications\Qualification;
+use App\DTO\QualificationRequirementViewData;
+use App\Models\Qualifications\Requirement;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 class RequirementsController extends Controller
 {
@@ -12,15 +14,29 @@ class RequirementsController extends Controller
      */
     public function index()
     {
-        $qualifications = Qualification::with('requirements')
-            ->isOrderByDefault()
-            ->isVisible()
-            ->get();
-        $fractions = Fraction::get();
 
-        return view('requirements', [
-            'qualifications' => $qualifications,
-            'fractions' => $fractions,
-        ]);
+        $requirements = Requirement::query()
+            ->with([
+                'qualification',
+                'fraction',
+            ])
+            ->joinOrderedQualifications()
+            ->whereHas('qualification', function (Builder $query) {
+                /** @var Builder<\App\Models\Qualification> $query */
+                return $query->isVisible();
+            })
+            ->get()
+            ->groupBy('qualification.name')
+            ->map(function (Collection $item) {
+                /** @var Collection<Requirement> $item */
+                $items = $item->map(function (Requirement $item) {
+                    return QualificationRequirementViewData::fromModel($item);
+                })
+                    ->groupBy('fraction_name');
+
+                return $items;
+            });
+
+        return view('requirements', compact('requirements'));
     }
 }

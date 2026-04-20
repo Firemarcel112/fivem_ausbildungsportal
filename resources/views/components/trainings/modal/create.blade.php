@@ -1,3 +1,12 @@
+@use('Illuminate\Support\Collection')
+@use('App\DTO\SimpleListItem')
+@php
+    /** @var Collection<SimpleListItem> $trainers **/
+@endphp
+@props([
+    'trainers' => collect(),
+    'default_meeting_point' => 'Ort',
+])
 @can('trainings.store')
     <a class="btn btn-primary" data-bs-target="#create-training" data-bs-toggle="modal">
         {{ __('general.ausbildung_erstellen') }}
@@ -6,30 +15,26 @@
         <x-slot:title>{{ __('general.ausbildung_erstellen') }}</x-slot:title>
         <x-slot:body>
             <div>
-                <x-forms.select :title="__('general.qualifikation_auswaehlen')" label="{{ __('general.qualifikation') }}" name="qualification_id" required>
-                    @foreach ($getQualifications ?? [] as $qualification)
-                        <option value="{{ $qualification->getId() }}">{{ $qualification->getName() }}</option>
-                    @endforeach
-                </x-forms.select>
+                <x-forms.select.qualifications :label="__('general.qualifikation_auswaehlen')" name="qualification_id" required />
             </div>
 
             <div>
                 <x-forms.select :title="__('general.ausbilder_auswaehlen')" label="{{ __('general.ausbilder') }}" name="trainer_id" required>
-                    @foreach ($getTrainers() ?? [] as $trainer)
-                        <option value="{{ $trainer->getId() }}">{{ $trainer->getFullName() }}</option>
+                    @foreach ($trainers ?? [] as $trainer)
+                        <option @selected($isSelectedTrainer($trainer->id)) value="{{ $trainer->id }}">{{ $trainer->label }}</option>
                     @endforeach
                 </x-forms.select>
             </div>
 
             <div>
-                <x-forms.input name="meeting_point" required value="{{ config('settings.default_meeting_point') }}">
+                <x-forms.input name="meeting_point" required value="{{ $default_meeting_point }}">
                     {{ __('general.treffpunkt') }}
                 </x-forms.input>
             </div>
 
             <div class="row">
                 <div class="col">
-                    <x-forms.input name="date" required type="date">
+                    <x-forms.input :default="now()->toDateString()" name="date" required type="date">
                         {{ __('general.datum') }}
                     </x-forms.input>
                 </div>
@@ -54,7 +59,7 @@
             </div>
             <div>
                 <div class="form-floating">
-                    <textarea class="form-control" id="additional_informations" name="infos" placeholder="{{ __('general.zusaetzliche_informationen') }}" style="height: 100px"></textarea>
+                    <textarea class="form-control" id="additional_informations" name="additional_information" placeholder="{{ __('general.zusaetzliche_informationen') }}" style="height: 100px"></textarea>
                     <label for="additional_informations">{{ __('general.zusaetzliche_informationen') }}</label>
                 </div>
             </div>

@@ -79,8 +79,8 @@ Route::middleware(['auth', 'alerts'])
                     ->name('show')
                     ->where('user', '[0-9]+');
 
-                Route::post('einstellungen/store/{user}', 'store')
-                    ->name('store')
+                Route::post('einstellungen/update/{user}', 'update')
+                    ->name('update')
                     ->where('user', '[0-9]+');
             });
 
@@ -112,8 +112,6 @@ Route::middleware(['auth', 'alerts'])
                     ->group(function () {
                         Route::post('ban/{user}', 'ban')
                             ->name('ban');
-                        Route::post('request', 'request')
-                            ->name('request');
                     });
 
                 Route::controller(\App\Http\Controllers\TrainingRequestController::class)
@@ -121,6 +119,8 @@ Route::middleware(['auth', 'alerts'])
                     ->group(function () {
                         Route::get('wuensche', 'index')
                             ->name('index');
+                        Route::post('request', 'store')
+                            ->name('store');
                     });
             });
         Route::prefix('qualifikation')
@@ -193,7 +193,7 @@ Route::middleware(['auth', 'alerts'])
             ->name('documents.')
             ->controller(\App\Http\Controllers\DocumentsController::class)
             ->group(function () {
-                Route::match(['GET', 'POST'], '', 'index')
+                Route::get('', 'index')
                     ->name('index');
                 Route::get('anzeigen/{document}', 'show')
                     ->name('show');

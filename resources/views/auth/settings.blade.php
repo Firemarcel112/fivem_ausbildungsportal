@@ -1,3 +1,11 @@
+@use('App\DTO\SimpleUserViewData')
+@use('App\DTO\SimpleListItem')
+@use('Illuminate\Support\Collection')
+@php
+    /** @var SimpleUserViewData $user **/
+    /** @var Collection<SimpleListItem> $fractions **/
+@endphp
+
 @extends('layouts.app')
 
 @section('content')
@@ -8,7 +16,7 @@
                     {{ __('general.einstellungen') }}
                 </div>
                 <h2 class="page-title">
-                    {{ $user->getSalutation() }} {{ $user->getFullName() }}
+                    {{ $user->salutation }} {{ $user->full_name }}
                 </h2>
             </div>
             @include('default.alerts')
@@ -21,7 +29,7 @@
                 </h2>
             </x-slot:header>
             <x-slot:body>
-                <form action="{{ route('user.store', $user) }}" class="space-y" method="POST">
+                <form action="{{ route('user.update', $user->id) }}" class="space-y" method="POST">
                     @csrf
 
                     <div>
@@ -29,7 +37,7 @@
                     </div>
 
                     <div>
-                        <x-forms.input :default="$user->getName()" name="username" required>{{ __('general.benutzername') }}</x-forms.input>
+                        <x-forms.input :default="$user->username" name="username" required>{{ __('general.benutzername') }}</x-forms.input>
                     </div>
                     <div>
                         <x-forms.input name="password" type="password">
@@ -42,32 +50,28 @@
                     </div>
                     <div class="row">
                         <div class="col">
-                            <x-forms.input :default="$user->account->getFirstName()" name="first_name" required>{{ __('general.vorname') }}</x-forms.input>
+                            <x-forms.input :default="$user->first_name" name="first_name" required>{{ __('general.vorname') }}</x-forms.input>
                         </div>
                         <div class="col">
-                            <x-forms.input :default="$user->account->getLastName()" name="last_name" required>{{ __('general.nachname') }}</x-forms.input>
+                            <x-forms.input :default="$user->last_name" name="last_name" required>{{ __('general.nachname') }}</x-forms.input>
                         </div>
                         <div class="col">
-                            <x-forms.select label="{{ __('general.geschlecht') }}" name="gender" required>
-                                @foreach ($genders as $gender)
-                                    <option @selected($user->account->getGender() == $gender['value']) value="{{ $gender['value'] }}">{{ $gender['name'] }}</option>
-                                @endforeach
-                            </x-forms.select>
+                            <x-forms.select.genders />
                         </div>
                     </div>
                     <div class="row">
                         <div class="col">
-                            <x-forms.input :default="$user->account->getBirthLocation()" name="birth_location" required>{{ __('general.geburtsort') }}</x-forms.input>
+                            <x-forms.input :default="$user->birth_location" name="birth_location" required>{{ __('general.geburtsort') }}</x-forms.input>
                         </div>
                         <div class="col">
-                            <x-forms.input :default="$user->account->getDateOfBirth()->format('Y-m-d')" name="date_of_birth" required type="date">{{ __('general.geburtsdatum') }}</x-forms.input>
+                            <x-forms.input :default="$user->date_of_birth->format('Y-m-d')" name="date_of_birth" required type="date">{{ __('general.geburtsdatum') }}</x-forms.input>
                         </div>
                     </div>
 
                     <div>
                         <x-forms.select label="{{ __('general.default_fraktion') }}" name="default_fraction" required>
                             @foreach ($fractions as $fraction)
-                                <option @selected($user->account->getDefaultFractionId() == $fraction->getKey()) value="{{ $fraction->getKey() }}">{{ $fraction->full_name }}</option>
+                                <option @selected($user->fraction_data['default']['id'] == $fraction->id) value="{{ $fraction->id }}">{{ $fraction->label }}</option>
                             @endforeach
                         </x-forms.select>
                     </div>

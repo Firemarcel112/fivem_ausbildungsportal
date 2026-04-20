@@ -3,28 +3,32 @@
 namespace App\Http\Controllers\Admin;
 
 use App\DTO\Export\UserWithQualificationsDTO;
+use App\DTO\SimpleUserViewData;
 use App\Facades\Alert;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserStoreRequest;
-use App\Models\Fractions\Fraction;
+use App\Models\Fraction;
 use App\Models\PermissionCategorie;
-use App\Models\Qualifications\Qualification;
+use App\Models\Qualification;
 use App\Models\User;
 use App\Models\User\Account;
 use App\Models\User\Fraction as UserFraction;
 use App\Services\Export\UserWithQualificationsService;
 use Arr;
 use DB;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
 class UserManagementController extends Controller
 {
+    use AuthorizesRequests;
+
     public UserWithQualificationsService $export_service;
 
     public function __construct(
@@ -41,6 +45,8 @@ class UserManagementController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('view', User::class);
+
         if ($request->isMethod('POST')) {
             $request->flash();
         }
@@ -52,11 +58,13 @@ class UserManagementController extends Controller
             $fraction = array_map('intval', $fraction);
         }
         $sort_by = $request->sort_by ?? 'first_name';
-        $qualifications = Cache::rememberForever('qualifications.all.with_hidden', function () {
-            return Qualification::isOrderByDefault()
-                ->get();
-        });
+        $qualifications = Qualification::getAllQualifications(true);
+
         $fractions = Fraction::get();
+
+        $accounts_table_name = (new Account)->getTable();
+
+        $items_per_page = $request->integer('items_per_page', 10);
 
         $data = User::with([
             'discord',
@@ -66,67 +74,46 @@ class UserManagementController extends Controller
             'permissions',
             'roles.permissions',
         ])
+            ->joinAccounts()
             ->when(!empty($search), function ($query) use ($search) {
-                $query->whereHas('account', function ($query) use ($search) {
-                    $query->isSearch($search);
-                });
+                $query->searchAccount($search);
             })
             ->when(!empty($fraction), function ($query) use ($fraction) {
                 $query->whereHas('account.fractions', function ($query) use ($fraction) {
                     $query->whereIn('fractions.fraction_id', $fraction);
                 });
             })
-            ->get();
-
-        switch ($sort_by) {
-            case 'last_name':
-                $data = $data->sortBy(fn($user) => $user->account->getLastName());
-                break;
-            case 'created_at':
-                $data = $data->sortByDesc('created_at');
-                break;
-            default:
-                $data = $data->sortBy(fn($user) => $user->account->getFirstName());
-        }
+            ->when(!empty($sort_by), function (Builder $query) use ($sort_by, $accounts_table_name) {
+                switch ($sort_by) {
+                    case 'last_name':
+                        return $query->orderBy($accounts_table_name . '.last_name');
+                    case 'created_at':
+                        return $query->orderBy($accounts_table_name . '.created_at');
+                    default:
+                        return $query->orderBy($accounts_table_name . '.first_name');
+                }
+            });
 
         if ($request->has('export')) {
+            $data = $data->get()
+                ->map(fn(User $user) => SimpleUserViewData::fromModel($user));
             $this->export($request, $data, $qualifications->pluck('name')->toArray());
 
             return;
         }
 
-        $genders = [
-            [
-                'name' => __('general.maennlich') . ' (' . __('general.anrede') . ': ' . __('general.herr') . ')',
-                'value' => 'M',
-            ],
-            [
-                'name' => __('general.weiblich') . ' (' . __('general.anrede') . ': ' . __('general.frau') . ')',
-                'value' => 'W',
-            ],
-            [
-                'name' => __('general.divers') . ' (' . __('general.anrede') . ': ' . __('general.ohne') . ')',
-                'value' => 'D',
-            ],
-        ];
-        $items_per_page = $request->items_per_page ?? 10;
-        $data = new LengthAwarePaginator(
-            $data->forPage($request->input('page', 1), $items_per_page),
-            $data->count(),
-            $items_per_page,
-            $request->input('page', 1),
-            ['path' => $request->url(), 'query' => $request->query()]
-        );
+        $paginator = $data->paginate($items_per_page);
+
+        $paginator->getCollection()->transform(fn(User $user) => SimpleUserViewData::fromModel($user));
 
         return view(
             'admin.usermanagement.index',
-            compact(
-                'data',
-                'fractions',
-                'qualifications',
-                'items_per_page',
-                'genders',
-            )
+            [
+                'data' => $paginator,
+                'fractions' => $fractions,
+                'qualifications' => $qualifications,
+                'items_per_page' => $items_per_page,
+            ],
         );
     }
 
@@ -138,20 +125,8 @@ class UserManagementController extends Controller
      */
     public function edit(User $user)
     {
-        if ($user->isSuperadmin() && !Auth::user()->isSuperadmin()) {
-            Alert::addAlert(__('general.keine_berechtigung'), 'danger');
+        $this->authorize('update', $user);
 
-            return redirect()->back();
-        }
-        if (!Auth::user()->canAny([
-            'usermanagement.edit.account_data',
-            'usermanagement.edit.personal_data',
-            'usermanagement.edit.permissions',
-        ])) {
-            Alert::addAlert(__('general.keine_berechtigung'), 'danger');
-
-            return redirect()->route('usermanagement.index');
-        }
         $user->load('account.fractions');
         $fractions = Fraction::get();
         $permission_categories = PermissionCategorie::with('permissions')
@@ -171,34 +146,21 @@ class UserManagementController extends Controller
             $query->orderByRaw("CASE WHEN name LIKE '%*%' THEN 0 ELSE 1 END, name");
         }])
             ->get();
-        $current_user_permissions = Auth::user()->getAllPermissions();
+        $current_user_permissions = Auth::user()?->getAllPermissions();
+        $can_give_permission = [];
+
         foreach ($permission_names as $name) {
             $has_direct_permission_to[$name] = $user->hasDirectPermission($name);
-            $has_permission_to[$name] = $user->hasPermissionTo($name, null, false);
-            $permission_from_role_id[$name] = $role_permissions?->where('name', $name)?->first()->pivot?->role_id ?? null;
-            $can_give_permission[$name] = $current_user_permissions->firstWhere('name', $name)?->exists ?? Auth::user()->isSuperadmin() ?? false;
+            $has_permission_to[$name] = $user->hasPermissionTo($name, null);
+            $permission_from_role_id[$name] = $role_permissions->where('name', $name)->first()->pivot->role_id ?? null;
+            $can_give_permission[$name] = $current_user_permissions->firstWhere('name', $name)->exists ?? Auth::user()?->isSuperadmin() ?? false;
         }
         $account = $user->account;
 
-        $user_fractions = $account->fractions
+        $user_fractions = $account?->fractions
             ->where('pivot.default', 0)
             ->pluck('fraction_id')
             ->toArray();
-
-        $genders = [
-            [
-                'name' => __('general.maennlich') . ' (' . __('general.anrede') . ': ' . __('general.herr') . ')',
-                'value' => 'M',
-            ],
-            [
-                'name' => __('general.weiblich') . ' (' . __('general.anrede') . ': ' . __('general.frau') . ')',
-                'value' => 'W',
-            ],
-            [
-                'name' => __('general.divers') . ' (' . __('general.anrede') . ': ' . __('general.ohne') . ')',
-                'value' => 'D',
-            ],
-        ];
 
         return view('admin.usermanagement.edit', compact(
             'user',
@@ -212,7 +174,6 @@ class UserManagementController extends Controller
             'can_give_permission',
             'account',
             'user_fractions',
-            'genders',
         ));
     }
 
@@ -225,11 +186,11 @@ class UserManagementController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        $permission_account_data = Auth::user()->can('usermanagement.edit.account_data');
-        $permission_personal_data = Auth::user()->can('usermanagement.edit.personal_data');
-        $permission_permissions = Auth::user()->can('usermanagement.edit.permissions');
+        $permission_account_data = Auth::user()?->can('usermanagement.edit.account_data');
+        $permission_personal_data = Auth::user()?->can('usermanagement.edit.personal_data');
+        $permission_permissions = Auth::user()?->can('usermanagement.edit.permissions');
 
-        if (!Auth::user()->canAny([
+        if (!Auth::user()?->canAny([
             'usermanagement.edit.account_data',
             'usermanagement.edit.personal_data',
             'usermanagement.edit.permissions',
@@ -261,31 +222,27 @@ class UserManagementController extends Controller
      */
     public function store(UserStoreRequest $request)
     {
-        if (!Auth::user()->can('usermanagement.store')) {
-            Alert::addAlert(__('general.keine_berechtigung'), 'danger');
-
-            return redirect()->back();
-        }
+        $this->authorize('create', User::class);
         $new_password = Str::random(12);
 
         DB::beginTransaction();
         $user = new User;
-        $user->setName($request->input('username'));
-        $user->setPassword($new_password);
-        $user->setEmail(substr(strtolower($request->input('first_name')), 0, 1) . '.' . trim(strtolower(str_replace(' ', '_', $request->last_name))) . '@example.com');
+        $user->name = $request->input('username');
+        $user->password = $new_password;
+        $user->email = substr(strtolower($request->input('first_name')), 0, 1) . '.' . trim(strtolower(str_replace(' ', '_', $request->last_name))) . '@example.com';
         $user->save();
 
         $account = new Account;
-        $account->setUserId($user->getQueueableId());
-        $account->setFirstName($request->input('first_name'));
-        $account->setLastName($request->input('last_name'));
-        $account->setDateOfBirth(Carbon::create($request->input('date_of_birth')));
+        $account->user_id = $user->getQueueableId();
+        $account->first_name = $request->input('first_name');
+        $account->last_name = $request->input('last_name');
+        $account->date_of_birth = Carbon::create($request->input('date_of_birth'));
         $account->save();
 
         $fraction_model = new UserFraction;
-        $fraction_model->setUserId($user->getQueueableId());
-        $fraction_model->setFractionId($request->input('default_fraction'));
-        $fraction_model->setDefault(1);
+        $fraction_model->user_id = $user->getQueueableId();
+        $fraction_model->fraction_id = $request->input('default_fraction');
+        $fraction_model->default = 1;
         $fraction_model->save();
 
         DB::commit();
@@ -302,7 +259,7 @@ class UserManagementController extends Controller
      * @param  \App\Models\User $user
      * @return mixed
      */
-    public function updateAccountData(Request $request, User $user)
+    public function updateAccountData(Request $request, User $user): mixed
     {
         $user_data = [
             'first_name' => $request->input('first_name'),
@@ -314,12 +271,16 @@ class UserManagementController extends Controller
             'gender' => $request->input('gender'),
         ];
         $user_data['fractions'][] = $request->input('default_fraction', null);
+        /**
+         * @var Account $account
+         */
         $account = $user->account;
-        $account->setFirstName($user_data['first_name']);
-        $account->setDateOfBirth($user_data['date_of_birth']);
-        $account->setLastName($user_data['last_name']);
-        $account->setBirthLocation($user_data['birth_location']);
-        $account->setGender($user_data['gender']);
+
+        $account->first_name = $user_data['first_name'];
+        $account->date_of_birth = $user_data['date_of_birth'];
+        $account->last_name = $user_data['last_name'];
+        $account->birth_location = $user_data['birth_location'];
+        $account->gender = $user_data['gender'];
 
         $current_fractions = $account->fractions->pluck('fraction_id')->toArray();
         $remove_fractions = array_diff($current_fractions, $user_data['fractions']);
@@ -328,25 +289,26 @@ class UserManagementController extends Controller
                 'user_id' => $account->getId(),
                 'fraction_id' => (int) $fraction_id,
             ]);
-            $fraction_model->setDefault($fraction_id == $user_data['default_fraction'] ? 1 : 0);
+            $fraction_model->default = $fraction_id == $user_data['default_fraction'] ? 1 : 0;
             $fraction_model->save();
         }
         foreach ($remove_fractions as $fraction_id) {
-            $model = UserFraction::where('user_id', $account->getId())
+            $model = UserFraction::where('user_id', $account->getKey())
                 ->where('fraction_id', $fraction_id)
                 ->first();
             $model->delete();
         }
         if ($account->isDirty()) {
             if ($account->save()) {
-                if ($user->getId() == Auth::user()->getId()) {
-                    session()->put('name', $account->getFullName());
+                if ($user->getKey() == Auth::user()?->getKey()) {
+                    session()->put('name', $account->full_name);
                 }
                 Alert::addAlert(__('general.erfolgreich_gespeichert'), 'success');
 
                 return redirect()->back();
             }
         }
+        return redirect()->back();
     }
 
     /**
@@ -362,10 +324,10 @@ class UserManagementController extends Controller
             'username' => $request->input('username'),
             'change_password' => $request->has('change_password'),
         ];
-        $user->setName($account_data['username']);
+        $user->name = $account_data['username'];
         if ($account_data['change_password']) {
             $new_password = Str::random(12);
-            $user->setPassword($new_password);
+            $user->password = $new_password;
             Alert::addAlert(__('general.neues_passwort', ['password' => $new_password]), 'warning');
         }
 
@@ -384,18 +346,18 @@ class UserManagementController extends Controller
      *
      * @param  Request          $request
      * @param  \App\Models\User $user
-     * @return mixed
+     * @return void
      */
-    public function updatePermissions(Request $request, User $user)
+    public function updatePermissions(Request $request, User $user): void
     {
-        $get_current_user_permissions = Auth::user()->getAllPermissions();
+        $get_current_user_permissions = Auth::user()?->getAllPermissions();
         $get_current_user_roles = Auth::user()->roles;
         if ($request->has('permissions')) {
             $grant_permission_id = [];
             $revoke_permission_id = [];
             foreach ($request->permissions as $key => $value) {
-                $current_user_has_permission = $get_current_user_permissions->firstWhere('id', $key)?->exists ?? false;
-                if (!$current_user_has_permission && !Auth::user()->isSuperadmin()) {
+                $current_user_has_permission = $get_current_user_permissions->firstWhere('id', $key)->exists ?? false;
+                if (!$current_user_has_permission && !Auth::user()?->isSuperadmin()) {
                     continue;
                 }
                 if ($value == 1) {
@@ -410,8 +372,8 @@ class UserManagementController extends Controller
             $grant_role_id = [];
             $revoke_role_id = [];
             foreach ($request->roles as $key => $value) {
-                $current_user_has_role = $get_current_user_roles->firstWhere('id', $key)?->exists ?? false;
-                if (!$current_user_has_role && !Auth::user()->isSuperadmin()) {
+                $current_user_has_role = $get_current_user_roles->firstWhere('id', $key)->exists ?? false;
+                if (!$current_user_has_role && !Auth::user()?->isSuperadmin()) {
                     continue;
                 }
                 if ($value == 1) {
@@ -433,7 +395,7 @@ class UserManagementController extends Controller
     public function destroy(User $user)
     {
         $this->checkPermission('usermanagement.delete');
-        if ($user->isSuperadmin() || Auth::user()->getId() == $user->getId()) {
+        if ($user->isSuperadmin() || Auth::user()?->getKey() == $user->getKey()) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
 
             return redirect()->back();
@@ -459,13 +421,14 @@ class UserManagementController extends Controller
     /**
      * Exportiert die Benutzer mit ihren Qualifikationen
      *
-     * @param  Request $request
+     * @param Request $request
+     * @param Collection<int, SimpleUserViewData>
      * @return void
      */
-    public function export(Request $request, $data = null, $qualifications = null)
+    public function export(Request $request, ?Collection $data = null, $qualifications = null)
     {
-        $data = $data->map(function (User $user) use ($qualifications) {
-            return UserWithQualificationsDTO::fromModel($user->account, $qualifications);
+        $data = $data->map(function (SimpleUserViewData $user) use ($qualifications) {
+            return UserWithQualificationsDTO::fromSimpleUserViewDataModel($user, $qualifications);
         });
 
         $this->export_service->export(

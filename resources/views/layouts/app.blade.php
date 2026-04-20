@@ -1,3 +1,6 @@
+@php
+    /** @var \App\DTO\SimpleUserViewData|null $auth_user */
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     @include('layouts.head')

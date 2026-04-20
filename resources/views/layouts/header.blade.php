@@ -1,3 +1,6 @@
+@php
+    /** @var \App\DTO\SimpleUserViewData $auth_user **/
+@endphp
 <header class="navbar navbar-expand-md d-print-none" data-bs-theme="dark">
     <div class="container-xl">
         <button aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler collapsed" data-bs-target="#navbar-menu" data-bs-toggle="collapse" type="button">
@@ -32,19 +35,18 @@
             @auth
                 <div class="nav-item dropdown">
                     <a aria-label="Open user menu" class="p-0 nav-link d-flex lh-1 text-reset" data-bs-toggle="dropdown" href="#">
-                        <x-avatar :user="auth()->user()" size='sm'></x-avatar>
-
+                        <x-avatar :initials="$auth_user->initials" size='sm'></x-avatar>
                         <div class="text-white d-none d-xl-block ps-2">
-                            <div class="text-nowrap">{{ auth()->user()->getSalutation() }} {{ auth()->user()->getDiscordName() }}</div>
+                            <div class="text-nowrap">{{ $auth_user->salutation }} {{ $auth_user->full_name }}</div>
                             <div class="mt-1 text-white small">
-                                {{ auth()->user()->account->getDefaultFraction()->name }} ({{ auth()->user()->account->getDefaultFraction()->short_name }})
+                                {{ $auth_user->fraction_data['default']['name'] }} ({{ $auth_user->fraction_data['default']['short_name'] }})
                             </div>
                         </div>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                        <a class="dropdown-item" href="{{ route('profile.show', auth()->user()) }}">{{ __('general.profil') }}</a>
+                        <a class="dropdown-item" href="{{ route('profile.show', $auth_user->id) }}">{{ __('general.profil') }}</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{{ route('user.show', auth()->user()) }}">{{ __('general.einstellungen') }}</a>
+                        <a class="dropdown-item" href="{{ route('user.show', $auth_user->id) }}">{{ __('general.einstellungen') }}</a>
                         <a class="dropdown-item" href="{{ route('logout') }}">{{ __('general.ausloggen') }}</a>
                     </div>
                 </div>
@@ -61,20 +63,23 @@
                         <x-slot:text>{{ __('general.voraussetzungen') }}</x-slot:text>
                     </x-navigation.item>
 
-                    @canAny(['trainings.show', 'trainings.requests'])
-                        <x-navigation.dropdown :items="[
-                            [
-                                'text' => __('general.ausbilder_dashboard'),
-                                'route_name' => 'ausbilder.index',
-                                'permission' => 'trainings.show',
-                            ],
-                            [
-                                'text' => __('general.ausbildungswuensche'),
-                                'route_name' => 'trainings.request.index',
-                                'permission' => 'trainings.requests',
-                            ],
-                        ]" :text="__('general.ausbilder')" icon="login" />
-                    @endcan
+                    <x-navigation.dropdown :items="[
+                        [
+                            'text' => __('general.ausbilder_dashboard'),
+                            'route_name' => 'ausbilder.index',
+                            'permission' => 'trainings.show',
+                        ],
+                        [
+                            'text' => __('general.abgeschlossene_ausbildungen'),
+                            'route_name' => 'ausbilder.completed',
+                            'permission' => 'trainings.show',
+                        ],
+                        [
+                            'text' => __('general.ausbildungswuensche'),
+                            'route_name' => 'trainings.request.index',
+                            'permission' => 'trainings.requests',
+                        ],
+                    ]" :text="__('general.ausbilder')" icon="login" />
 
                     @can('usermanagement.index')
                         <x-navigation.item icon="users" url="usermanagement.index">

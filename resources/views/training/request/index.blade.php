@@ -1,3 +1,8 @@
+@use('Illuminate\Support\Collection')
+@use('App\DTO\TrainingRequestViewData')
+@php
+    /** @var Collection<string, Collection<string, Collection<TrainingRequestViewData>>> $data **/
+@endphp
 @extends('layouts.app')
 
 @section('content')
@@ -14,60 +19,33 @@
         </div>
         @include('default.alerts')
 
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>{{ __('Datum') }}</th>
-                    <th>{{ __('Name') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($data as $date => $value)
-                    @foreach ($value as $name => $users)
-                        <tr>
-                            <td>{{ $date }}</td>
-                            <td>
-                                <span class="d-block">{{ $name }}</span>
-
-                                <div class="accordion-flush" id="collapse-id-{{ $loop->parent->index }}-{{ $loop->index }}">
-                                    <div class="accordion-item">
-                                        <div class="accordion-header">
-                                            <button aria-controls="collapse-{{ $loop->parent->index }}-{{ $loop->index }}" aria-expanded="false" class="accordion-button collapsed" data-bs-target="#collapse-{{ $loop->parent->index }}-{{ $loop->index }}" data-bs-toggle="collapse">
-                                                {{ __('general.angefordert_von') }}
-                                                <div class="accordion-button-toggle">
-                                                    <x-icon name="chevron-down" />
-                                                </div>
-                                            </button>
-
-                                        </div>
-                                        <div class="accordion-collapse collapse" data-bs-parent="#collapse-{{ $loop->parent->index }}-{{ $loop->index }}" id="collapse-{{ $loop->parent->index }}-{{ $loop->index }}">
-                                            <div class="accordion-body">
-                                                <ul style="list-style: none; padding-left: 0;">
-                                                    @foreach ($users['users'] as $user)
-                                                        <li>{{ $user['name'] }} - ({{ $user['id'] }})</li>
-                                                    @endforeach
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {{-- <button aria-controls="collapse-{{ $loop->parent->index }}-{{ $loop->index }}" aria-expanded="false" class="btn btn-link p-0" data-bs-target="#collapse-{{ $loop->parent->index }}-{{ $loop->index }}" data-bs-toggle="collapse" type="button">
-                                    <span class="text-danger">{{ __('general.angefordert_von') }}</span>
-                                </button>
-                                <div class="collapse mt-2" id="collapse-{{ $loop->parent->index }}-{{ $loop->index }}">
-                                    <ul class="list-unstyled mb-0">
-                                        @foreach ($users['users'] as $user)
-                                            <li>{{ $user['name'] }} - ({{ $user['id'] }})</li>
-                                        @endforeach
-                                    </ul>
-                                </div> --}}
-                            </td>
-                        </tr>
-                    @endforeach
-                @endforeach
-            </tbody>
-        </table>
-
+        <div class="row">
+            @foreach ($data as $date => $items)
+                <div class="col-4">
+                    <h2>{{ $date }}</h2>
+                    <x-card card-body-classes="m-0 p-2">
+                        <x-slot:body>
+                            <div class="accordion accordion-flush" id="accordion-flush">
+                                @foreach ($items as $name => $view_data)
+                                    <x-accordion-item>
+                                        <x-slot:header>{{ $name }} ({{ __('general.fruehstens') }} : {{ $view_data->first()->time }} {{ __('general.uhr') }})</x-slot:header>
+                                        <x-slot:body>
+                                            <ul>
+                                                @foreach ($view_data as $item)
+                                                    @if ($loop->first)
+                                                        <p class="mb-1">{{ __('general.angefordert_von') }}:</p>
+                                                    @endif
+                                                    <li>{{ $item->requested_user->label }} {{ $item->requested_user->description }} {{ __('general.ab') }} {{ $item->time }} {{ __('general.uhr') }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </x-slot:body>
+                                    </x-accordion-item>
+                                @endforeach
+                            </div>
+                        </x-slot:body>
+                    </x-card>
+                </div>
+            @endforeach
+        </div>
     </div>
 @endsection

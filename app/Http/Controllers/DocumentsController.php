@@ -2,19 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\DeleteDocumentAction;
+use App\Actions\UpdateDocumentAction;
+use App\DTO\DocumentViewData;
 use App\DTO\ParticipantDTO;
+use App\DTO\SimpleListItem;
 use App\DTO\TrainerDTO;
 use App\Enums\Gender;
 use App\Facades\Alert;
+use App\Http\Requests\StoreDocumentRequest;
+use App\Http\Requests\UpdateDocumentRequest;
+use App\Jobs\CreateCertificate;
 use App\Models\Document;
-use App\Models\DocumentLink;
-use App\Models\Qualifications\Qualification;
+use App\Models\Qualification;
 use App\Models\User;
 use App\Models\User\Account;
 use App\Services\DocumentService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class DocumentsController extends Controller
@@ -31,47 +36,57 @@ class DocumentsController extends Controller
     /**
      * Zeigt die Seite an
      *
-     * @param  Request $request
-     * @return \View
+     * @param Request $request
      */
     public function index(Request $request)
     {
-        $this->checkPermission(['documents.show.account']);
+        $can_edit = $this->authorize('viewAny', Document::class);
 
-        if ($request->isMethod('POST')) {
-            $request->flash();
-        }
+        /** @var User $auth_user */
+        $auth_user = Auth::user();
+
         $search = $request->input('search');
         $items_per_page = $request->input('items_per_page', 20);
         $sort_by = $request->input('sort_by', 'created_at');
 
-        $can_edit = Auth::user()->can('documents.edit');
         $allowed_types = [];
-        if (Auth::user()->can('documents.show.account')) {
+        if ($auth_user->can('documents.show.account')) {
             $allowed_types[] = 'ACCOUNT';
         }
 
-        $documents = Document::filteredList($can_edit, $allowed_types, [
-            'search' => $search,
-            'sort_by' => $sort_by,
-        ])
-            ->paginate($items_per_page);
+        $documents = Document::query()
+            ->filteredList(
+                $can_edit->allowed(),
+                $allowed_types,
+                [
+                    'search' => $search,
+                    'sort_by' => $sort_by,
+                ]
+            )
+            ->paginate($items_per_page)
+            ->map(fn(Document $item) => DocumentViewData::fromModel($item, $auth_user));
 
-        $genders = Gender::forSelect();
+        $accounts = Account::query()
+            ->get()
+            ->map(fn(Account $item) => new SimpleListItem(
+                $item->getKey(),
+                $item->salutation . ' ' . $item->full_name,
+                __('general.geboren_in', [
+                    'date' => $item->date_of_birth->format('d.m.Y'),
+                    'location' => $item->birth_location,
+                ])
+            ));
 
-        $users = Account::get();
-
-        $trainers = User::withIsTrainer()
-            ->get();
-
-        $qualifications = Qualification::getAllQualifications();
+        $trainers = User::getTrainers()
+            ->map(fn(User $item) => new SimpleListItem(
+                $item->getKey(),
+                $item->account->salutation . ' ' . $item->account->full_name,
+            ));
 
         return view('documents.index', [
-            'data' => $documents,
+            'documents' => $documents,
             'items_per_page' => $items_per_page,
-            'genders' => $genders,
-            'users' => $users,
-            'qualifications' => $qualifications,
+            'accounts' => $accounts,
             'trainers' => $trainers,
         ]);
     }
@@ -79,53 +94,43 @@ class DocumentsController extends Controller
     /**
      * Speichert ein Zertifikat
      *
-     * @param  Request                           $request
+     * @param  StoreDocumentRequest              $request
      * @return \Illuminate\Http\RedirectResponse
      *
      * @throws \Exception
      */
-    public function store(Request $request)
+    public function store(StoreDocumentRequest $request)
     {
-        $this->checkPermission('documents.create');
+        $this->authorize('create', Document::class);
+
+        $account_id = null;
 
         if ($request->filled('participant')) {
-            $user = Account::findOrFail($request->input('participant'));
-            $participant_dto = ParticipantDTO::fromModel($user);
+            $account = Account::findOrFail($request->validated('participant'));
+            $account_id = $account->getKey();
+            $participant_dto = ParticipantDTO::fromModel($account);
         } else {
-
-            $salutation = Gender::tryFrom($request->input('gender'))->salutation();
-            $participant_dto = new ParticipantDTO(
-                $salutation,
-                $request->input('first_name'),
-                $request->input('last_name'),
-                Carbon::create($request->input('date_of_birth')),
-                $request->input('birth_location'),
-            );
+            $salutation = Gender::tryFrom($request->validated('gender'))->salutation();
+            $participant_dto = ParticipantDTO::fromRequest($request, $salutation);
         }
-        $trainer = Account::findOrFail($request->input('trainer'));
-        $training_date = Carbon::create($request->input('training_date'))->format('d.m.Y');
-        $qualification = Qualification::findOrfail($request->input('qualification'));
+
+        $trainer = Account::findOrFail($request->validated('trainer'));
+        $training_date = $request->date('training_date')->format('d.m.Y');
+        $qualification = Qualification::findOrFail($request->validated('qualification_id'));
 
         $trainer_dto = TrainerDTO::fromModel($trainer);
 
-        $document_url = $this->document_service
-            ->createCertificate(
-                $participant_dto,
-                $trainer_dto,
-                $qualification->getName(),
-                $training_date,
-            );
-        Document::createDocument(
-            'Zertifikat: ' . $qualification->getName(),
-            $document_url,
-            null,
-            $user?->getKey() ?? null,
-            'ACCOUNT',
+        CreateCertificate::dispatch(
+            $participant_dto,
+            $trainer_dto,
+            $qualification,
+            $training_date,
+            $account_id,
         );
 
-        Alert::addAlert(__('general.erfolgreich_angelegt'), 'success');
+        Alert::success(__('general.zertifikat_wird_erstellt'));
 
-        return redirect()->back();
+        return redirect()->action([self::class, 'index']);
     }
 
     /**
@@ -139,7 +144,10 @@ class DocumentsController extends Controller
     {
         $this->authorize('view', $document);
 
-        if (Auth::user()->isSuperadmin() && !$request->has('download')) {
+        /** @var User $auth_user */
+        $auth_user = Auth::user();
+
+        if ($auth_user->isSuperadmin() && !$request->has('download')) {
             return response()->file($document->url);
         }
 
@@ -155,16 +163,26 @@ class DocumentsController extends Controller
      */
     public function edit(Request $request, Document $document)
     {
-        $this->checkPermission('documents.edit');
+        $this->authorize('update', $document);
+
+        /** @var User $auth_user * */
+        $auth_user = Auth::user();
 
         $document->load('documentAssign');
 
-        $users = Account::get();
+        $document = DocumentViewData::fromModel($document, $auth_user);
 
-        return view('documents.edit', [
-            'document' => $document,
-            'users' => $users,
-        ]);
+        $accounts = Account::get()
+            ->map(fn(Account $item) => new SimpleListItem(
+                $item->getKey(),
+                str($item->salutation)->append(' ')->append($item->full_name)->value(),
+                str("({$item->getKey()})")->value(),
+                [
+                    'selected' => $item->getKey() == $document->assign_to_id,
+                ],
+            ));
+
+        return view('documents.edit', compact('document', 'accounts'));
     }
 
     /**
@@ -174,31 +192,13 @@ class DocumentsController extends Controller
      * @param  \App\Models\Document              $document
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, Document $document)
+    public function update(UpdateDocumentRequest $request, Document $document, UpdateDocumentAction $update_document_action)
     {
-        $this->checkPermission('documents.edit');
+        $this->authorize('update', $document);
 
-        $document->title = $request->input('title', $document->title);
-        if (!empty($request->input('assign'))) {
-            $assign = $request->input('assign', $document->documentAssign?->getKey() ?? 0);
-            if (!empty($document->documentAssign)) {
-                $assign_id = $document->documentAssign->getKey();
-                if ($assign_id != $assign) {
-                    $document->documentAssign->delete();
-                }
-            }
+        $updated = $update_document_action->execute($document, $request->toArray());
 
-            if (!empty($assign)) {
-                $model = DocumentLink::create([
-                    'document_id' => $document->getKey(),
-                    'link_id' => $assign,
-                    'link_type' => 'ACCOUNT',
-                ]);
-                $model->save();
-            }
-        }
-        $document->save();
-        Alert::addAlert(__('general.erfolgreich_aktualisiert'), 'success');
+        Alert::addAlert($updated->message, $updated->success ? 'success' : 'danger');
 
         return redirect()->back();
     }
@@ -209,18 +209,13 @@ class DocumentsController extends Controller
      * @param  \App\Models\Document              $document
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroy(Document $document)
+    public function destroy(Document $document, DeleteDocumentAction $delete_document_action)
     {
-        $this->checkPermission('documents.delete');
+        $this->authorize('delete', $document);
 
-        if (!empty($document->documentAssign)) {
-            $document->documentAssign->delete();
-        }
-        if (file_exists($document->url)) {
-            unlink($document->url);
-        }
-        $document->delete();
-        Alert::addAlert(__('general.erfolgreich_geloescht'), 'success');
+        $deleted = $delete_document_action->execute($document);
+
+        Alert::addAlert($deleted->message, $deleted->success ? 'success' : 'danger');
 
         return redirect()->back();
     }

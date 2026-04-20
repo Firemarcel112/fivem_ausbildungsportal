@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Administration;
 use App\Facades\Alert;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Administration\Requirements\CreateRequest;
-use App\Models\Fractions\Fraction;
-use App\Models\Qualifications\Qualification;
+use App\Models\Fraction;
+use App\Models\Qualification;
 use App\Models\Qualifications\Requirement;
 use Illuminate\Http\Request;
 
@@ -43,12 +43,13 @@ class RequirementsController extends Controller
     public function store(CreateRequest $request, Qualification $qualification)
     {
         $this->checkPermission('administration.qualifications.edit');
-        $requirement = new Requirement;
-        $requirement->setName($request->input('name'));
-        $requirement->setFractionId($request->input('fraction_id'));
-        $requirement->setQualificationId($qualification->getId());
-        $requirement->setRank($request->input('rank', 0));
-        $requirement->save();
+
+        Requirement::create([
+            'name' => $request->input('name'),
+            'fraction_id' => $request->input('fraction_id'),
+            'qualification_id' => $qualification->getKey(),
+            'rank' => $request->input('rank', 0),
+        ]);
 
         Alert::addAlert(__('general.erfolgreich_angelegt'), 'success');
 
@@ -58,9 +59,9 @@ class RequirementsController extends Controller
     /**
      * Seite zum bearbeiten einer Voraussetzung
      *
-     * @param  \Illuminate\Http\Request                 $request
-     * @param  \App\Models\Qualifications\Qualification $qualification
-     * @param  \App\Models\Qualifications\Requirement   $requirement
+     * @param  \Illuminate\Http\Request               $request
+     * @param  \App\Models\Qualification              $qualification
+     * @param  \App\Models\Qualifications\Requirement $requirement
      * @return \Illuminate\Contracts\View\View
      */
     public function edit(Request $request, Qualification $qualification, Requirement $requirement)
@@ -79,20 +80,20 @@ class RequirementsController extends Controller
     /**
      * Update einer Voraussetzung
      *
-     * @param  \App\Http\Requests\Administration\Qualifications\CreateRequest $request
-     * @param  \App\Models\Qualifications\Qualification                       $qualification
-     * @param  \App\Models\Qualifications\Requirement                         $requirement
+     * @param  CreateRequest                          $request
+     * @param  \App\Models\Qualification              $qualification
+     * @param  \App\Models\Qualifications\Requirement $requirement
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(CreateRequest $request, Qualification $qualification, Requirement $requirement)
     {
         $this->checkPermission('administration.qualifications.edit');
-
-        $requirement->setName($request->input('name'));
-        $requirement->setFractionId($request->input('fraction_id'));
-        $requirement->setQualificationId($qualification->getId());
-        $requirement->setRank($request->input('rank', 0));
-        $requirement->save();
+        $requirement->update([
+            'name' => $request->input('name'),
+            'fraction_id' => $request->input('fraction_id'),
+            'qualification_id' => $qualification->getKey(),
+            'rank' => $request->input('rank', 0),
+        ]);
 
         Alert::addAlert(__('general.erfolgreich_aktualisiert'), 'success');
 

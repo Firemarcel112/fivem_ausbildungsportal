@@ -1,5 +1,9 @@
+@props([
+    'id' => 0,
+    'name' => '',
+])
 @can('documents.delete')
-    <x-modal body_classes="text-center" form_action="{{ route('documents.destroy', [$document]) }}" id="document-{{ $document->getKey() }}-delete">
+    <x-modal body_classes="text-center" form_action="{{ route('documents.destroy', [$id]) }}" id="document-{{ $id }}-delete">
 
         <x-slot:title>{{ __('general.loeschen') }}</x-slot:title>
         <x-slot:body>
@@ -8,7 +12,7 @@
             </div>
             <p class="text-warning">{!! __('general.dokument_sicher_loeschen', [
                 'br' => '<br/>',
-                'name' => $document->title,
+                'name' => $name,
             ]) !!}</p>
         </x-slot:body>
         <x-slot:footer>

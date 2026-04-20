@@ -58,4 +58,21 @@ class Input extends Component
     {
         return view('components.forms.input');
     }
+
+    public function getValue()
+    {
+        if (session()->hasOldInput($this->name)) {
+            return old($this->name);
+        }
+
+        if ($this->value !== null) {
+            return $this->value;
+        }
+
+        if (request()->has($this->name)) {
+            return request()->get($this->name);
+        }
+
+        return $this->default;
+    }
 }

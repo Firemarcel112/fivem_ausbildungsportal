@@ -12,7 +12,7 @@ abstract class Controller extends BaseController
     /**
      * Prüft die Permission und leitet den Benutzer zurück
      *
-     * @param  mixed                 $permission
+     * @param  string|array<int, string> $permissions
      * @return bool|RedirectResponse
      */
     public function checkPermission(string|array $permissions)
@@ -21,16 +21,20 @@ abstract class Controller extends BaseController
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
             abort(403);
         }
+
+        /** @var \App\Models\User $user; */
+        $user = Auth::user();
+
         if (is_array($permissions)) {
             foreach ($permissions as $permission) {
-                if (Auth::user()->hasPermissionTo($permission)) {
+                if ($user->can($permission)) {
                     return true;
                 }
             }
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
             abort(403);
         }
-        if (!Auth::user()->hasPermissionTo($permissions)) {
+        if (!$user->can($permissions)) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
             abort(403);
         }

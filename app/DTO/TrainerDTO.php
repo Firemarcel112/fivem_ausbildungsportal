@@ -48,9 +48,9 @@ class TrainerDTO
         }
 
         return new self(
-            $trainer->getSalutation(),
-            $trainer->getFirstName(),
-            $trainer->getLastName(),
+            $trainer->salutation,
+            $trainer->first_name,
+            $trainer->last_name,
         );
     }
 }

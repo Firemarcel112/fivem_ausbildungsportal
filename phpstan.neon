@@ -1,0 +1,37 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - vendor/nesbot/carbon/extension.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+
+parameters:
+
+    paths:
+        - app/
+        - database/
+
+    resultCachePath: %currentWorkingDirectory%/storage/app/resultCache.php
+
+    strictRules:
+        disallowedLooseComparison: false
+        booleansInConditions: false
+        booleansInLoopConditions: false
+        uselessCast: true
+        requireParentConstructorCall: false
+        disallowedBacktick: false
+        disallowedEmpty: false
+        disallowedImplicitArrayCreation: false
+        disallowedShortTernary: false
+        overwriteVariablesWithLoop: true
+        closureUsesThis: false
+        matchingInheritedMethodNames: false
+        numericOperandsInArithmeticOperators: false
+        strictFunctionCalls: false
+        dynamicCallOnStaticMethod: false
+        switchConditionsMatchingType: false
+        noVariableVariables: false
+        strictArrayFilter: false
+        illegalConstructorMethodCall: false
+
+
+    # Level 10 is the highest level
+    level: 8

@@ -1,14 +1,10 @@
 <?php
 
-$providers = [
+return [
     App\Providers\AppServiceProvider::class,
-    App\Providers\EventServiceProvider::class,
+    App\Providers\ViewServiceProvider::class,
+    Spatie\Permission\PermissionServiceProvider::class,
+    BarryVdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
     OwenIt\Auditing\AuditingServiceProvider::class,
-    \SocialiteProviders\Manager\ServiceProvider::class,
+    SocialiteProviders\Manager\ServiceProvider::class,
 ];
-
-if (config('app.env') == 'local') {
-    $providers[] = BarryVdh\LaravelIdeHelper\IdeHelperServiceProvider::class;
-}
-
-return $providers;

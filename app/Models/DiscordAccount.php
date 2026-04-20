@@ -65,61 +65,7 @@ class DiscordAccount extends BaseModel
     }
 
     # ########################
-    # GET & SET
+    # ACCESSORS & MUTATORS
     # ########################
 
-    public function getId()
-    {
-        return $this->discord_account_id;
-    }
-
-    public function getUserId()
-    {
-        return $this->user_id;
-    }
-
-    public function setUserId(int $value)
-    {
-        $this->user_id = $value;
-    }
-
-    public function getDiscordId()
-    {
-        return $this->discord_id;
-    }
-
-    public function setDiscordId(string $value)
-    {
-        $this->discord_id = $value;
-    }
-
-    public function getUsername()
-    {
-        return $this->username;
-    }
-
-    public function setUsername(string $value)
-    {
-        $this->username = $this->clean($value);
-    }
-
-    public function getAvatar()
-    {
-        return $this->avatar;
-    }
-
-    public function setAvatar(string $value)
-    {
-        $this->avatar = $value;
-    }
-
-    public function getToken()
-    {
-        return $this->token;
-    }
-
-    public function setToken(string $value)
-    {
-        $this->token = $value;
-    }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\DTO\ParticipantDTO;
-use App\DTO\TrainerDTO;
+use App\DTO\SimpleUserViewData;
+use App\DTO\TrainingParticipantViewData;
 use Exception;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
@@ -16,44 +16,51 @@ class DocumentService
     /**
      * Erstellt ein Zertifikat
      *
-     * @param  ParticipantDTO $participant
-     * @param  TrainerDTO     $trainer
-     * @param  string         $qualification_name
-     * @param  string         $training_date
+     * @param  TrainingParticipantViewData $participant
+     * @param  SimpleUserViewData          $trainer
+     * @param  string                      $qualification_name
+     * @param  string                      $training_date
      * @return string
      *
      * @throws RuntimeException
      */
     public function createCertificate(
-        ParticipantDTO $participant,
-        TrainerDTO $trainer,
+        TrainingParticipantViewData $participant,
+        SimpleUserViewData $trainer,
         string $qualification_name,
         string $training_date,
     ) {
         $certificate_overrides = [
-            'participant_name' => Str::slug($participant->getFullName(), '_', 'de'),
+            'participant_name' => Str::slug($participant->full_name, '_', 'de'),
             'qualification_name' => Str::slug($qualification_name, '_', 'de'),
         ];
 
-        $certificate_name = 'Zertifikat_' . $certificate_overrides['participant_name'] . '_' . $certificate_overrides['qualification_name'] . '_' . now()->format('Y_m_d_His');
+        $certificate_name = str('Zertifikat_')
+            ->append($certificate_overrides['participant_name'])
+            ->append('_')
+            ->append($certificate_overrides['qualification_name'])
+            ->append('_')
+            ->append(now()->format('Y_m_d_His'));
 
         $certificate_path = Storage::disk('certificates')
-            ->path($certificate_name . '.pdf');
+            ->path($certificate_name->append('.pdf'));
 
         try {
             $view_path = 'certificate.index';
-            if (View::exists('certificate.custom')) {
-                $view_path = 'certificate.custom';
+            if (View::exists('certificate.custom.' . $certificate_overrides['qualification_name'])) {
+                $view_path = 'certificate.custom.' . $certificate_overrides['qualification_name'];
+            } elseif (View::exists('certificate.custom.index')) {
+                $view_path = 'certificate.custom.index';
             }
 
             $pdf = Pdf::view($view_path, [
                 'salutation_trainer' => $trainer->salutation,
-                'trainer_name' => $trainer->getFullName(),
+                'trainer_name' => $trainer->full_name,
                 'training_date' => $training_date,
 
                 'salutation' => $participant->salutation,
-                'name' => $participant->getFullName(),
-                'birth_date' => $participant->getBirthDate(),
+                'name' => $participant->full_name,
+                'birth_date' => $participant->date_of_birth->format('d.m.Y'),
                 'birth_location' => $participant->birth_location,
                 'qualification' => $qualification_name,
             ])
@@ -74,7 +81,7 @@ class DocumentService
         }
     }
 
-    public function signPdf(string $pdf_path)
+    public function signPdf(string $pdf_path): void
     {
         $pdf_service = new PdfService;
         $pdf_service->sign($pdf_path);

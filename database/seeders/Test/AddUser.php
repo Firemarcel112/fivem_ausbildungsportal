@@ -2,11 +2,10 @@
 
 namespace Database\Seeders\Test;
 
-use App\Models\Fractions\Fraction;
+use App\Models\Fraction;
 use App\Models\User;
 use App\Models\User\Account;
 use App\Models\User\Fraction as UserFraction;
-use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
 class AddUser extends Seeder
@@ -21,23 +20,24 @@ class AddUser extends Seeder
         $count = 10;
 
         for ($count; $count > 0; $count--) {
-            $model = new User;
-            $model->setName(fake()->userName());
-            $model->setPassword('password');
-            $model->save();
+            $model = User::create([
+                'name' => fake()->userName(),
+                'password' => 'password',
+            ]);
 
-            $account_model = new Account;
-            $account_model->setUserId($model->id);
-            $account_model->setFirstName(fake()->firstName());
-            $account_model->setLastName(fake()->lastName());
-            $account_model->setDateOfBirth(Carbon::create(fake()->date()));
-            $account_model->save();
+            $account_model = Account::create([
+                'user_id' => $model->getKey(),
+                'first_name' => fake()->firstName(),
+                'last_name' => fake()->lastName(),
+                'date_of_birth' => fake()->date(),
+            ]);
 
-            $fraction_model = new UserFraction;
-            $fraction_model->setUserId($account_model->getQueueableId());
-            $fraction_model->setFractionId($fractions->random()->getKey());
-            $fraction_model->setDefault(true);
-            $fraction_model->save();
+            $fraction_model = UserFraction::create([
+                'user_id' => $account_model->getKey(),
+                'fraction_id' => $fractions->random()->getKey(),
+                'default' => true,
+            ]);
+
             $additional_fraction = fake()->boolean(50);
 
             if ($additional_fraction) {
@@ -45,11 +45,11 @@ class AddUser extends Seeder
                 while ($fraction_id == $fraction_model->fraction_id) {
                     $fraction_id = $fractions->random()->getKey();
                 }
-                $fraction_model = new UserFraction;
-                $fraction_model->setUserId($account_model->getQueueableId());
-                $fraction_model->setFractionId($fraction_id);
-                $fraction_model->setDefault(false);
-                $fraction_model->save();
+                UserFraction::create([
+                    'user_id' => $account_model->getKey(),
+                    'fraction_id' => $fraction_id,
+                    'default' => false,
+                ]);
             }
         }
     }

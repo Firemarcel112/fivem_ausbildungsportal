@@ -11,11 +11,7 @@
                 <x-forms.input name="last_name" required>{{ __('general.nachname') }}</x-forms.input>
             </div>
             <div class="col">
-                <x-forms.select label="{{ __('general.geschlecht') }}" name="gender" required>
-                    @foreach ($genders as $gender)
-                        <option value="{{ $gender['value'] }}">{{ $gender['name'] }}</option>
-                    @endforeach
-                </x-forms.select>
+                <x-forms.select.genders />
             </div>
         </div>
         <div class="row">

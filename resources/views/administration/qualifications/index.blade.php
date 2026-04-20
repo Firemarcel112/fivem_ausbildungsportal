@@ -36,23 +36,23 @@
                         @foreach ($qualifications as $qualification)
                             <tr>
                                 <td>
-                                    {{ $qualification->getId() }}
+                                    {{ $qualification->getKey() }}
                                 </td>
                                 <td>
-                                    {{ $qualification->getName() }}
+                                    {{ $qualification->name }}
                                 </td>
                                 <td>
-                                    @if ($qualification->getGenerateCertificate())
+                                    @if ($qualification->generate_certificate)
                                         {{ __('general.ja') }}
                                     @else
                                         {{ __('general.nein') }}
                                     @endif
                                 </td>
                                 <td>
-                                    {{ $qualification->getRank() }}
+                                    {{ $qualification->rank }}
                                 </td>
                                 <td>
-                                    @if ($qualification->getHide())
+                                    @if ($qualification->hide)
                                         {{ __('general.ja') }}
                                     @else
                                         {{ __('general.nein') }}
@@ -66,16 +66,16 @@
                                         <x-icon :hovertext="__('general.bearbeiten')" name="edit" />
                                     </a>
                                     @if (empty($qualification->trainings->count()) && empty($qualification->userQualifications->count()))
-                                        <a class="btn btn-danger btn-sm" data-bs-target="#qualification-{{ $qualification->getId() }}-delete" data-bs-toggle="modal">
+                                        <a class="btn btn-danger btn-sm" data-bs-target="#qualification-{{ $qualification->getKey() }}-delete" data-bs-toggle="modal">
                                             <x-icon :hovertext="__('general.loeschen')" name="trash" />
                                         </a>
                                     @else
-                                        @if ($qualification->getHide() == 0)
-                                            <a class="btn btn-warning btn-sm" data-bs-target="#qualification-{{ $qualification->getId() }}-hide" data-bs-toggle="modal">
+                                        @if ($qualification->hide == 0)
+                                            <a class="btn btn-warning btn-sm" data-bs-target="#qualification-{{ $qualification->getKey() }}-hide" data-bs-toggle="modal">
                                                 <x-icon :hovertext="__('general.ausblenden')" name="eye-off" />
                                             </a>
                                         @else
-                                            <a class="btn btn-secondaryw btn-sm" data-bs-target="#qualification-{{ $qualification->getId() }}-show" data-bs-toggle="modal">
+                                            <a class="btn btn-secondary btn-sm" data-bs-target="#qualification-{{ $qualification->getKey() }}-show" data-bs-toggle="modal">
                                                 <x-icon :hovertext="__('general.einblenden')" name="eye" />
                                             </a>
                                         @endif
@@ -87,8 +87,8 @@
                                     'qualification' => $qualification,
                                 ])
                             @else
-                                @includeWhen($qualification->getHide() == 0, 'administration.qualifications.modals.hide')
-                                @includeWhen($qualification->getHide() == 1, 'administration.qualifications.modals.show')
+                                @includeWhen($qualification->hide == 0, 'administration.qualifications.modals.hide')
+                                @includeWhen($qualification->hide == 1, 'administration.qualifications.modals.show')
                             @endif
                         @endforeach
                     </thead>

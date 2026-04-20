@@ -2,7 +2,7 @@
     <x-modal body_classes="text-center" form_action="{{ route('administration.requirements.destroy', [
         'qualification' => $qualification,
         'requirement' => $requirement,
-    ]) }}" id="requirement-{{ $requirement->getId() }}-delete">
+    ]) }}" id="requirement-{{ $requirement->getKey() }}-delete">
 
         <x-slot:title>{{ __('general.loeschen') }}</x-slot:title>
         <x-slot:body>
@@ -11,7 +11,7 @@
             </div>
             <p class="text-warning">{!! __('general.voraussetzung_sicher_loeschen', [
                 'br' => '<br/>',
-                'name' => $requirement->getName(),
+                'name' => $requirement->name,
             ]) !!}</p>
         </x-slot:body>
         <x-slot:footer>

@@ -2,38 +2,50 @@
 
 namespace App\View\Components\Trainings\Modal;
 
-use App\Models\Qualifications\Qualification;
+use App\DTO\SimpleListItem;
 use App\Models\User;
-use Cache;
 use Closure;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\View\Component;
 
 class Create extends Component
 {
     /**
+     * @var Collection<int, SimpleListItem>
+     */
+    public Collection $trainers;
+
+    public string $default_meeting_point;
+
+    /**
      * Create a new component instance.
      */
-    public function __construct()
-    {
-        //
+    public function __construct(
+        ?string $default_meeting_point = null
+    ) {
+        $this->default_meeting_point = $default_meeting_point ?? config('settings.default_meeting_point');
     }
 
-    public function getTrainers(): Collection
+    /**
+     * @return Collection<int, SimpleListItem>
+     */
+    protected function getTrainers(): Collection
     {
-        return User::with(['permissions', 'account'])
+        return $this->trainers ??= User::with('account')
             ->withIsTrainer()
-            ->get();
+            ->get()
+            ->map(fn(User $item) => new SimpleListItem(
+                $item->getKey(),
+                $item->account?->full_name
+            ));
     }
 
-    public function getQualifications(): Collection
+    public function isSelectedTrainer(mixed $option_value): bool
     {
-        return Cache::rememberForever('qualifications.all', function () {
-            return Qualification::isVisible()
-                ->isOrderByDefault()
-                ->get();
-        });
+        $current_value = old('trainer_id', request('trainer_id') ?? '');
+
+        return $current_value == $option_value;
     }
 
     /**
@@ -41,6 +53,8 @@ class Create extends Component
      */
     public function render(): View|Closure|string
     {
+        $this->trainers = $this->getTrainers();
+
         return view('components.trainings.modal.create');
     }
 }

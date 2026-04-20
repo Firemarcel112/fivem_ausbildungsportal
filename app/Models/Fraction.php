@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Models\Fractions;
+namespace App\Models;
 
-use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 

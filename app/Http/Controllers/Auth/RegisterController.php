@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Facades\Alert;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserStoreRequest;
-use App\Models\Fractions\Fraction;
+use App\Models\Fraction;
 use App\Models\User;
 use App\Models\User\Account;
 use App\Models\User\Fraction as UserFraction;
@@ -43,6 +43,7 @@ class RegisterController extends Controller
      */
     public function store(UserStoreRequest $request)
     {
+        $alert_success = false;
         $fractions = array_merge($request->input('fraction', []), [$request->input('default_fraction')]);
         $fractions = array_unique($fractions);
         DB::beginTransaction();
@@ -70,7 +71,7 @@ class RegisterController extends Controller
             $fraction_model->save();
         }
 
-        if ($account->save() && $alert_success) {
+        if ($alert_success) {
             Alert::addAlert(__('general.registrierung_erfolgreich'));
         } else {
             DB::rollBack();

@@ -1,13 +1,13 @@
-<x-modal form_action="{{ route('qualifications.user.remove', $user) }}" id="remove-user-qualification-{{ $user->getId() }}">
+<x-modal form_action="{{ route('qualifications.user.remove', $user->id) }}" id="remove-user-qualification-{{ $user->id }}">
     <x-slot:title>
         {{ __('general.qualifikation_entfernen', [
-            'name' => $user->getFullName(),
+            'name' => $user->full_name,
         ]) }}
     </x-slot:title>
     <x-slot:body>
         <x-forms.select label="{{ __('general.qualifikation') }}" multiple name="qualifications" required>
             @foreach ($qualifications as $qualification)
-                <option value="{{ $qualification->getId() }}">{{ $qualification->getName() }}</option>
+                <option value="{{ $qualification->id }}">{{ $qualification->label }}</option>
             @endforeach
         </x-forms.select>
     </x-slot:body>

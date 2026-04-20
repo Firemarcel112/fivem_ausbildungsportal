@@ -8,7 +8,7 @@
                     {{ __('general.administration') }}
                 </div>
                 <h2 class="page-title">
-                    {{ __('general.voraussetzungen') }}: {{ $qualification->getName() }}
+                    {{ __('general.voraussetzungen') }}: {{ $qualification->name }}
                 </h2>
             </div>
             <div class="col-auto ms-auto d-print-none">
@@ -38,16 +38,16 @@
                         @foreach ($requirements as $requirement)
                             <tr>
                                 <td>
-                                    {{ $requirement->getId() }}
+                                    {{ $requirement->getKey() }}
                                 </td>
                                 <td>
-                                    {{ $requirement->getName() }}
+                                    {{ $requirement->name }}
                                 </td>
                                 <td>
                                     {{ $requirement->fraction->name }}
                                 </td>
                                 <td>
-                                    {{ $requirement->getRank() }}
+                                    {{ $requirement->rank }}
                                 </td>
                                 <td class="text-end">
                                     <a class="btn btn-primary btn-sm me-2" href="{{ route('administration.requirements.edit', [
@@ -56,7 +56,7 @@
                                     ]) }}">
                                         <x-icon :hovertext="__('general.bearbeiten')" name="edit" />
                                     </a>
-                                    <a class="btn btn-danger btn-sm" data-bs-target="#requirement-{{ $requirement->getId() }}-delete" data-bs-toggle="modal">
+                                    <a class="btn btn-danger btn-sm" data-bs-target="#requirement-{{ $requirement->getKey() }}-delete" data-bs-toggle="modal">
                                         <x-icon :hovertext="__('general.loeschen')" name="trash" />
                                     </a>
                                 </td>

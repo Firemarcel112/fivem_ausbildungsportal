@@ -1,21 +1,22 @@
-<x-modal id="training-ban-reason-{{ $user->getId() }}">
+@props(['id', 'full_name', 'issuer_name', 'reason', 'internal_note' => null])
+<x-modal id="training-ban-reason-{{ $id }}">
     <x-slot:title>
         {{ __('general.ausbildungssperre_fuer', [
-            'name' => $user->account->getFullName(),
+            'name' => $full_name,
         ]) }}
     </x-slot:title>
     <x-slot:body>
         <p>{{ __('general.ausgestellt_von', [
-            'name' => $user->activeTrainingBan->getIssuerName(),
+            'name' => $issuer_name,
         ]) }}
         </p>
         <hr>
         <p>{{ __('general.grund') }}</p>
-        <p>{!! nl2br($user->activeTrainingBan->getReason()) !!}</p>
+        <p>{!! $reason !!}</p>
         @can('training.ban.show_internal_reason')
             <hr>
             <p>{{ __('general.interne_notizen') }}</p>
-            <p>{!! nl2br($user->activeTrainingBan->getInternalNote()) !!}</p>
+            <p>{!! $internal_note !!}</p>
         @endcan
     </x-slot:body>
     <x-slot:footer>

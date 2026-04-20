@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Administration;
 use App\Facades\Alert;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Administration\Fractions\CreateRequest;
-use App\Models\Fractions\Fraction;
+use App\Models\Fraction;
 use App\Models\User\Fraction as UserFraction;
 use Illuminate\Http\Request;
 
@@ -49,7 +49,7 @@ class FractionsController extends Controller
      * Seite zum bearbeiten einer Fraktion
      *
      * @param  \Illuminate\Http\Request        $request
-     * @param  \App\Models\Fractions\Fraction  $fraction
+     * @param  \App\Models\Fraction            $fraction
      * @return \Illuminate\Contracts\View\View
      */
     public function edit(Request $request, Fraction $fraction)
@@ -63,7 +63,7 @@ class FractionsController extends Controller
      * Update einer Fraktion
      *
      * @param  \App\Http\Requests\Administration\Fractions\CreateRequest $request
-     * @param  \App\Models\Fractions\Fraction                            $fraction
+     * @param  \App\Models\Fraction                                      $fraction
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(CreateRequest $request, Fraction $fraction)
@@ -86,7 +86,7 @@ class FractionsController extends Controller
     /**
      * Löscht eine Fraktion
      *
-     * @param  \App\Models\Fractions\Fraction    $fraction
+     * @param  \App\Models\Fraction              $fraction
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Fraction $fraction)

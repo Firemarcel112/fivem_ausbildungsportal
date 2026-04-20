@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Models\Qualifications;
+namespace App\Models;
 
 use App\Events\QualificationAction;
-use App\Models\BaseModel;
-use App\Models\Trainings\Training;
+use App\Models\Training;
 use App\Models\User\Qualification as UserQualification;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Qualifications\Requirement;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * @property int $qualification_id
@@ -18,15 +20,14 @@ use Illuminate\Support\Facades\Cache;
  * @property int $hide
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
+ * @property-read Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Requirement> $requirements
+ * @property-read Collection<int, Requirement> $requirements
  * @property-read int|null $requirements_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Training> $trainings
+ * @property-read Collection<int, Training> $trainings
  * @property-read int|null $trainings_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, UserQualification> $userQualifications
+ * @property-read Collection<int, UserQualification> $userQualifications
  * @property-read int|null $user_qualifications_count
- *
  * @method static Builder<static>|Qualification isOrderByDefault()
  * @method static Builder<static>|Qualification isVisible(bool $value = true)
  * @method static Builder<static>|Qualification newModelQuery()
@@ -39,7 +40,6 @@ use Illuminate\Support\Facades\Cache;
  * @method static Builder<static>|Qualification whereQualificationId($value)
  * @method static Builder<static>|Qualification whereRank($value)
  * @method static Builder<static>|Qualification whereUpdatedAt($value)
- *
  * @mixin \Eloquent
  */
 class Qualification extends BaseModel
@@ -54,6 +54,10 @@ class Qualification extends BaseModel
         'deleted' => QualificationAction::class,
     ];
 
+    protected $guarded = [
+        'qualification_id',
+    ];
+
     # ########################
     # CUSTOM FUNCTIONS
     # ########################
@@ -64,7 +68,7 @@ class Qualification extends BaseModel
      * @param                                                                                                                                                                          $with_hidden Wenn true, werden auch ausgeblendete Qualifikationen zurückgegeben
      * @return mixed|\Illuminate\Database\Eloquent\Collection<int, Qualification>|\Illuminate\Database\Eloquent\Collection<int, TModel>|\Illuminate\Support\Collection<int, \stdClass>
      */
-    public static function getAllQualifications($with_hidden = false)
+    public static function getAllQualifications(bool $with_hidden = false)
     {
         if ($with_hidden) {
             return Cache::rememberForever('qualifications.all.with_hidden', function () {
@@ -75,6 +79,29 @@ class Qualification extends BaseModel
 
         return Cache::rememberForever('qualifications.all', function () {
             return self::isVisible()
+                ->isOrderByDefault()
+                ->get();
+        });
+    }
+
+    /**
+     * @param bool $with_hidden
+     * @return mixed|\Illuminate\Database\Eloquent\Collection<int, Qualification>|\Illuminate\Database\Eloquent\Collection<int, TModel>|\Illuminate\Support\Collection<int, \stdClass>
+     */
+    public static function getAllQualificationsWithRequirements(bool $with_hidden = false): Collection
+    {
+        Cache::forget('qualifications.all.with_requirements');
+        if ($with_hidden) {
+            return Cache::rememberForever('qualifications.all.with_hidden.with_requirements', function () {
+                return self::with('requirements')
+                    ->isOrderByDefault()
+                    ->get();
+            });
+        }
+
+        return Cache::rememberForever('qualifications.all.with_requirements', function () {
+            return self::with('requirements.fraction')
+                ->isVisible()
                 ->isOrderByDefault()
                 ->get();
         });
@@ -113,7 +140,7 @@ class Qualification extends BaseModel
     # RELATIONS
     # #######################
 
-    public function requirements()
+    public function requirements(): HasMany
     {
         return $this->hasMany(
             Requirement::class,
@@ -123,7 +150,7 @@ class Qualification extends BaseModel
             ->orderByDefault();
     }
 
-    public function trainings()
+    public function trainings(): HasMany
     {
         return $this->hasMany(
             Training::class,
@@ -132,7 +159,7 @@ class Qualification extends BaseModel
         );
     }
 
-    public function userQualifications()
+    public function userQualifications(): HasMany
     {
         return $this->hasMany(
             UserQualification::class,
@@ -142,174 +169,6 @@ class Qualification extends BaseModel
     }
 
     # ########################
-    # GET & SET
+    # ACCESSORS & MUTATORS
     # ########################
-
-    /**
-     * Get the qualification_id attribute.
-     *
-     * @return int
-     */
-    public function getId(): int
-    {
-        return $this->qualification_id;
-    }
-
-    /**
-     * Set the qualification_id attribute.
-     *
-     * @param  int  $value
-     * @return void
-     */
-    public function setId(int $value)
-    {
-        $this->qualification_id = $value;
-    }
-
-    /**
-     * Get the qualification_id attribute.
-     *
-     * @return int
-     */
-    public function getQualificationId(): int
-    {
-        return $this->qualification_id;
-    }
-
-    /**
-     * Set the qualification_id attribute.
-     *
-     * @param  int  $value
-     * @return void
-     */
-    public function setQualificationId(int $value)
-    {
-        $this->qualification_id = $value;
-    }
-
-    /**
-     * Get the name attribute.
-     *
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Set the name attribute.
-     *
-     * @param  string $value
-     * @return void
-     */
-    public function setName(string $value)
-    {
-        $this->name = $value;
-    }
-
-    /**
-     * Get the rank attribute.
-     *
-     * @return int
-     */
-    public function getRank(): int
-    {
-        return $this->rank;
-    }
-
-    /**
-     * Set the rank attribute.
-     *
-     * @param  int  $value
-     * @return void
-     */
-    public function setRank(int $value)
-    {
-        $this->rank = $value;
-    }
-
-    /**
-     * Get the created_at attribute.
-     *
-     * @return ?Carbon
-     */
-    public function getCreated(): ?Carbon
-    {
-        return is_null($this->created_at) ? null : Carbon::parse($this->created_at);
-    }
-
-    /**
-     * Set the created_at attribute.
-     *
-     * @param  ?Carbon $value
-     * @return void
-     */
-    public function setCreated(?Carbon $value)
-    {
-        $this->created_at = $value;
-    }
-
-    /**
-     * Get the updated_at attribute.
-     *
-     * @return ?Carbon
-     */
-    public function getUpdated(): ?Carbon
-    {
-        return is_null($this->updated_at) ? null : Carbon::parse($this->updated_at);
-    }
-
-    /**
-     * Set the updated_at attribute.
-     *
-     * @param  ?Carbon $value
-     * @return void
-     */
-    public function setUpdated(?Carbon $value)
-    {
-        $this->updated_at = $value;
-    }
-
-    /**
-     * Get the generate_certificate attribute.
-     *
-     * @return int
-     */
-    public function getGenerateCertificate(): int
-    {
-        return $this->generate_certificate;
-    }
-
-    /**
-     * Set the generate_certificate attribute.
-     *
-     * @param  int  $value
-     * @return void
-     */
-    public function setGenerateCertificate(int $value)
-    {
-        $this->generate_certificate = $value;
-    }
-
-    /**
-     * Get the hide attribute.
-     *
-     * @return int
-     */
-    public function getHide(): int
-    {
-        return $this->hide;
-    }
-
-    /**
-     * Set the hide attribute.
-     *
-     * @param  int  $value
-     * @return void
-     */
-    public function setHide(int $value)
-    {
-        $this->hide = $value;
-    }
 }

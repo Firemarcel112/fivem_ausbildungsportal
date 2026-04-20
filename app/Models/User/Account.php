@@ -2,15 +2,18 @@
 
 namespace App\Models\User;
 
+use App\Enums\Gender;
 use App\Models\BaseModel;
 use App\Models\Document;
-use App\Models\Fractions\Fraction;
-use App\Models\Qualifications\Qualification;
+use App\Models\Fraction;
+use App\Models\Qualification;
 use App\Models\Trainings\Participant;
 use App\Models\User;
 use App\Models\User\Fraction as UserFraction;
 use App\Models\User\Qualification as UserQualification;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
@@ -20,25 +23,30 @@ use Illuminate\Support\Carbon;
  * @property int $user_id
  * @property string $first_name
  * @property string $last_name
- * @property string $date_of_birth
+ * @property Carbon $date_of_birth
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property string $gender Bestimmt die Anrede auf dem Zertifikat M = Herr / W = Frau / D = Ohne Anrede
+ * @property Gender $gender Bestimmt die Anrede auf dem Zertifikat M = Herr / W = Frau / D = Ohne Anrede
  * @property string|null $birth_location Bestimmt den Geburtsort auf dem Zertifikat
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Document> $certificates
  * @property-read int|null $certificates_count
+ * @property-read mixed $default_fraction
  * @property-read \Illuminate\Database\Eloquent\Collection<int, UserQualification> $directQualifications
  * @property-read int|null $direct_qualifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Fraction> $fractions
  * @property-read int|null $fractions_count
+ * @property-read mixed $full_name
+ * @property-read mixed $initials
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Qualification> $qualifications
  * @property-read int|null $qualifications_count
+ * @property-read mixed $salutation
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Participant> $trainings
  * @property-read int|null $trainings_count
  * @property-read User|null $user
  *
+ * @method static Builder<static>|Account isNotInIds(array $account_ids)
  * @method static Builder<static>|Account isSearch(string $search)
  * @method static Builder<static>|Account newModelQuery()
  * @method static Builder<static>|Account newQuery()
@@ -61,34 +69,32 @@ class Account extends BaseModel
 
     protected $primaryKey = 'user_account_id';
 
+    protected $guarded = [
+        'user_account_id',
+    ];
+
+    protected $casts = [
+        'date_of_birth' => 'date',
+        'gender' => Gender::class,
+    ];
+
     # ########################
     # CUSTOM FUNCTIONS
     # ########################
 
     /**
-     * Gibt den vollen Namen zurück
+     * Gibt die Standard Fraktion zurück
      *
-     * @return string
+     * @return int
      */
-    public function getFullName()
+    public function getDefaultFractionId(): int
     {
-        return $this->first_name . ' ' . $this->last_name;
+        return $this->fractions->firstWhere('pivot.default', 1)->getKey();
     }
 
-    /**
-     * Gibt die Anrede zurück
-     *
-     * @return string
-     */
-    public function getSalutation()
+    public function getDefaultFraction(): mixed
     {
-        $gender = $this?->getGender() ?? 'D';
-
-        return match ($gender) {
-            'M' => __('general.herr'),
-            'W' => __('general.frau'),
-            'D' => '',
-        };
+        return $this->fractions->firstWhere('pivot.default', 1);
     }
 
     # ########################
@@ -98,11 +104,11 @@ class Account extends BaseModel
     /**
      * Scope für Suche
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $query
-     * @param  string                                $search
-     * @return Builder
+     * @param  Builder<Account> $query
+     * @param  string           $search
+     * @return Builder<Account>
      */
-    public function scopeIsSearch(Builder $query, string $search)
+    public function scopeIsSearch(Builder $query, string $search): Builder
     {
         return $query->where(function ($query) use ($search) {
             $query->where('first_name', 'LIKE', "{$search}%")
@@ -111,16 +117,28 @@ class Account extends BaseModel
         });
     }
 
+    /**
+     * Scope für Nicht in Account Ids
+     *
+     * @param  Builder<Account> $query
+     * @param  array<int>       $account_ids
+     * @return Builder<Account>
+     */
+    public function scopeIsNotInIds(Builder $query, array $account_ids)
+    {
+        return $query->whereNotIn($this->getKeyName(), $account_ids);
+    }
+
     # ########################
     # RELATIONS
     # ########################
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function trainings()
+    public function trainings(): HasMany
     {
         return $this->hasMany(
             Participant::class,
@@ -133,7 +151,7 @@ class Account extends BaseModel
     {
         return $this->belongsToMany(
             Fraction::class,
-            UserFraction::getTableName(),
+            (new UserFraction)->getTable(),
             'user_id',
             'fraction_id'
         )->withPivot('created_at', 'default');
@@ -143,7 +161,7 @@ class Account extends BaseModel
     {
         return $this->belongsToMany(
             Qualification::class,
-            UserQualification::getTableName(),
+            (new UserQualification)->getTable(),
             'user_id',
             'qualification_id'
         )->withPivot('created_at', 'training_id');
@@ -158,7 +176,7 @@ class Account extends BaseModel
         );
     }
 
-    public function certificates()
+    public function certificates(): BelongsToMany
     {
         return $this->belongsToMany(
             Document::class,
@@ -170,231 +188,43 @@ class Account extends BaseModel
     }
 
     # ########################
-    # GET & SET
+    # ACCESSORS & MUTATORS
     # ########################
 
-    /**
-     * Gibt die Standard Fraktion zurück
-     *
-     * @return int
-     */
-    public function getDefaultFractionId(): int
+    public function fullName(): Attribute
     {
-        return $this->fractions->firstWhere('pivot.default', 1)->getKey();
+        return Attribute::make(
+            get: function () {
+                return $this->first_name . ' ' . $this->last_name;
+            }
+        );
     }
 
-    public function getDefaultFraction()
+    public function salutation(): Attribute
     {
-        return $this->fractions->firstWhere('pivot.default', 1);
+        return Attribute::make(
+            get: function () {
+                return $this->gender->salutation();
+            }
+        );
     }
 
-    /**
-     * Get the user_account_id attribute.
-     *
-     * @return int
-     */
-    public function getId(): int
+    public function initials(): Attribute
     {
-        return $this->user_account_id;
+        return Attribute::make(
+            function () {
+                return str($this->first_name)->substr(0, 1)
+                    ->append(str($this->last_name)->substr(0, 1))
+                    ->upper()
+                    ->value();
+            }
+        );
     }
 
-    /**
-     * Set the user_account_id attribute.
-     *
-     * @param  int  $value
-     * @return void
-     */
-    public function setId(int $value)
+    public function defaultFraction(): Attribute
     {
-        $this->user_account_id = $value;
-    }
-
-    /**
-     * Get the user_account_id attribute.
-     *
-     * @return int
-     */
-    public function getUserAccountId(): int
-    {
-        return $this->user_account_id;
-    }
-
-    /**
-     * Set the user_account_id attribute.
-     *
-     * @param  int  $value
-     * @return void
-     */
-    public function setUserAccountId(int $value)
-    {
-        $this->user_account_id = $value;
-    }
-
-    /**
-     * Get the user_id attribute.
-     *
-     * @return int
-     */
-    public function getUserId(): int
-    {
-        return $this->user_id;
-    }
-
-    /**
-     * Set the user_id attribute.
-     *
-     * @param  int  $value
-     * @return void
-     */
-    public function setUserId(int $value)
-    {
-        $this->user_id = $value;
-    }
-
-    /**
-     * Get the first_name attribute.
-     *
-     * @return string
-     */
-    public function getFirstName(): string
-    {
-        return $this->first_name;
-    }
-
-    /**
-     * Set the first_name attribute.
-     *
-     * @param  string $value
-     * @return void
-     */
-    public function setFirstName(string $value)
-    {
-        $this->first_name = $value;
-    }
-
-    /**
-     * Get the last_name attribute.
-     *
-     * @return string
-     */
-    public function getLastName(): string
-    {
-        return $this->last_name;
-    }
-
-    /**
-     * Set the last_name attribute.
-     *
-     * @param  string $value
-     * @return void
-     */
-    public function setLastName(string $value)
-    {
-        $this->last_name = $value;
-    }
-
-    /**
-     * Get the date_of_birth attribute.
-     *
-     * @return Carbon
-     */
-    public function getDateOfBirth(): Carbon
-    {
-        return Carbon::parse($this->date_of_birth);
-    }
-
-    /**
-     * Set the date_of_birth attribute.
-     *
-     * @param  Carbon $value
-     * @return void
-     */
-    public function setDateOfBirth(Carbon $value)
-    {
-        $this->date_of_birth = $value;
-    }
-
-    /**
-     * Get the created_at attribute.
-     *
-     * @return ?Carbon
-     */
-    public function getCreated(): ?Carbon
-    {
-        return is_null($this->created_at) ? null : Carbon::parse($this->created_at);
-    }
-
-    /**
-     * Set the created_at attribute.
-     *
-     * @param  ?Carbon $value
-     * @return void
-     */
-    public function setCreated(?Carbon $value)
-    {
-        $this->created_at = $value;
-    }
-
-    /**
-     * Get the updated_at attribute.
-     *
-     * @return ?Carbon
-     */
-    public function getUpdated(): ?Carbon
-    {
-        return is_null($this->updated_at) ? null : Carbon::parse($this->updated_at);
-    }
-
-    /**
-     * Set the updated_at attribute.
-     *
-     * @param  ?Carbon $value
-     * @return void
-     */
-    public function setUpdated(?Carbon $value)
-    {
-        $this->updated_at = $value;
-    }
-
-    /**
-     * Get the gender attribute.
-     *
-     * @return mixed
-     */
-    public function getGender(): mixed
-    {
-        return $this->gender;
-    }
-
-    /**
-     * Set the gender attribute.
-     *
-     * @param  mixed $value
-     * @return void
-     */
-    public function setGender(mixed $value)
-    {
-        $this->gender = $value;
-    }
-
-    /**
-     * Get the birth_location attribute.
-     *
-     * @return ?string
-     */
-    public function getBirthLocation(): ?string
-    {
-        return $this->birth_location;
-    }
-
-    /**
-     * Set the birth_location attribute.
-     *
-     * @param  ?string $value
-     * @return void
-     */
-    public function setBirthLocation(?string $value)
-    {
-        $this->birth_location = $value;
+        return Attribute::make(
+            get: fn() => $this->fractions->firstWhere('pivot.default', 1),
+        );
     }
 }

@@ -1,7 +1,7 @@
-<x-modal form_action="{{ route('trainings.ban', $user) }}" id="add-training-ban-{{ $user->getId() }}">
+<x-modal form_action="{{ route('trainings.ban', $user->id) }}" id="add-training-ban-{{ $user->id }}">
     <x-slot:title>
         {{ __('general.ausbildungssperre_fuer', [
-            'name' => $user->getFullName(),
+            'name' => $user->full_name,
         ]) }}
     </x-slot:title>
     <x-slot:body>

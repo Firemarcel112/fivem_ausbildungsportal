@@ -2,6 +2,8 @@
 
 namespace App\Enums;
 
+use Illuminate\Support\Collection;
+
 enum Gender: string
 {
     case MALE = 'M';
@@ -35,11 +37,11 @@ enum Gender: string
     /**
      * Formatiert die Geschlechter für Selects
      */
-    public static function forSelect(): array
+    public static function forSelect(): Collection
     {
-        return collect(self::cases())->map(fn($gender) => [
-            'name' => $gender->label(),
-            'value' => $gender->value,
-        ])->toArray();
+        return Collection::make(self::cases())->map(fn(Gender $gender) => new \App\DTO\SimpleListItem(
+            $gender->value,
+            $gender->label(),
+        ));
     }
 }
