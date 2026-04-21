@@ -102,7 +102,7 @@
             @if (!empty($training->additional_informations))
                 <hr class="m-2 mt-4">
                 <p class="fw-bold">{{ __('general.zusaetzliche_informationen') }}</p>
-                {{ $training->$training->additional_informations }}
+                {{ $training->additional_informations }}
             @endif
         </div>
     </x-slot:body>
