@@ -301,7 +301,7 @@ class TrainingController extends Controller
     {
         $this->checkPermission('trainings.delete');
 
-        if ($training->isCompleted()) {
+        if ($training->completed == 1) {
             Alert::addAlert(__('general.ausbildung_bereits_abgeschlossen'), 'danger');
 
             return redirect()->back();
