@@ -6,14 +6,10 @@ use App\Interfaces\DiscordNotificationInterface;
 use App\Traits\DiscordTrait;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\foundation\Queue\Queueable;
 
 class SendDiscordEmbed implements ShouldQueue
 {
     use DiscordTrait;
-    use Queueable;
-
-    public $tries = 3;
 
     public function handle(DiscordNotificationInterface $event)
     {

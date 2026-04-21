@@ -396,7 +396,7 @@ class TrainingController extends Controller
      */
     public function signOut(Request $request, Training $training)
     {
-        if ($training->isCompleted()) {
+        if ($training->completed == 1) {
             Alert::addAlert('Ausbildung bereits abgeschlossen', 'danger');
 
             return redirect()->back();
