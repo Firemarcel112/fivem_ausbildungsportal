@@ -226,7 +226,7 @@ class User extends Authenticatable implements Auditable
         $trainings = Participant::with(['training' => function ($query) use ($date_from, $date_to) {
             $query->whereBetween('date', [$date_from, $date_to]);
         }])
-            ->where('user_id', $this->getId())
+            ->where('user_id', $this->getKey())
             ->whereHas('training', function ($query) use ($date_from, $date_to) {
                 $query->whereBetween('date', [$date_from, $date_to]);
             })

@@ -286,7 +286,7 @@ class UserManagementController extends Controller
         $remove_fractions = array_diff($current_fractions, $user_data['fractions']);
         foreach ($user_data['fractions'] as $fraction_id) {
             $fraction_model = UserFraction::firstOrCreate([
-                'user_id' => $account->getId(),
+                'user_id' => $account->getKey(),
                 'fraction_id' => (int) $fraction_id,
             ]);
             $fraction_model->default = $fraction_id == $user_data['default_fraction'] ? 1 : 0;

@@ -123,30 +123,6 @@ class Training extends BaseModel
     }
 
     /**
-     * Gibt den Namen der Ausbildung zurück
-     *
-     * @param $with_link (Gibt den Namen inklusive ID und Anzeigen Link zurück)
-     * @param $with_id   (Gibt den Namen mit ID zurück)
-     */
-    public function getName(bool $with_link = false, bool $with_id = false)
-    {
-        $name = $this->qualification->name;
-        $id = $this->getId();
-
-        $return = $name;
-
-        if ($with_link) {
-            $return = '<a class="text-secondary" href="' . route('ausbildung.show', $this) . '">' . $name . ' - ' . __('general.lehrgangs_id') . ': ' . $id . '</a>';
-        }
-
-        if ($with_id && !$with_link) {
-            $return .= ' - ' . __('general.lehrgangs_id') . ': ' . $id;
-        }
-
-        return $return;
-    }
-
-    /**
      * Gibt die Zeit für den Lehrgang zurück
      *
      * @return Carbon
@@ -206,7 +182,7 @@ class Training extends BaseModel
      */
     public function isRegistered(): bool
     {
-        $registered = $this->participants->firstWhere('user_id', Auth::user()?->getId() ?? 0);
+        $registered = $this->participants->firstWhere('user_id', Auth::user()?->getKey() ?? 0);
 
         if (!empty($registered)) {
             return true;
