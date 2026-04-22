@@ -19,7 +19,7 @@ class TrainingCard extends Component
     public function __construct(TrainingViewData $training, ?int $enrollDeadlineInMinutes = null)
     {
         $this->training = $training;
-        $this->enroll_deadline_in_minutes = $enrollDeadlineInMinutes ?? config('settings.enroll_deadline');
+        $this->enroll_deadline_in_minutes = $enrollDeadlineInMinutes ?? config('settings.enroll_deadline', 0);
     }
 
     /**
