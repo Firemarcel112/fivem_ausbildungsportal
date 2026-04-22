@@ -19,7 +19,7 @@ class HomeController extends Controller
         $is_trainer = Gate::check('isTrainer', GeneralPolicy::class);
 
         $trainings = Training::getUpcomingTrainings($is_trainer ? false : true)
-            ->map(fn(Training $training): TrainingViewData => TrainingViewData::fromModel($training, config('settings.enroll_deadline')))
+            ->map(fn(Training $training): TrainingViewData => TrainingViewData::fromModel($training, config('settings.enroll_deadline', 0)))
             ->groupBy('date')
             ->map(fn(Collection $items): TrainingGroupDTO => new TrainingGroupDTO(
                 $items->first()?->day_of_week . ' ' . $items->first()?->date_output,
