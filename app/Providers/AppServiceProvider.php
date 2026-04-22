@@ -112,7 +112,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function loadSettings()
     {
-        if (DB::table('settings')->exists()) {
+        if (!DB::table('settings')->exists()) {
             return;
         }
 
