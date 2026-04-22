@@ -21,6 +21,7 @@ class StoreTrainingRequestAction
             $data['user_id'] = $auth_user->getKey();
 
             $create = $model->firstOrNew($data);
+            $create->save();
 
             if ($create->exists) {
                 return new ActionResult(
