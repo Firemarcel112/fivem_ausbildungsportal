@@ -3,21 +3,19 @@
 namespace App\Models;
 
 use App\Events\QualificationAction;
-use App\Models\Training;
-use App\Models\User\Qualification as UserQualification;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Qualifications\Requirement;
+use App\Models\User\Qualification as UserQualification;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * @property int $qualification_id
  * @property string $name
  * @property int $generate_certificate Wenn 1 dann werden automatisch bei abschluss dieser Qualifikation Zertifikate erstellt
  * @property int $rank
- * @property int $hide
+ * @property int $hide Qualifikation wird in der Ausbidlungsliste angezeigt
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Collection<int, \OwenIt\Auditing\Models\Audit> $audits
@@ -28,6 +26,7 @@ use Illuminate\Database\Eloquent\Collection;
  * @property-read int|null $trainings_count
  * @property-read Collection<int, UserQualification> $userQualifications
  * @property-read int|null $user_qualifications_count
+ *
  * @method static Builder<static>|Qualification isOrderByDefault()
  * @method static Builder<static>|Qualification isVisible(bool $value = true)
  * @method static Builder<static>|Qualification newModelQuery()
@@ -40,6 +39,7 @@ use Illuminate\Database\Eloquent\Collection;
  * @method static Builder<static>|Qualification whereQualificationId($value)
  * @method static Builder<static>|Qualification whereRank($value)
  * @method static Builder<static>|Qualification whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Qualification extends BaseModel
@@ -85,7 +85,7 @@ class Qualification extends BaseModel
     }
 
     /**
-     * @param bool $with_hidden
+     * @param  bool                                                                                                                                                                    $with_hidden
      * @return mixed|\Illuminate\Database\Eloquent\Collection<int, Qualification>|\Illuminate\Database\Eloquent\Collection<int, TModel>|\Illuminate\Support\Collection<int, \stdClass>
      */
     public static function getAllQualificationsWithRequirements(bool $with_hidden = false): Collection

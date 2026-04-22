@@ -29,7 +29,7 @@ class StoreTrainingRequestRequest extends FormRequest
         return [
             'qualification_id' => [
                 'required',
-                Rule::exists($qualification->getTable(), $qualification->getKEyName()),
+                Rule::exists($qualification->getTable(), $qualification->getKeyName()),
             ],
             'date' => [
                 'required',

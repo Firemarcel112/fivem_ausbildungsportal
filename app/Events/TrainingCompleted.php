@@ -28,6 +28,9 @@ class TrainingCompleted implements DiscordNotificationInterface
      * passed: bool,
      * signed_out: bool,
      * notices: string|null
+     * }>|array{
+     *   cancelled: true,
+     *   cancelled_notice: string
      * }> $participants_fields
      */
     public function __construct(

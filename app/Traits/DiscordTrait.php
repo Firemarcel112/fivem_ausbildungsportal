@@ -9,16 +9,16 @@ trait DiscordTrait
     /**
      * Summary of setEmbed
      *
-     * @param  string                                           $title
-     * @param  string                                           $description
-     * @param  string                                           $url
-     * @param  int                                              $color
+     * @param  string                    $title
+     * @param  string                    $description
+     * @param  string                    $url
+     * @param  int                       $color
      * @param  array<string, int|string> $fields
-     * @param  string                                           $footerText
-     * @param  string                                           $footerIconUrl
-     * @param  string                                           $thumbnailUrl
-     * @param  string                                           $imageUrl
-     * @param  string                                           $content
+     * @param  string                    $footerText
+     * @param  string                    $footerIconUrl
+     * @param  string                    $thumbnailUrl
+     * @param  string                    $imageUrl
+     * @param  string                    $content
      * @return array<mixed>
      */
     public function buildEmbed(string $title, array $fields = [], string $description = '', string $footerText = 'Ausbildungsportal', string $footerIconUrl = '', string $url = '', int $color = 3447003, string $thumbnailUrl = '', string $imageUrl = '', string $content = ''): array
@@ -70,8 +70,8 @@ trait DiscordTrait
     /**
      * Send the embed message to a Discord webhook
      *
-     * @param  string $webhookUrl
-     * @param  array  $embedData
+     * @param  string       $webhookUrl
+     * @param  array<mixed> $embedData
      * @return void
      */
     public function sendToDiscord(string $webhookUrl, array $embedData): void

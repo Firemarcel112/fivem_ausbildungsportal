@@ -2,12 +2,16 @@
 
 namespace App\Services\Export;
 
-use App\DTO\Export\UserWithQualificationsDTO;
-
 class UserWithQualificationsService extends AbstractExportService
 {
+    /**
+     * @var array<string>
+     */
     public array $qualifications;
 
+    /**
+     * @param array<string> $qualifications
+     */
     public function __construct(array $qualifications)
     {
         $this->qualifications = $qualifications;
@@ -25,12 +29,6 @@ class UserWithQualificationsService extends AbstractExportService
         );
     }
 
-    /**
-     * Mappt die Felder des DTOs auf die Spalten der Excel-Datei
-     *
-     * @param  UserWithQualificationsDTO          $item
-     * @return array|array{id: int, name: string}
-     */
     protected function mapToRow($item): array
     {
         $row = [

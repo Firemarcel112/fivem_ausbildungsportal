@@ -54,12 +54,14 @@ return [
 
         'stack' => [
             'driver' => 'stack',
+            'tap' => [App\Logging\DynamicLogPath::class],
             'channels' => explode(',', env('LOG_STACK', 'single')),
             'ignore_exceptions' => false,
         ],
 
         'single' => [
             'driver' => 'single',
+            'tap' => [App\Logging\DynamicLogPath::class],
             'path' => storage_path('logs/' . date('Y-m-d') . '.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
@@ -67,6 +69,7 @@ return [
 
         'daily' => [
             'driver' => 'daily',
+            'tap' => [App\Logging\DynamicLogPath::class],
             'path' => storage_path('logs/' . date('Y-m-d') . '.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => env('LOG_DAILY_DAYS', 14),

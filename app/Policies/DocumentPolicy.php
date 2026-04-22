@@ -46,7 +46,7 @@ class DocumentPolicy
     /**
      * Determine whether the user can update any model.
      */
-    public function updateAny(User $user, Document $document): bool
+    public function updateAny(User $user): bool
     {
         return $user->can('documents.edit');
     }
@@ -62,7 +62,7 @@ class DocumentPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Document $document): bool
+    public function delete(User $user): bool
     {
         return $user->can('documents.delete');
     }

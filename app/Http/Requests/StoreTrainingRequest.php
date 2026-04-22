@@ -88,7 +88,10 @@ class StoreTrainingRequest extends FormRequest
         ];
     }
 
-    public function after(): array
+    /**
+     * @return (callable(Validator ):void)[]
+     */
+    public function after()
     {
         return [
             function (Validator $validator) {

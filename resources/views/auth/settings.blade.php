@@ -56,7 +56,7 @@
                             <x-forms.input :default="$user->last_name" name="last_name" required>{{ __('general.nachname') }}</x-forms.input>
                         </div>
                         <div class="col">
-                            <x-forms.select.genders />
+                            <x-forms.select.genders :selected="$user->gender->value" />
                         </div>
                     </div>
                     <div class="row">

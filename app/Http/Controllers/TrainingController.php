@@ -34,7 +34,7 @@ class TrainingController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): mixed
     {
         $this->authorize('viewAny', Training::class);
 
@@ -49,7 +49,7 @@ class TrainingController extends Controller
      *
      * @return \Illuminate\Contracts\View\View
      */
-    public function completed()
+    public function completed(): mixed
     {
         $trainings = Training::with([
             'participants.account',
@@ -98,7 +98,7 @@ class TrainingController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Training $training)
+    public function show(Training $training): mixed
     {
 
         $this->authorize('view', $training);
@@ -136,7 +136,7 @@ class TrainingController extends Controller
      * @param Training              $training
      * @param UpdateTrainingAction  $update_training_action
      */
-    public function update(UpdateTrainingRequest $request, Training $training, UpdateTrainingAction $update_training_action)
+    public function update(UpdateTrainingRequest $request, Training $training, UpdateTrainingAction $update_training_action): mixed
     {
         $this->authorize('update', $training);
 
@@ -181,7 +181,7 @@ class TrainingController extends Controller
         CompletedTrainingRequest $request,
         Training $training,
         UpdateTrainingAction $update_training_action
-    ) {
+    ): mixed {
 
         if ($request->input('cancelled') == 1) {
             $updated = $update_training_action->execute(
@@ -202,7 +202,7 @@ class TrainingController extends Controller
                     null,
                     [
                         'cancelled' => true,
-                        'cancelled_notice' => $request->input('cancelled_notice'),
+                        'cancelled_notice' => $request->string('cancelled_notice', '')->value(),
                     ],
                 ));
 
@@ -263,7 +263,9 @@ class TrainingController extends Controller
             ]);
         }
 
-        Alert::addAlert($saved->message, $saved->success ? 'success' : 'danger');
+        if (isset($saved)) {
+            Alert::addAlert($saved->message, $saved->success ? 'success' : 'danger');
+        }
 
         return redirect()->back();
     }
@@ -277,7 +279,7 @@ class TrainingController extends Controller
      */
     public function removeParticipant(Request $request, Participant $participant)
     {
-        if (!Auth::user()->isTrainer()) {
+        if (!Auth::user()?->isTrainer()) {
             Alert::addAlert(__('general.keine_berechtigung'), 'danger');
 
             return redirect()->back();
@@ -296,6 +298,8 @@ class TrainingController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @return mixed
      */
     public function destroy(Request $request, Training $training)
     {
@@ -318,6 +322,8 @@ class TrainingController extends Controller
 
             return redirect()->back();
         }
+
+        return redirect()->back();
     }
 
     /**
@@ -364,7 +370,7 @@ class TrainingController extends Controller
     {
         $model = Participant::firstOrNew([
             'training_id' => $training->getKey(),
-            'user_id' => Auth::user()->account->getKey(),
+            'user_id' => Auth::user()?->account?->getKey(),
         ]);
 
         if ($model->exists) {
@@ -375,7 +381,7 @@ class TrainingController extends Controller
         if ($model->save()) {
             Alert::addAlert(
                 __('general.anmeldung_lehrgang_erfolgreich', [
-                    'name' => Auth::user()->account->full_name,
+                    'name' => Auth::user()?->account?->full_name,
                     'training' => $training->name,
                 ]),
                 'success',
@@ -402,8 +408,8 @@ class TrainingController extends Controller
             return redirect()->back();
         }
 
-        $participant = Participant::isTrainingId($training->getId())
-            ->isAccountId(Auth::user()->account->getId())
+        $participant = Participant::isTrainingId($training->getKey())
+            ->isAccountId(Auth::user()?->account?->getKey()())
             ->first();
 
         if ($participant) {

@@ -18,9 +18,9 @@ class TrainingUpdated implements DiscordNotificationInterface
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @param Training                      $model
-     * @param array<int, string|int|Carbon> $original_values
-     * @param array<int, string|int>        $notification_fractions_ids
+     * @param Training                                  $model
+     * @param array<int|string, string|int|Carbon|null> $original_values
+     * @param array<int, string|int>                    $notification_fractions_ids
      */
     public function __construct(
         public Training $model,

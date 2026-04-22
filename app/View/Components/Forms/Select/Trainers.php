@@ -33,12 +33,15 @@ class Trainers extends Component
         return view('components.select.trainers');
     }
 
+    /**
+     * @return Collection<int, SimpleListItem>
+     */
     public function getTrainers(): Collection
     {
         return $this->trainers ??= User::getTrainers()
             ->map(fn(User $item) => new SimpleListItem(
                 $item->getKey(),
-                $item->account->full_name
+                $item->account?->full_name
             ));
     }
 }

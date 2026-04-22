@@ -11,7 +11,9 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        $has_permission = $user->can('usermanagement.index', [0, 'ignore-superadmin']);
+
+        return $has_permission;
     }
 
     /**

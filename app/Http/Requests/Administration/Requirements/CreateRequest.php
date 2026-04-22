@@ -11,7 +11,7 @@ class CreateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check() && auth()->user()->can('administration.qualifications.edit');
+        return auth()->user()?->can('administration.qualifications.edit') ?? false;
     }
 
     /**

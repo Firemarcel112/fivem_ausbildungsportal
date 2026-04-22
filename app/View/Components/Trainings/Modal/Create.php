@@ -12,9 +12,9 @@ use Illuminate\View\Component;
 class Create extends Component
 {
     /**
-     * @var Collection<int, SimpleListItem>
+     * @var null|Collection<int, SimpleListItem>
      */
-    public Collection $trainers;
+    public ?Collection $trainers = null;
 
     public string $default_meeting_point;
 
@@ -24,7 +24,7 @@ class Create extends Component
     public function __construct(
         ?string $default_meeting_point = null
     ) {
-        $this->default_meeting_point = $default_meeting_point ?? config('settings.default_meeting_point');
+        $this->default_meeting_point = $default_meeting_point ?? config('settings.default_meeting_point', '');
     }
 
     /**

@@ -173,7 +173,8 @@ class User extends Authenticatable implements Auditable
      */
     public function syncRoles(array $grant_role_ids = [], array $revoke_role_ids = [])
     {
-        if (Auth::user()->hasPermissionTo('usermanagement.edit.permissions')) {
+
+        if (Auth::user()->can('usermanagement.edit.permissions')) {
             foreach ($revoke_role_ids as $role_id) {
                 $has_role = $this->hasRole($role_id, null, false);
                 if ($has_role) {
@@ -215,12 +216,12 @@ class User extends Authenticatable implements Auditable
         $date_from = $date_from ?? date('Y-m-d');
         $date_to = $date_to ?? now()->addDays(7);
         $model = new TrainingBan;
-        $model->setUserId($this->getId());
-        $model->setIssuerId(Auth::user()->getId());
-        $model->setReason($reason);
-        $model->setDateFrom(Carbon::parse($date_from));
-        $model->setDateTo(Carbon::parse($date_to));
-        $model->setInternalNote($notice);
+        $model->user_id = $this->getKey();
+        $model->issuer_id = Auth::user()?->getKey();
+        $model->reason = $reason;
+        $model->date_from = Carbon::parse($date_from);
+        $model->date_to = Carbon::parse($date_to);
+        $model->internal_note = $notice;
 
         $trainings = Participant::with(['training' => function ($query) use ($date_from, $date_to) {
             $query->whereBetween('date', [$date_from, $date_to]);

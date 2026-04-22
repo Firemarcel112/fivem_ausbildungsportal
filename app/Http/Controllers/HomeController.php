@@ -14,7 +14,7 @@ class HomeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): mixed
     {
         $is_trainer = Gate::check('isTrainer', GeneralPolicy::class);
 
@@ -22,7 +22,7 @@ class HomeController extends Controller
             ->map(fn(Training $training): TrainingViewData => TrainingViewData::fromModel($training, config('settings.enroll_deadline')))
             ->groupBy('date')
             ->map(fn(Collection $items): TrainingGroupDTO => new TrainingGroupDTO(
-                $items->first()->day_of_week . ' ' . $items->first()->date_output,
+                $items->first()?->day_of_week . ' ' . $items->first()?->date_output,
                 $items,
             ));
 

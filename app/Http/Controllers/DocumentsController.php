@@ -80,7 +80,7 @@ class DocumentsController extends Controller
         $trainers = User::getTrainers()
             ->map(fn(User $item) => new SimpleListItem(
                 $item->getKey(),
-                $item->account->salutation . ' ' . $item->account->full_name,
+                $item->account?->salutation . ' ' . $item->account?->full_name,
             ));
 
         return view('documents.index', [
@@ -110,12 +110,12 @@ class DocumentsController extends Controller
             $account_id = $account->getKey();
             $participant_dto = ParticipantDTO::fromModel($account);
         } else {
-            $salutation = Gender::tryFrom($request->validated('gender'))->salutation();
+            $salutation = Gender::tryFrom($request->validated('gender'))?->salutation();
             $participant_dto = ParticipantDTO::fromRequest($request, $salutation);
         }
 
         $trainer = Account::findOrFail($request->validated('trainer'));
-        $training_date = $request->date('training_date')->format('d.m.Y');
+        $training_date = $request->date('training_date')?->format('d.m.Y');
         $qualification = Qualification::findOrFail($request->validated('qualification_id'));
 
         $trainer_dto = SimpleUserViewData::fromModel($trainer->user);
@@ -188,8 +188,9 @@ class DocumentsController extends Controller
     /**
      * Aktualisiert ein Dokument
      *
-     * @param  \Illuminate\Http\Request          $request
+     * @param  UpdateDocumentRequest             $request
      * @param  \App\Models\Document              $document
+     * @param  UpdateDocumentAction              $update_document_action
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(UpdateDocumentRequest $request, Document $document, UpdateDocumentAction $update_document_action)

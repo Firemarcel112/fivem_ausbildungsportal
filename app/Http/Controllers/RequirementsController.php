@@ -12,7 +12,7 @@ class RequirementsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): mixed
     {
 
         $requirements = Requirement::query()
@@ -23,12 +23,13 @@ class RequirementsController extends Controller
             ->joinOrderedQualifications()
             ->whereHas('qualification', function (Builder $query) {
                 /** @var Builder<\App\Models\Qualification> $query */
+                /** @phpstan-ignore-next-line */
                 return $query->isVisible();
             })
             ->get()
             ->groupBy('qualification.name')
             ->map(function (Collection $item) {
-                /** @var Collection<Requirement> $item */
+                /** @var Collection<int, Requirement> $item */
                 $items = $item->map(function (Requirement $item) {
                     return QualificationRequirementViewData::fromModel($item);
                 })

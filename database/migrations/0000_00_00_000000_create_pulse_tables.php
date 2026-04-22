@@ -20,6 +20,7 @@ return new class extends PulseMigration
             $table->unsignedInteger('timestamp');
             $table->string('type');
             $table->mediumText('key');
+            /** @phpstan-ignore-next-line */
             match ($this->driver()) {
                 'mariadb', 'mysql' => $table->char('key_hash', 16)->charset('binary')->virtualAs('unhex(md5(`key`))'),
                 'pgsql' => $table->uuid('key_hash')->storedAs('md5("key")::uuid'),
@@ -37,6 +38,7 @@ return new class extends PulseMigration
             $table->unsignedInteger('timestamp');
             $table->string('type');
             $table->mediumText('key');
+            /** @phpstan-ignore-next-line */
             match ($this->driver()) {
                 'mariadb', 'mysql' => $table->char('key_hash', 16)->charset('binary')->virtualAs('unhex(md5(`key`))'),
                 'pgsql' => $table->uuid('key_hash')->storedAs('md5("key")::uuid'),
@@ -56,6 +58,7 @@ return new class extends PulseMigration
             $table->unsignedMediumInteger('period');
             $table->string('type');
             $table->mediumText('key');
+            /** @phpstan-ignore-next-line */
             match ($this->driver()) {
                 'mariadb', 'mysql' => $table->char('key_hash', 16)->charset('binary')->virtualAs('unhex(md5(`key`))'),
                 'pgsql' => $table->uuid('key_hash')->storedAs('md5("key")::uuid'),

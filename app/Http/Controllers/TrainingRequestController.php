@@ -39,8 +39,8 @@ class TrainingRequestController extends Controller
     /**
      * Ausbildungswunsch Anfragen
      *
-     * @param  \Illuminate\Http\Request                $request
-     * @param  TrainingRequestAction                   $training_request_action
+     * @param  StoreTrainingRequestRequest             $request
+     * @param  StoreTrainingRequestAction              $store_training_request_action
      * @return mixed|\Illuminate\Http\RedirectResponse
      */
     public function store(StoreTrainingRequestRequest $request, StoreTrainingRequestAction $store_training_request_action)

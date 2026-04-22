@@ -6,7 +6,7 @@ use Closure;
 
 class IgnoreInvalidHttpMethodOverride
 {
-    public function handle($request, Closure $next)
+    public function handle(mixed $request, Closure $next): mixed
     {
         $override = $request->input('_method')
             ?? $request->header('X-HTTP-Method-Override');

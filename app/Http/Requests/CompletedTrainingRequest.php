@@ -14,7 +14,7 @@ class CompletedTrainingRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::user()?->isTrainer();
+        return Auth::user()?->isTrainer() ?? false;
     }
 
     /**

@@ -22,6 +22,9 @@ class ModifyTrainingParticipantData implements ShouldQueue
     {
         $participants = $this->prepareForUpdate($event->getGroupedParticipants());
 
+        /**
+         * @var \App\Models\Qualification $qualification
+         */
         $qualification = $event->model->qualification;
 
         foreach ($participants as $participant) {
@@ -36,7 +39,11 @@ class ModifyTrainingParticipantData implements ShouldQueue
         }
     }
 
-    protected function prepareForUpdate(array $grouped_participants)
+    /**
+     * @param  array<mixed>        $grouped_participants
+     * @return array<array<mixed>>
+     */
+    protected function prepareForUpdate(array $grouped_participants): array
     {
         $return_data = [];
         foreach ($grouped_participants as $key => $grouped_data) {

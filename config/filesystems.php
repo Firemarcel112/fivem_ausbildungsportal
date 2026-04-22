@@ -54,6 +54,16 @@ return [
             'visibility' => 'private',
             'throw' => false,
             'report' => false,
+            'permissions' => [
+                'file' => [
+                    'public' => 0660,
+                    'private' => 0600,
+                ],
+                'dir' => [
+                    'public' => 0770,
+                    'private' => 0700,
+                ],
+            ],
         ],
 
         's3' => [

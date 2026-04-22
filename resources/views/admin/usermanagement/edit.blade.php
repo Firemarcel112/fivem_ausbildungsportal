@@ -42,7 +42,7 @@
                                 </x-forms.input>
                             </div>
                             <div class="col-4">
-                                <x-forms.select.genders />
+                                <x-forms.select.genders :selected="$user->account->gender->value" />
                             </div>
                         </div>
                         <div class="row">

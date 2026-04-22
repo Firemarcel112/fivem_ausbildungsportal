@@ -11,13 +11,7 @@ use Illuminate\Support\Facades\DB;
 class StoreDocumentAction
 {
     /**
-     * @param array{
-     * title: string,
-     * url: string,
-     * description: string|null,
-     * link_id: string|null,
-     * link_type: string|null
-     * } $data
+     * @param  array<string, mixed> $data
      * @return ActionResult
      */
     public function execute(array $data): ActionResult

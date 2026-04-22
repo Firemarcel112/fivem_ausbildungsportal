@@ -23,11 +23,11 @@ use Illuminate\Support\Carbon;
  * @property int $user_id
  * @property string $first_name
  * @property string $last_name
+ * @property Gender $gender Bestimmt die Anrede auf dem Zertifikat M = Herr / W = Frau / D = Ohne Anrede
  * @property Carbon $date_of_birth
+ * @property string|null $birth_location Bestimmt den Geburtsort auf dem Zertifikat
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property Gender $gender Bestimmt die Anrede auf dem Zertifikat M = Herr / W = Frau / D = Ohne Anrede
- * @property string|null $birth_location Bestimmt den Geburtsort auf dem Zertifikat
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \OwenIt\Auditing\Models\Audit> $audits
  * @property-read int|null $audits_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Document> $certificates
@@ -133,11 +133,17 @@ class Account extends BaseModel
     # RELATIONS
     # ########################
 
+    /**
+     * @return BelongsTo<\App\Models\User, \App\Models\User\Account>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
+    /**
+     * @return HasMany<\App\Models\Trainings\Participant, \App\Models\User\Account>
+     */
     public function trainings(): HasMany
     {
         return $this->hasMany(
@@ -147,6 +153,9 @@ class Account extends BaseModel
         );
     }
 
+    /**
+     * @return BelongsToMany<Fraction, \App\Models\User\Account, \Illuminate\Database\Eloquent\Relations\Pivot>
+     */
     public function fractions(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -157,6 +166,9 @@ class Account extends BaseModel
         )->withPivot('created_at', 'default');
     }
 
+    /**
+     * @return BelongsToMany<Qualification, \App\Models\User\Account, \Illuminate\Database\Eloquent\Relations\Pivot>
+     */
     public function qualifications(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -167,6 +179,9 @@ class Account extends BaseModel
         )->withPivot('created_at', 'training_id');
     }
 
+    /**
+     * @return HasMany<User\Qualification, \App\Models\User\Account>
+     */
     public function directQualifications(): HasMany
     {
         return $this->hasMany(
@@ -176,6 +191,9 @@ class Account extends BaseModel
         );
     }
 
+    /**
+     * @return BelongsToMany<Document, \App\Models\User\Account, \Illuminate\Database\Eloquent\Relations\Pivot>
+     */
     public function certificates(): BelongsToMany
     {
         return $this->belongsToMany(

@@ -11,6 +11,8 @@ parameters:
 
     resultCachePath: %currentWorkingDirectory%/storage/app/resultCache.php
 
+    checkUninitializedProperties: true
+
     strictRules:
         disallowedLooseComparison: false
         booleansInConditions: false
@@ -23,7 +25,7 @@ parameters:
         disallowedShortTernary: false
         overwriteVariablesWithLoop: true
         closureUsesThis: false
-        matchingInheritedMethodNames: false
+        matchingInheritedMethodNames: true
         numericOperandsInArithmeticOperators: false
         strictFunctionCalls: false
         dynamicCallOnStaticMethod: false

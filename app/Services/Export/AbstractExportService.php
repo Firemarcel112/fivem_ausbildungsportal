@@ -17,9 +17,9 @@ abstract class AbstractExportService implements ExportInterface
     /**
      * Exportiert die Daten in Excel
      *
-     * @param  iterable $data
-     * @param  string   $filename
-     * @param  string   $file_type
+     * @param  iterable<mixed> $data
+     * @param  string          $filename
+     * @param  string          $file_type
      * @return void
      */
     public function export(iterable $data, string $filename, string $file_type = 'xlsx'): void
@@ -53,7 +53,14 @@ abstract class AbstractExportService implements ExportInterface
         return SimpleExcelWriter::streamDownload("{$filename}.{$file_type}");
     }
 
+    /**
+     * @return array<string>
+     */
     abstract protected function setHeaders(): array;
 
+    /**
+     * @param  mixed                $item
+     * @return array<string, mixed>
+     */
     abstract protected function mapToRow($item): array;
 }

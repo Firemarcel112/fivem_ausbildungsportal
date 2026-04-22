@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Events\QualificationAction;
 use App\Events\TrainingCompleted;
 use App\Interfaces\DiscordNotificationInterface;
 use App\Listeners\Discord\SendDiscordEmbed;
 use App\Listeners\GenerateCertificate;
 use App\Listeners\ModifyTrainingParticipantData;
+use App\Listeners\Qualification\ClearCache;
 use App\Models\Setting;
 use App\Models\User;
 use App\Services\AlertService;
@@ -14,6 +16,7 @@ use App\Services\Export\UserWithQualificationsService;
 use App\Traits\ClockworkTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -32,6 +35,11 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(
             events: TrainingCompleted::class,
             listener: ModifyTrainingParticipantData::class
+        );
+
+        Event::listen(
+            events: QualificationAction::class,
+            listener: ClearCache::class,
         );
 
         Event::listen(
@@ -104,6 +112,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function loadSettings()
     {
+        if (DB::table('settings')->exists()) {
+            return;
+        }
+
         $this->beginClockwork('Load Settings');
         $settings = Setting::all();
         foreach ($settings as $setting) {

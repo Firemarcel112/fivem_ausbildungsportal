@@ -70,7 +70,7 @@ class AddDefaultSettings extends Seeder
             ]);
 
             if (!$model->exists) {
-                $model->value = $value;
+                $model->value = $value ?? '';
                 $model->description = $description;
             }
             $model->save();

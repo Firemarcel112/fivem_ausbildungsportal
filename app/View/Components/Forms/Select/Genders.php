@@ -17,9 +17,8 @@ class Genders extends Component
      */
     public function __construct(
         public string $name = 'gender',
-    ) {
-        //
-    }
+        public mixed $selected = null,
+    ) {}
 
     /**
      * Get the view / contents that represent the component.
@@ -35,12 +34,5 @@ class Genders extends Component
     public function getGenders(): Collection
     {
         return $this->genders ??= Gender::forSelect();
-    }
-
-    public function isSelected(mixed $option_value): bool
-    {
-        $current_value = old($this->name, request()->get($this->name) ?? '');
-
-        return $current_value == $option_value;
     }
 }

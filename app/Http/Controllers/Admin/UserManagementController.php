@@ -45,7 +45,7 @@ class UserManagementController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('view', User::class);
+        $this->authorize('viewAny', User::class);
 
         if ($request->isMethod('POST')) {
             $request->flash();
@@ -308,6 +308,7 @@ class UserManagementController extends Controller
                 return redirect()->back();
             }
         }
+
         return redirect()->back();
     }
 

@@ -13,6 +13,6 @@
 <x-forms.select :$required :label="$label" :name="$name">
     <option disabled selected value="">-- {{ __('general.bitte_waehlen') }} --</option>
     @foreach ($getGenders ?? [] as $gender)
-        <option @selected($isSelected($gender->id)) value="{{ $gender->id }}">{{ $gender->label }}</option>
+        <option @selected($gender->id == ($selected ?? '')) value="{{ $gender->id }}">{{ $gender->label }}</option>
     @endforeach
 </x-forms.select>

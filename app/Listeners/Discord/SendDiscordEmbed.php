@@ -11,7 +11,7 @@ class SendDiscordEmbed implements ShouldQueue
 {
     use DiscordTrait;
 
-    public function handle(DiscordNotificationInterface $event)
+    public function handle(DiscordNotificationInterface $event): void
     {
 
         $embed = $event->getEmbed();

@@ -23,16 +23,19 @@ class QualificationsController extends Controller
     {
         $this->checkPermission('user.qualifications.assign');
 
+        /**
+         * @var Qualification $qualification
+         */
         $qualification = Qualification::findOrFail($request->qualification_id);
 
         $user_qualification = UserQualification::firstOrNew([
             'qualification_id' => $qualification->getKey(),
-            'user_id' => $user->getId(),
+            'user_id' => $user->getKey(),
         ]);
         $user_qualification->created_at = $request->date;
         $user_qualification->save();
 
-        return redirect()->to(route('usermanagement.index') . '?search=' . $user->getFullName());
+        return redirect()->to(route('usermanagement.index') . '?search=' . $user->full_name);
     }
 
     /**
@@ -51,11 +54,11 @@ class QualificationsController extends Controller
         /** @var Qualification $qualification */
         foreach ($qualifications as $qualification) {
             try {
-                $document = $user->account->certificates->where('title', 'LIKE', 'Zertifikat: ' . $qualification->name)->first();
-                $document_id = $document->getKey();
+                $document = $user->account?->certificates->where('title', 'LIKE', 'Zertifikat: ' . $qualification->name)->first();
+                $document_id = $document?->getKey();
                 DocumentLink::firstWhere('document_id', $document_id)?->delete();
 
-                $user_qualification = $user->account->directQualifications->where('qualification_id', $qualification->getKey())
+                $user_qualification = $user->account?->directQualifications->where('qualification_id', $qualification->getKey())
                     ->first();
                 $user_qualification?->delete();
             } catch (Exception $e) {
@@ -67,6 +70,6 @@ class QualificationsController extends Controller
 
         Alert::addAlert('Qualifikation entfernt', 'success');
 
-        return redirect()->to(route('usermanagement.index') . '?search=' . $user->getFullName());
+        return redirect()->to(route('usermanagement.index') . '?search=' . $user->full_name);
     }
 }

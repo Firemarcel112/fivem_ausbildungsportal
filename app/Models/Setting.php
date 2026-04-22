@@ -36,6 +36,8 @@ class Setting extends BaseModel
 
     protected $primaryKey = 'setting_id';
 
+    protected $guarded = ['setting_id'];
+
     # ########################
     # CUSTOM FUNCTIONS
     # ########################

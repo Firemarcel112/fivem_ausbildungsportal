@@ -16,21 +16,29 @@ class GenerateCertificate implements ShouldQueue
      */
     public function handle(TrainingCompleted $event): void
     {
-        if (!$event->model->qualification->generate_certificate) {
+        if (!$event->model->qualification?->generate_certificate) {
             return;
         }
 
         $participants = $this->filterForCertificate($event->getGroupedParticipants());
 
-        $trainer = $event->model->trainer;
+        $model_trainer = $event->model->trainer;
 
-        $trainer = SimpleUserViewData::fromModel($trainer);
+        /**
+         * @var \App\Models\Qualification $qualification
+         */
+        $qualification = $event->model->qualification;
+
+        /**
+         * @var SimpleUserViewData $trainer
+         */
+        $trainer = SimpleUserViewData::fromModel($model_trainer);
 
         foreach ($participants as $participant) {
             CreateCertificate::dispatch(
                 $participant,
                 $trainer,
-                $event->model->qualification,
+                $qualification,
                 $event->model->date->format('d.m.Y'),
                 $participant->account_id,
             );
@@ -38,12 +46,12 @@ class GenerateCertificate implements ShouldQueue
     }
 
     /**
-     * @param  array                                        $grouped_participants
+     * @param  array<mixed>                                 $grouped_participants
      * @return Collection<int, TrainingParticipantViewData>
      */
     protected function filterForCertificate(array $grouped_participants): Collection
     {
-        /** @var Collection $grouped_participants_passed */
+        /** @var Collection<int, mixed> $grouped_participants_passed */
         $grouped_participants_passed = $grouped_participants['passed'];
 
         if ($grouped_participants_passed->isEmpty()) {

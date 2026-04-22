@@ -10,6 +10,8 @@ class Icon extends Component
 {
     /**
      * Create a new component instance.
+     *
+     * @param array<string> $classes
      */
     public function __construct(
         public string $name,
@@ -33,7 +35,7 @@ class Icon extends Component
         ]);
     }
 
-    public function getHoverTextAttributes()
+    public function getHoverTextAttributes(): string
     {
         $attributes = [];
 
