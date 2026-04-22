@@ -89,7 +89,7 @@ class TrainingViewData
     {
         $participants = collect($this->participants);
 
-        return $participants->contains('id', $user_id);
+        return $participants->contains('user_id', $user_id);
     }
 
     /**

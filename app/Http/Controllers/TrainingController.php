@@ -409,7 +409,7 @@ class TrainingController extends Controller
         }
 
         $participant = Participant::isTrainingId($training->getKey())
-            ->isAccountId(Auth::user()?->account?->getKey()())
+            ->isAccountId(Auth::user()?->account?->getKey())
             ->first();
 
         if ($participant) {

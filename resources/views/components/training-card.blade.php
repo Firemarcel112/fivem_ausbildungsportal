@@ -114,7 +114,7 @@
                     <button class="me-2 btn btn-primary" type="submit">{{ __('general.anmelden') }}
                     </button>
                 </form>
-            @elseif($training->isRegistered())
+            @elseif($training->isRegistered($user_id))
                 <form action="{{ route('training.sign_out', $training->id) }}" method="POST">
                     @csrf
                     <button class="me-2 btn btn-danger" type="submit">{{ __('general.abmelden') }}
