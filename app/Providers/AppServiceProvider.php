@@ -112,7 +112,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function loadSettings()
     {
-        if (!DB::table('settings')->exists()) {
+        try {
+            DB::table('settings')->exists();
+        } catch (\Illuminate\Database\QueryException) {
             return;
         }
 

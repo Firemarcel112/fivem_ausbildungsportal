@@ -33,11 +33,12 @@ class LoginController extends Controller
     public function login(LoginRequest $request, AuthenticationService $auth_service)
     {
 
-        if (!$auth_service->attemptLogin($request->input('username'), $request->input('password'), $request->has('remember'))) {
-            Alert::addAlert(__('general.benutzername_oder_passwort_falsch'), 'error');
+        if ($auth_service->attemptLogin($request->input('username'), $request->input('password'), $request->has('remember'))) {
+            return redirect()->intended($auth_service->getRedirectRouteForUser(Auth::user()));
         }
+        Alert::addAlert(__('general.benutzername_oder_passwort_falsch'), 'error');
 
-        return redirect()->intended($auth_service->getRedirectRouteForUser(Auth::user()));
+        return redirect()->back();
     }
 
     /**

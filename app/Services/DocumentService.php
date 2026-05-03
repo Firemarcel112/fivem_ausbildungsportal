@@ -84,7 +84,11 @@ class DocumentService
 
     public function signPdf(string $pdf_path): void
     {
-        $pdf_service = new PdfService;
-        $pdf_service->sign($pdf_path);
+        try {
+            $pdf_service = new PdfService;
+            $pdf_service->sign($pdf_path);
+        } catch (Exception $e) {
+            logger()->error('PDF kann nicht signiert werden', [$e]);
+        }
     }
 }

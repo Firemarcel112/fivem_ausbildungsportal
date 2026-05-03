@@ -15,13 +15,23 @@ class AddUser extends Seeder
      */
     public function run(): void
     {
-        $fractions = Fraction::get();
+        $fractions = Fraction::query()
+            ->get();
 
         $count = 10;
 
-        for ($count; $count > 0; $count--) {
+        $user_count = User::query()
+            ->count('*');
+
+        for ($i = 0; $i < $count; $i++) {
+
+            $login_name = fake()->userName();
+            if ($user_count == 0 && $i == 0) {
+                $login_name = 'administrator';
+            }
+
             $model = User::create([
-                'name' => fake()->userName(),
+                'name' => $login_name,
                 'password' => 'password',
             ]);
 
@@ -32,25 +42,11 @@ class AddUser extends Seeder
                 'date_of_birth' => fake()->date(),
             ]);
 
-            $fraction_model = UserFraction::create([
+            UserFraction::create([
                 'user_id' => $account_model->getKey(),
                 'fraction_id' => $fractions->random()->getKey(),
                 'default' => true,
             ]);
-
-            $additional_fraction = fake()->boolean(50);
-
-            if ($additional_fraction) {
-                $fraction_id = $fractions->random()->getKey();
-                while ($fraction_id == $fraction_model->fraction_id) {
-                    $fraction_id = $fractions->random()->getKey();
-                }
-                UserFraction::create([
-                    'user_id' => $account_model->getKey(),
-                    'fraction_id' => $fraction_id,
-                    'default' => false,
-                ]);
-            }
         }
     }
 }

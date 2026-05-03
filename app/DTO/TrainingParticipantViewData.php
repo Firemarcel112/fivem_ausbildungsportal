@@ -59,7 +59,7 @@ readonly class TrainingParticipantViewData
                 $item,
             ));
 
-        $can_view_profile = Auth::user()->can('view', $participant->account->user);
+        $can_view_profile = Auth::user()?->can('view', $participant->account->user) ?? false;
 
         return new self(
             $participant->getKey(),
